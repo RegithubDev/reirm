@@ -22,11 +22,34 @@ div.main-menu-content {
           <ul class="nav navbar-nav" id="main-menu-navigation" data-menu="menu-navigation" >
           
        <%--  <c:if test="${sessionScope.BASE_ROLE ne 'User' }"> --%>
-           <li class="dropdown nav-item "  data-menu id="home"  url ="/home">
+           
+           <c:if test="${sessionScope.BASE_ROLE ne 'Admin' && sessionScope.BASE_ROLE ne 'Management'}">
+					<li class="dropdown nav-item "  data-menu id="home"  url ="/home">
 					    <a class="dropdown-item d-flex align-items-center" href="<%=request.getContextPath() %>/home" data-bs-toggle=""
 					    data-i18n="Analytics"> <i data-feather="home"></i>
 					      <span data-i18n="Dashboards">Dashboard</span></a>
-			</li>
+					</li>
+			</c:if>
+				<c:if test="${sessionScope.BASE_ROLE eq 'Admin'|| sessionScope.BASE_ROLE eq 'Management' }">
+			<li class="dropdown nav-item " data-menu="dropdown" id="home"><a class="dropdown-toggle nav-link d-flex align-items-center" href="#" data-bs-toggle="dropdown"><i data-feather="package"></i><span data-i18n="Masters">Dashboard</span></a>
+              <ul class="dropdown-menu" data-bs-popper="none">
+					
+			
+			
+			<li class="" data-menu  id="homeChild0" url = "/home" onClick="exFunction('homeChild0')">
+					    <a class="dropdown-item d-flex align-items-center" href="<%=request.getContextPath() %>/home" data-bs-toggle=""
+					     data-i18n="home"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle"><circle cx="12" cy="12" r="10"></circle></svg>
+					      <span data-i18n="home">Power BI Dashboard</span></a> 
+					</li>
+			<li class="" data-menu  id="homeChild1" url = "/dash-sd" onClick="exFunction('homeChild1')">
+					    <a class="dropdown-item d-flex align-items-center" href="<%=request.getContextPath() %>/dash-sd" data-bs-toggle=""
+					     data-i18n="home"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle"><circle cx="12" cy="12" r="10"></circle></svg>
+					      <span data-i18n="home">Secondary Dashboard</span></a> 
+					</li>
+				
+            </ul>
+           </li>
+           </c:if>
           <%--  </c:if>  --%>
           
 	
@@ -94,6 +117,12 @@ div.main-menu-content {
 		           			$('#irm').addClass('active');
 		           		}else if(url.indexOf('/home') != -1){
 		           			$('#home').addClass('active');
+		           			$('#homeChild0 li.active').removeClass('active');
+		           		    $('#homeChild0').addClass('active');
+		           		}else if(url.indexOf('/dash-sd') != -1){
+		           			$('#home').addClass('active');
+		           			$('#homeChild1 li.active').removeClass('active');
+		           		    $('#homeChild1').addClass('active');
 		           		}else if(url.indexOf('/help') != -1){
 		           			$('#help').addClass('active');
 		           		}else if(option.indexOf('masters') != -1 || option == 'irm'){
@@ -115,7 +144,13 @@ div.main-menu-content {
    		           			$('#irm').addClass('active');
    		           		}else if(url.indexOf('/home') != -1){
    		           			$('#home').addClass('active');
-   		           		}else if(url.indexOf('/help') != -1){
+	   		           		$('#homeChild0 li.active').removeClass('active');
+	   		           		$('#homeChild0').addClass('active');
+   		           		}else if(url.indexOf('/dash-sd') != -1){
+		           			$('#home').addClass('active');
+		           			$('#homeChild1 li.active').removeClass('active');
+		           		    $('#homeChild1').addClass('active');
+		           		}else if(url.indexOf('/help') != -1){
    		           			$('#help').addClass('active');
    		           		}else if(option.indexOf('masters') != -1){
    		           			$('#masters').addClass('active');

@@ -4,14 +4,16 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class IRM {
 	
-	private String id,	level_code,project,document_code,maxRole,i_no_reviewer,maxRole2,mainStatus	,sb_notes,incident_type,email_id,role_code,all_irm,active_irm,inActive_irm,project_name,department_name,location_name,	email,description	,department_code,incident_name,user_id,	project_code	,location,	ptw_code	,
+	private String id,plant_name,CustomerCode,ActualVisitMonth,MSG,pull_datetime,plant,CustomerSAPCode,	level_code,project,document_code,maxRole,i_no_reviewer,maxRole2,mainStatus	,sb_notes,incident_type,email_id,role_code,all_irm,active_irm,inActive_irm,project_name,department_name,location_name,	email,description	,department_code,incident_name,user_id,	project_code	,location,	ptw_code	,
 	risk_type,	photo	,status,created_date,action,sub_code,sub_name,	created_by	,modified_by,	mdified_date,attachment,
 	approver_type,	approver_code	,otp,otp_code,	assigned_on,employee_code,	action_taken,incident_code,	corrective_action,location_code,from_date,to_date,	preventive_action,user_name,
 	approver_name,	remarks,approver_type_before,employee_code_before,not_assigned, statusChanged,next_level_user,approver_type_name,from_and_to,sbu_code,sbu_name,role,user,
 	admin_incidents , i_pending ,i_completed,sb_rei_notes,person_location,reinitiate_date,sb_date,ca_before,pa_before,remarks_before,doc_before,type_prevs,approver_prvs,
-		AC,NM,UA,UC,ACT,NMT,UAT,UCT,created_datetime,expired_datetime,	person_responsible,message,module_type	,doc,capa_id,rca_id,noCounts,tentative_date,investigation_team,base_role,base_department,daysNotLogined,incidents_count	,counts,ca,pa,level_status,	attachments,incident_types,	incident_seviourity,incident_category,	ua_type,	uc_type,	management_type	;
+		AC,NM,UA,UC,ACT,NMT,UAT,UCT,created_datetime,expired_datetime,TotalVisits,ActiveVistis,incativeVistis,customerId,Plantname,CustomerID,ActualMonthAndYear,	person_responsible,message,module_type	,doc,capa_id,rca_id,noCounts,tentative_date,investigation_team,base_role,base_department,daysNotLogined,incidents_count	,counts,ca,pa,level_status,	attachments,incident_types,	incident_seviourity,incident_category,	ua_type,	uc_type,	management_type	;
 
 	List<IRM> irmFilesList;
 	List<IRM> irmIncidentsList;
@@ -20,6 +22,120 @@ public class IRM {
 
 	private MultipartFile[] mediaList;
 	
+	
+	public String getPlant() {
+		return plant;
+	}
+
+	public void setPlant(String plant) {
+		this.plant = plant;
+	}
+
+	public String getCustomerSAPCode() {
+		return CustomerSAPCode;
+	}
+
+	public void setCustomerSAPCode(String customerSAPCode) {
+		CustomerSAPCode = customerSAPCode;
+	}
+
+	public String getPlant_name() {
+		return plant_name;
+	}
+
+	public void setPlant_name(String plant_name) {
+		this.plant_name = plant_name;
+	}
+
+	public String getCustomerCode() {
+		return CustomerCode;
+	}
+
+	public void setCustomerCode(String customerCode) {
+		CustomerCode = customerCode;
+	}
+
+	public String getActualVisitMonth() {
+		return ActualVisitMonth;
+	}
+
+	public void setActualVisitMonth(String actualVisitMonth) {
+		ActualVisitMonth = actualVisitMonth;
+	}
+
+	public String getMSG() {
+		return MSG;
+	}
+
+	public void setMSG(String mSG) {
+		MSG = mSG;
+	}
+
+	public String getPull_datetime() {
+		return pull_datetime;
+	}
+
+	public void setPull_datetime(String pull_datetime) {
+		this.pull_datetime = pull_datetime;
+	}
+
+	@JsonProperty("Plantname")
+	public String getPlantname() {
+		return Plantname;
+	}
+
+	public void setPlantname(String plantname) {
+		Plantname = plantname;
+	}
+	@JsonProperty("CustomerID")
+	public String getCustomerID() {
+		return CustomerID;
+	}
+
+	public void setCustomerID(String customerID) {
+		CustomerID = customerID;
+	}
+	@JsonProperty("ActualMonthAndYear")
+	public String getActualMonthAndYear() {
+		return ActualMonthAndYear;
+	}
+
+	public void setActualMonthAndYear(String actualMonthAndYear) {
+		ActualMonthAndYear = actualMonthAndYear;
+	}
+	
+	public String getTotalVisits() {
+		return TotalVisits;
+	}
+
+	public void setTotalVisits(String totalVisits) {
+		TotalVisits = totalVisits;
+	}
+
+	public String getActiveVistis() {
+		return ActiveVistis;
+	}
+
+	public void setActiveVistis(String activeVistis) {
+		ActiveVistis = activeVistis;
+	}
+
+	public String getIncativeVistis() {
+		return incativeVistis;
+	}
+
+	public void setIncativeVistis(String incativeVistis) {
+		this.incativeVistis = incativeVistis;
+	}
+
+	public String getCustomerId() {
+		return customerId;
+	}
+
+	public void setCustomerId(String customerId) {
+		this.customerId = customerId;
+	}
+
 	public String getCreated_datetime() {
 		return created_datetime;
 	}

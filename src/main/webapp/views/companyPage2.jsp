@@ -406,7 +406,7 @@ body {
              <span id="company_name_editError" class="error-msg" ></span>
           </div>
           <div class="col-12 col-md-6">
-            <label class="form-label" for="modalEditUserLastName">Company Code</label><span class="required"> *</span>
+            <label class="form-label" for="modalEditUserLastName">Company Code</label><span class="required"> *</span> 
             <input
               type="text"
               id="company_code_edit"

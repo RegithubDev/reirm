@@ -119,6 +119,66 @@ public class HomeController {
 		return model;
 	}
 	
+	@RequestMapping(value = "/dash-sd", method = {RequestMethod.POST, RequestMethod.GET})
+	public ModelAndView userSD(@ModelAttribute User user,IRM obj, HttpSession session) {
+		ModelAndView model = null;
+		String userId = null;
+		String userName = null;
+		String role = null;
+		List<IRM> companiesList = null;
+		try {   
+			userId = (String) session.getAttribute("USER_ID");
+			userName = (String) session.getAttribute("USER_NAME");
+			role = (String) session.getAttribute("BASE_ROLE");
+			String email = (String) session.getAttribute("USER_EMAIL");
+			obj.setRole(role);
+			obj.setUser(userId);
+			User uBoj = new User();
+			uBoj.setEmail_id(email);
+			User userDetails = service.validateUser(uBoj);
+			companiesList = service2.getIRMList(obj);
+			user.setUser_id(userId);
+			user.setRole(role);
+			List<User> rewardsList = service.getRewardsHistory(user);
+			if(role.equals("Admin") || role.equals("Management")) {
+				 model = new ModelAndView(PageConstants.dashboardAdmin2);
+				 model.addObject("rewardsList", rewardsList);
+				 model.addObject("reward_points", userDetails.getReward_points());
+				 if(!StringUtils.isEmpty(companiesList) && companiesList.size() > 0) {
+					 model.addObject("all_irm", companiesList.get(0).getAll_irm());
+					 model.addObject("active_irm", companiesList.get(0).getActive_irm());
+					 model.addObject("inActive_irm", companiesList.get(0).getInActive_irm());
+					 model.addObject("not_assigned", companiesList.get(0).getNot_assigned());
+				 }
+			}else if(role.equals("User")) {
+				 model = new ModelAndView(PageConstants.dashboard);
+				 model.addObject("rewardsList", rewardsList);
+				 model.addObject("reward_points", userDetails.getReward_points());
+				 if(!StringUtils.isEmpty(companiesList) && companiesList.size() > 0) {
+					 model.addObject("all_irm", companiesList.get(0).getAll_irm());
+					 model.addObject("active_irm", companiesList.get(0).getActive_irm());
+					 model.addObject("inActive_irm", companiesList.get(0).getInActive_irm());
+					 model.addObject("not_assigned", companiesList.get(0).getNot_assigned());
+				 }
+			}else {
+				model = new ModelAndView(PageConstants.dashboard);
+				model.addObject("rewardsList", rewardsList);
+				 model.addObject("reward_points", userDetails.getReward_points());
+				 if(!StringUtils.isEmpty(companiesList) && companiesList.size() > 0) {
+					 model.addObject("all_irm", companiesList.get(0).getAll_irm());
+					 model.addObject("active_irm", companiesList.get(0).getActive_irm());
+					 model.addObject("inActive_irm", companiesList.get(0).getInActive_irm());
+					 model.addObject("not_assigned", companiesList.get(0).getNot_assigned());
+				 }
+			}
+			//List <User> deptList = service.getDeptList(user);
+			//model.addObject("deptList", deptList);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return model;
+	}
+	
 	@RequestMapping(value = "/ajax/get-users", method = { RequestMethod.POST, RequestMethod.GET })
 	public void getUsersList(@ModelAttribute User obj, HttpServletRequest request,
 			HttpServletResponse response, HttpSession session) throws IOException {

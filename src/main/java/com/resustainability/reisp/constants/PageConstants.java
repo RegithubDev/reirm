@@ -9,7 +9,8 @@ public class PageConstants {
 	public static final String passwordReset = "passwordReset";	
 	public static final String home = "home";	
 	public static final String dashboard = "dashboard";	
-	public static final String dashboardAdmin = "dashboardAdmin";	
+	public static final String dashboardAdmin = "dashboardAdmin";
+	public static final String dashboardAdmin2 = "dashboardAdmin2";
 	
 	/// Mobile Forms  
 	public static final String Applogin = "mobilepages/newLoginPage";  

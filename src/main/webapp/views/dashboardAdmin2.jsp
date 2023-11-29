@@ -125,7 +125,7 @@ License: You must have a valid license purchased only from themeforest(the above
       <div class="content-overlay"></div>
       <div class="header-navbar-shadow"></div>
       <div class="content-wrapper container-xxl p-0">
-      <!--   <div class="content-header row">
+        <div class="content-header row">
         <div class="content-header-left col-md-9 col-12 mb-2">
             <div class="row breadcrumbs-top">
               <div class="col-12">
@@ -135,13 +135,10 @@ License: You must have a valid license purchased only from themeforest(the above
               </div>
             </div>
           </div>
-        </div> -->
+        </div>
         <div class="content-body"><!-- Dashboard Ecommerce Starts -->
-<section id="dashboard-ecommerce"> 
-<iframe title="PROTECT SAFETY FIRST DASHBOARD" width="100%" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiYjkzMzM5NzUtZjIzYy00Zjk1LTkyNWItNGMxYmQwNmRiYWU3IiwidCI6ImM5MzA2NWY5LTg1ODctNGJmYy05YjQzLWMyYWZhMGRjNTY1MCJ9" frameborder="0" allowFullScreen="true" style="
-    height: 100vh;
-"></iframe>
- <%--  <div class="row match-height">
+<section id="dashboard-ecommerce">
+  <div class="row match-height">
     <!-- Medal Card -->
     <div class="col-xl-4 col-md-6 col-12">
     <div class="card">
@@ -161,13 +158,13 @@ License: You must have a valid license purchased only from themeforest(the above
       </div>
     </div>
     
-      <div class="card card-congratulation-medal">
+    <%--   <div class="card card-congratulation-medal">
         <div class="card-body">
           <h5>Welcome ${sessionScope.USER_NAME }</h5>
           <p class="card-text font-small-3">You have <b>${reward_points } Rewards!</b> </p>
           <button type="button" class="btn btn-primary" onclick="historyRE();">View Rewards History</button>
  		</div>
-      </div>
+      </div> --%>
     </div>
     <!--/ Medal Card -->
 
@@ -997,7 +994,7 @@ License: You must have a valid license purchased only from themeforest(the above
       </div>
     </div> -->
     <!--/ Transaction Card -->
-  </div> --%>
+  </div>
 </section>
 <!-- Dashboard Ecommerce ends -->
 
@@ -1157,14 +1154,14 @@ License: You must have a valid license purchased only from themeforest(the above
 
     </div>
     --> <!-- End: Customizer-->
-<!-- <div class="modal-size-xl d-inline-block">
-              Button trigger modal
+<div class="modal-size-xl d-inline-block">
+              <!-- Button trigger modal -->
               <button type="button" class="btn btn-outline-primary waves-effect" data-bs-toggle="modal" data-bs-target="#xlarge" id="clickModal" style="
     display: none;
 ">
                 
               </button>
-              Modal
+              <!-- Modal -->
               <div class="modal fade text-start show" id="xlarge" tabindex="-1" aria-labelledby="myModalLabel16" style="display: none;" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-xl">
                   <div class="modal-content">
@@ -1185,7 +1182,7 @@ License: You must have a valid license purchased only from themeforest(the above
                   </div>
                 </div>
               </div>
-            </div> -->
+            </div>
   
     <div class="sidenav-overlay"></div>
     <div class="drag-target"></div>

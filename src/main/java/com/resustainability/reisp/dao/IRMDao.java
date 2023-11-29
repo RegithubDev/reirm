@@ -1873,7 +1873,7 @@ public class IRMDao {
 				String emailSubject = "Daily Safety Report | PROTECT";
 				String emailSubjectName = "Protect - Safety First";
 				Mail mail = new Mail();
-				mail.setMailTo("amarnathreddy@resustainability.com,rameshreddy.g@resustainability.com,drksrinivas@resustainability.com"); 
+				mail.setMailTo("amarnathreddy@resustainability.com,suryaprakash.a@resustainability.com,muralimohan.h@resustainability.com"); 
 				mail.setMailBcc("businessapps.appworks@resustainability.com");
 				mail.setMailSubject(emailSubject);
 				mail.setTemplateName("SafetyDaily.vm");
@@ -1976,7 +1976,7 @@ public class IRMDao {
 				String emailSubject = "Monthly Safety Report | PROTECT";
 				String emailSubjectName = "Protect - Safety First";
 				Mail mail = new Mail();
-				mail.setMailTo(""); 
+				mail.setMailTo("amarnathreddy@resustainability.com,suryaprakash.a@resustainability.com,muralimohan.h@resustainability.com"); 
 				mail.setMailBcc("businessapps.appworks@resustainability.com");
 				mail.setMailSubject(emailSubject);
 				mail.setTemplateName("MonthlySafertAlerts.vm");
