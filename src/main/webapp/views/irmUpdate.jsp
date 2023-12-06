@@ -255,7 +255,7 @@ h1{
         <div class="content-body"><section class="invoice-preview-wrapper">
   <div class="row invoice-preview">
     <!-- Invoice -->
-    <div class="col-xl-10 col-md-8 col-12" id="printableArea">
+    <div class="col-xl-9 col-md-8 col-12" id="printableArea">
     <form class="form" action="<%=request.getContextPath() %>/irm-update-submit" id="irmForm" name="irmForm" method="post" class="form-horizontal invoice-repeater" role="form" enctype="multipart/form-data">
         <fieldset <c:if test="${sessionScope.BASE_ROLE eq 'User' }" > disabled</c:if> >
       <div class="card invoice-preview-card">
@@ -388,7 +388,7 @@ h1{
 			                 <c:choose>
 					         <c:when test ="${fn:length(filesList) gt 0}" >
 					             <c:forEach var="obj" items="${filesList}">
-									<input type="hidden" id="design_file_ids" value="${obj}"/>
+									<input type="hidden" id="docs" value="${obj}"/>
 							        <a href="<%=CommonConstants.SAFETY_FILE_SAVING_PATH_LOC%>${IRMDetails.document_code }/${obj }" class="filevalue" download ="${obj}"><i class="fa fa-arrow-down"></i>
 				                  <span class="fw-bold">${obj }</span></a><br>
 								</c:forEach>
@@ -400,7 +400,7 @@ h1{
 			      </c:when>
 			       <c:otherwise>
 			       <c:if test="${ not empty fn:trim(IRMDetails.photo) }">
-		        		<input type="hidden" id="design_file_ids" value="${IRMDetails.photo}"/>
+		        		<input type="hidden" id="docs" value="${IRMDetails.photo}"/>
 				        <a href="<%=CommonConstants.SAFETY_FILE_SAVING_PATH_LOC%>${IRMDetails.document_code }/${IRMDetails.photo }" class="filevalue" download ="${IRMDetails.photo}"><i class="fa fa-arrow-down"></i>
 	                    <span class="fw-bold">${IRMDetails.photo }</span></a>
 			       </c:if>
@@ -621,7 +621,7 @@ h1{
                     <div class="mb-1">
                       <label class="form-label active" for="itemname">Corrective Action<span class="required"> *</span></label>
 		                   <c:if test ="${fObj.status eq 'In Progress' }" > <p> 
-									<input type="text" class=" form-control"  placeholder="Corrective Action"  name="cas" 
+									<input type="text" class=" form-control"  requried placeholder="Corrective Action"  name="cas" 
 					                  <c:if test ="${fObj.status eq 'In Progress' }" > id="corrective_action"  </c:if>
 					                  <c:if test ="${fObj.status ne 'In Progress' || sessionScope.BASE_ROLE eq 'Management' }" > readonly </c:if> value="${obj.ca }" />
 							</c:if>
@@ -653,17 +653,17 @@ h1{
 
                   <div class="col-md-2 col-12">
                     <div class="mb-1">
-                      <label class="form-label" for="pd-default">Target Date<span class="required"> *</span></label>
+                      <label class="form-label" for="pd-default">Target Date<span class="required"> </span></label>
           				<input type="date" id="fp-default" class="form-control datepicker" name="tentative_dates" placeholder="YYYY-MM-DD" value="${obj.tentative_date }">
                     </div>
                   </div>
                    <div class="col-md-2 col-12">
                     <div class="mb-1">
-                      <label class="form-label" for="pd-default">Attachment ${fn:length(fObj.capaList)} - ${ index.count }</label>
+                      <label class="form-label" for="pd-default">Attachment </label>
           				<input type="file" id="mediaList${ index.count }" name="mediaList" class="form-control" >
           				<c:if test="${not empty obj.attachment }"> 
-          				 <a   target="_blank" href="<%=CommonConstants.SAFETY_FILE_SAVING_PATH_LOC%>${IRMDetails.document_code }/${fObj.approver_type }/${obj.attachment }" 
-           					 ><span id ="docTest"> <i class="fa fa-eye"></i>${obj.attachment } ${ index.count }</span>
+          				 <a   target="_blank" href="<%=CommonConstants.SAFETY_FILE_SAVING_PATH_LOC%>${IRMDetails.document_code }/${fObj.approver_type }/${obj.attachment }"  download
+           					 ><span id ="docTest"> <i class="fa fa-eye"></i>${obj.attachment }</span>
 							                  </a>
 						 <input type="hidden"  name="docs" value="${obj.attachment }" /> </c:if>
                     </div>
@@ -724,7 +724,7 @@ h1{
 
                   <div class="col-md-2 col-12">
                     <div class="mb-1">
-                      <label class="form-label" for="pd-default">Target Date<span class="required"> *</span></label>
+                      <label class="form-label" for="pd-default">Target Date<span class="required"> </span></label>
                        <input type="date" id="fp-default" class="form-control datepicker" name="tentative_dates" placeholder="YYYY-MM-DD" value="${obj.tentative_date }">
           			<!-- 	<input type="date" id="fp-default" class="form-control datepicker"  name="tentative_dates" placeholder="YYYY-MM-DD" > -->
                     </div>
@@ -1020,18 +1020,34 @@ h1{
             </div>
             <div class="col-md-6 col-12 mb-1">
               <label class="form-label" for="exampleFormControlTextarea1"><b>Attachments</b><span class="required"> </span></label><br>
+              <div class="control-group" id="fields">
+	                           <div class="controls">
+	                               <div class="entry input-group upload-input-group">
+	                                   <input class="form-control" id="files${index.count }" name="mediaList" type="file" placeholder="choose relevent file">
+	                                 
+								        <%-- <a href="<%=CommonConstants.SAFETY_FILE_SAVING_PATH_LOC%>${IRMDetails.document_code }/${fObj.approver_type }/${fObj.attachment}" class="filevalue" download ="${fObj.attachment}"><i class="fa fa-arrow-down"></i>
+					                    <span class="fw-bold">${fObj.attachment}</span></a> --%>
+	                                   <c:if test="${sessionScope.USER_ID eq fObj.approver_code || sessionScope.BASE_ROLE eq 'Admin' }" >
+		                                   <button class="btn btn-upload btn-success btn-add" type="button">
+		                                       <i class="fa fa-plus"></i>
+		                                   </button>
+	                                    </c:if> 
+	                               </div>
+	                           </div>
+	                       </div> 
 				    <c:choose>
 				         <c:when test ="${fObj.status eq 'In Progress' && sessionScope.BASE_ROLE ne 'Management'  }">
 					    <c:choose>
 	  					 <c:when test="${  fn:contains( fObj.attachment, ',' ) }">
 			  	                <c:set var="filesList" value="${fn:split(fObj.attachment, ',')}" />
 								   <c:forEach var="obj" items="${filesList}">
+								   
 								     <div class="control-group" id="fields">
 			                           <div class="controls">
 			                               <div class="entry input-group upload-input-group">
-			                                <a href="<%=CommonConstants.SAFETY_FILE_SAVING_PATH_LOC%>${IRMDetails.document_code }/${fObj.approver_type }/${obj}" class="filevalue" download ="${fObj.attachment}"><i class="fa fa-arrow-down"></i>
-							                  </a>
-											 <input type=file id="files${index.count }" value="${obj}" class="form-control"  name="mediaList"/>
+			                               <input type="hidden" name="docs" value="${obj}" />
+			                                <a href="<%=CommonConstants.SAFETY_FILE_SAVING_PATH_LOC%>${IRMDetails.document_code }/${fObj.approver_type }/${obj}" class="filevalue" download ="${obj}"><i class="fa fa-arrow-down"></i>
+							                   <span class="fw-bold">${obj}</span> </a> &nbsp;&nbsp;&nbsp;
 	                                   			<c:if test="${sessionScope.USER_ID eq fObj.approver_code || sessionScope.BASE_ROLE eq 'Admin' }" >
 		                                  	 <button class="btn btn-upload  btn-danger btn-remove" type="button">
 		                                      <span class="fa fa-trash"></span>
@@ -1041,7 +1057,7 @@ h1{
 			                           </div> 
 			                       </div> 
 							    </c:forEach>
-							  <div class="control-group" id="fields">
+							 <%--  <div class="control-group" id="fields">
 	                           <div class="controls">
 	                               <div class="entry input-group upload-input-group">
 	                                   <input class="form-control" id="files${index.count }" name="mediaList" type="file" placeholder="choose relevent file">
@@ -1052,7 +1068,7 @@ h1{
 	                                    </c:if> 
 	                               </div>
 	                           </div>
-	                       </div>
+	                       </div> --%>
 											
 				      </c:when>
 				       <c:otherwise> 
@@ -1060,7 +1076,9 @@ h1{
 				        <div class="control-group" id="fields">
 	                           <div class="controls">
 	                               <div class="entry input-group upload-input-group">
-			        		 <input class="form-control" id="files${index.count }" name="mediaList" type="text" placeholder="choose relevent file" value="${fObj.attachment}">
+	                                <input type="hidden" name="docs" value="${fObj.attachment}" />
+	                               <a href="<%=CommonConstants.SAFETY_FILE_SAVING_PATH_LOC%>${IRMDetails.document_code }/${fObj.approver_type }/${fObj.attachment}" 
+	                               class="filevalue form-control" download ="${fObj.attachment}"><i class="fa fa-arrow-down"></i>      <span class="fw-bold">${fObj.attachment}</span></a>
 	                                   <c:if test="${sessionScope.USER_ID eq fObj.approver_code || sessionScope.BASE_ROLE eq 'Admin' }" >
 		                                    <button class="btn btn-upload  btn-danger btn-remove" type="button">
 		                                      <span class="fa fa-trash"></span>
@@ -1069,11 +1087,11 @@ h1{
 	                                </div>
 	                           </div>
 	                       </div>
-	                        <div class="control-group" id="fields">
+	                        <%-- <div class="control-group" id="fields">
 	                           <div class="controls">
 	                               <div class="entry input-group upload-input-group">
 	                                   <input class="form-control" id="files${index.count }" name="mediaList" type="file" placeholder="choose relevent file">
-	                                   <input type="hidden" id="design_file_ids" value="${fObj.attachment}"/>
+	                                   <input type="hidden" id="docs" value="${fObj.attachment}"/>
 								        <a href="<%=CommonConstants.SAFETY_FILE_SAVING_PATH_LOC%>${IRMDetails.document_code }/${fObj.approver_type }/${fObj.attachment}" class="filevalue" download ="${fObj.attachment}"><i class="fa fa-arrow-down"></i>
 					                    <span class="fw-bold">${fObj.attachment}</span></a>
 	                                   <c:if test="${sessionScope.USER_ID eq fObj.approver_code || sessionScope.BASE_ROLE eq 'Admin' }" >
@@ -1083,9 +1101,9 @@ h1{
 	                                    </c:if> 
 	                               </div>
 	                           </div>
-	                       </div> 
+	                       </div>  --%>
 				       </c:if>
-				        <c:if test="${ empty fn:trim(fObj.attachment) }">
+				       <%--  <c:if test="${ empty fn:trim(fObj.attachment) }">
 				          <div class="control-group" id="fields">
 	                           <div class="controls">
 	                               <div class="entry input-group upload-input-group">
@@ -1098,7 +1116,7 @@ h1{
 	                               </div>
 	                           </div>
 	                       </div>
-				        </c:if>
+				        </c:if> --%>
 				       </c:otherwise>
 			       </c:choose>
 			         </c:when>
@@ -1109,7 +1127,7 @@ h1{
 				                 <c:choose>
 						         <c:when test ="${fn:length(filesList) gt 0}" >
 						             <c:forEach var="obj" items="${filesList}">
-										<input type="hidden" id="design_file_ids" value="${obj}"/>
+										<input type="hidden" id="docs" value="${obj}"/>
 								        <a   style="  margin-left: 1.7rem;" href="<%=CommonConstants.SAFETY_FILE_SAVING_PATH_LOC%>${IRMDetails.document_code }/${fObj.approver_type }/${obj }" class="filevalue" download ="${obj}"><i class="fa fa-arrow-down"></i>
 					                <span class="fw-bold">${obj }</span></a><br>
 									</c:forEach>
@@ -1121,7 +1139,7 @@ h1{
 				      </c:when>
 				       <c:otherwise>
 				       <c:if test="${ not empty fn:trim(fObj.attachment) }">
-			        		<input type="hidden" id="design_file_ids" value="${fObj.attachment}"/>
+			        		<input type="hidden" id="docs" value="${fObj.attachment}"/>
 					        <a href="<%=CommonConstants.SAFETY_FILE_SAVING_PATH_LOC%>${IRMDetails.document_code }/${fObj.approver_type }/${fObj.attachment}" class="filevalue" download ="${fObj.attachment}"><i class="fa fa-arrow-down"></i>
 		                    <span class="fw-bold">${fObj.attachment}</span></a>
 				       </c:if>
@@ -1134,7 +1152,8 @@ h1{
 			   </c:choose>
             </div> 
               <c:if test ="${  fn:contains(fObj.approver_type , 'L3' ) }" > <input name="level_status" value="Closed"  type="hidden"/>
-              <input name="level_code" value="IRL3"  type="hidden"/>  </c:if>
+              	<input name="level_code" value="IRL3"  type="hidden"/>  
+              </c:if>
                 
               <c:if test ="${  fn:contains(fObj.approver_type , 'L2' ) }" >  
                <input name="level_code" value="IRL2"  type="hidden"/>
@@ -1232,7 +1251,7 @@ h1{
 	                <button type="button" class="btn btn-primary me-1" 
 	                 <c:if test ="${fObj.status ne 'In Progress' }" >disabled</c:if>
 	                 
-	                  onclick="submitIRM();">
+	                  onclick="submitIRM('${fObj.approver_type }');">
 	                   <c:if test ="${not empty IRMDetails.irmRolesList[fn:length(IRMDetails.irmIncidentsList) - 1].employee_code  }" >  
 	                   	Submit Review
 	                    </c:if>
@@ -1354,15 +1373,47 @@ h1{
     <!-- /Invoice -->
 
     <!-- Invoice Actions -->
-    <div class="col-xl-2 col-md-4 col-12 invoice-actions mt-md-0 mt-2">
-      <div class="card">
+    <div class="col-xl-3 col-md-4 col-12 invoice-actions mt-md-0 mt-2">
+    <c:if test="${sessionScope.USER_ID eq IRMDetails.created_by || sessionScope.BASE_ROLE eq 'Admin'}">
+	    <form action="<%=request.getContextPath() %>/submit-new-files" id="irmFilesForm" name="irmFilesForm" method="post" class="needs-validation" novalidate enctype="multipart/form-data">
+	   <div class="card">
+	    <div>
+	     	  <p class="card-text  p-1">
+	            You can <code> RE Upload</code> Relevent Files <code>Incase Missed</code>
+	          </p>
+	            <div class="col-lg-12 col-md-12 mb-1 mb-sm-0 text-center">
+		               <a  onclick="submitIMGS();" class="btn btn-relief-info"><i data-feather='image'></i> Upload New Files <i data-feather='arrow-right'></i></a>
+		        </div>
+	    </div>
+	    <div class="row">
+	    <input name="photo" value="${IRMDetails.photo }" type="hidden" />
+	    <input name="document_code_files" value="${IRMDetails.document_code }" type="hidden" />
+	            <div class="col-lg-12 col-md-12 mb-4 mb-sm-0">
+	                <div class="control-group mt-2" id="fields" style=" margin-left: 1rem;">
+		                      <label class="form-label" for="email-id-column">Upload New Files (optional)</label>
+		                           <div class="controls">
+		                               <div class="entry input-group upload-input-group">
+		                                   <input class="form-control mediaList" id="customFile1" name="mediaList" type="file" required placeholder="choose relevent file">
+		                                   <button class="btn btn-upload btn-success btn-add" type="button">
+		                                       <i class="fa fa-plus"></i>
+		                                   </button>
+		                               </div>
+		                           </div>
+		                  </div>  
+		        </div>
+	    </div>
+	    </div>
+	    </form>
+     </c:if>
+      <div class="card mt-2">
         <div class="card-body">
 
           <a class="btn btn-outline-secondary w-100 mb-75"  onclick="printDiv('printableArea')" class="noPrint"><i class="fa fa-print"></i> Print</a>
 
         </div>
       </div>
-    </div>
+       
+    
     <!-- /Invoice Actions -->
   </div>
 </section>
@@ -1725,30 +1776,68 @@ h1{
 	  	    console.log(msg);
         }
 	    
-	    function submitIRM(){
-	    	
+	    function submitIRM(level_A){
+	    	var flag = false;
+	    	var CAflag = false;
+	    	var PAflag = false;
+	    	var REflag = false;
 	    	var res =  '${IRMDetails.status}'; 
 	    	var levelF = '${IRMDetails.irmRolesList[fn:length(IRMDetails.irmIncidentsList) - 1].employee_code}';
 	    	var level3 = '${IRMDetails.irmIncidentsList[2].approver_type}';
-	    	if(levelF == ''){
-	    		document.getElementById("irmForm").submit();	
+	    	
+	    	 if(level_A == 'IRL1'){
+	    		$('input[name="cas"]').each(function() {
+	    		    var fieldValue = $(this).val();
+	    		    if( fieldValue != '' && fieldValue != null){
+	    		    	CAflag = true;
+	    		    }else{CAflag = false; }
+	    		    
+	    		});
+	    		$('input[name="pas"]').each(function() {
+	    			  var fieldValue = $(this).val();
+	    			if( fieldValue != '' && fieldValue != null){
+	    				PAflag = true;
+	    			 }else{PAflag = false;  }
+
+	    		});
+	    		$('input[name="remarkss"]').each(function() {
+	    			  var fieldValue = $(this).val();
+	    			if( fieldValue != '' && fieldValue != null){
+	    				REflag = true;
+	    			 }else{REflag = false; }
+
+	    		});
+	    		if(CAflag && PAflag && REflag){
+	    			flag = true;
+	    		}
+	    		
+	    	}else{
+	    		flag = true;
 	    	}
-	    	if(validator.form()){ // validation perform
-	    		 $.blockUI({
-		   		        message:
-		   		          '<div class="d-flex justify-content-center align-items-center"><p class="me-50 mb-0"> Please wait...</p> <div class="spinner-grow spinner-grow-sm text-white" role="status"></div> </div>',
-		   		        css: {
-		   		          backgroundColor: 'transparent',
-		   		          color: '#fff',
-		   		          border: '0'
-		   		        },
-		   		        overlayCSS: {
-		   		          opacity: 0.5
-		   		        }
-		   		      });
-	        	document.getElementById("irmForm").submit();	
+	    	if(flag){
+	    	   	if(levelF == ''){
+		    		document.getElementById("irmForm").submit();	
+		    	}
+		    	if(validator.form()){ // validation perform
+		    		
+		    		 $.blockUI({
+			   		        message:
+			   		          '<div class="d-flex justify-content-center align-items-center"><p class="me-50 mb-0"> Please wait...</p> <div class="spinner-grow spinner-grow-sm text-white" role="status"></div> </div>',
+			   		        css: {
+			   		          backgroundColor: 'transparent',
+			   		          color: '#fff',
+			   		          border: '0'
+			   		        },
+			   		        overlayCSS: {
+			   		          opacity: 0.5
+			   		        }
+			   		      });
+		        	document.getElementById("irmForm").submit();	
+		    	}
+	    	}else{
+	    		alert("Please Fill the Requried fileds ");
 	    	}
-	    
+	    	
 	    }
 	    var validator =	$('#irmForm').validate({
 		   	 errorClass:"my-error-class is-invalid",
@@ -2045,6 +2134,17 @@ function checkLength(val){
 	  
 }
 
+function submitIMGS(){
+	var fileInput = $(".mediaList").eq(0);
+	 if (fileInput[0].files.length > 0) {
+	        // Get the name of the first selected file
+	        var fileName = fileInput[0].files[0].name;
+	        $("#irmFilesForm").submit();
+	    } else {
+	        // No file selected, handle accordingly
+	        alert("No file selected.");
+	    }
+}
     </script>
   </body>
   <!-- END: Body-->

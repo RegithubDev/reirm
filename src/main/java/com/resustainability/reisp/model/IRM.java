@@ -8,12 +8,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class IRM {
 	
-	private String id,plant_name,CustomerCode,ActualVisitMonth,MSG,pull_datetime,plant,CustomerSAPCode,	level_code,project,document_code,maxRole,i_no_reviewer,maxRole2,mainStatus	,sb_notes,incident_type,email_id,role_code,all_irm,active_irm,inActive_irm,project_name,department_name,location_name,	email,description	,department_code,incident_name,user_id,	project_code	,location,	ptw_code	,
+	private String id,plant_name,pageIndex,CustomerCode,ActualVisitMonth,MSG,pull_datetime,plant,CustomerSAPCode,	level_code,project,document_code,maxRole,i_no_reviewer,maxRole2,mainStatus	,sb_notes,incident_type,email_id,role_code,all_irm,active_irm,inActive_irm,project_name,department_name,location_name,	email,description	,department_code,incident_name,user_id,	project_code	,location,	ptw_code	,
 	risk_type,	photo	,status,created_date,action,sub_code,sub_name,	created_by	,modified_by,	mdified_date,attachment,
 	approver_type,	approver_code	,otp,otp_code,	assigned_on,employee_code,	action_taken,incident_code,	corrective_action,location_code,from_date,to_date,	preventive_action,user_name,
 	approver_name,	remarks,approver_type_before,employee_code_before,not_assigned, statusChanged,next_level_user,approver_type_name,from_and_to,sbu_code,sbu_name,role,user,
 	admin_incidents , i_pending ,i_completed,sb_rei_notes,person_location,reinitiate_date,sb_date,ca_before,pa_before,remarks_before,doc_before,type_prevs,approver_prvs,
-		AC,NM,UA,UC,ACT,NMT,UAT,UCT,created_datetime,expired_datetime,TotalVisits,ActiveVistis,incativeVistis,customerId,Plantname,CustomerID,ActualMonthAndYear,	person_responsible,message,module_type	,doc,capa_id,rca_id,noCounts,tentative_date,investigation_team,base_role,base_department,daysNotLogined,incidents_count	,counts,ca,pa,level_status,	attachments,incident_types,	incident_seviourity,incident_category,	ua_type,	uc_type,	management_type	;
+		AC,NM,UA,UC,ACT,NMT,UAT,UCT,created_datetime,expired_datetime,document_code_files,TotalVisits,ActiveVistis,incativeVistis,customerId,Plantname,CustomerID,ActualMonthAndYear,	person_responsible,message,module_type	,doc,capa_id,rca_id,noCounts,tentative_date,investigation_team,base_role,base_department,daysNotLogined,incidents_count	,counts,ca,pa,level_status,	attachments,incident_types,	incident_seviourity,incident_category,	ua_type,	uc_type,	management_type	;
 
 	List<IRM> irmFilesList;
 	List<IRM> irmIncidentsList;
@@ -23,6 +23,22 @@ public class IRM {
 	private MultipartFile[] mediaList;
 	
 	
+	public String getPageIndex() {
+		return pageIndex;
+	}
+
+	public void setPageIndex(String pageIndex) {
+		this.pageIndex = pageIndex;
+	}
+
+	public String getDocument_code_files() {
+		return document_code_files;
+	}
+
+	public void setDocument_code_files(String document_code_files) {
+		this.document_code_files = document_code_files;
+	}
+
 	public String getPlant() {
 		return plant;
 	}

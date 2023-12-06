@@ -191,7 +191,7 @@ public class IRMDao {
 		return objsList;
 	}
 	static UrlGenerator ugObj = new UrlGenerator();
-	private String getUniqueID(IRM cObj) throws Exception {
+	public String getUniqueID(IRM cObj) throws Exception {
 		Connection con = null;
 		PreparedStatement stmt = null;
 		ResultSet resultSet = null;
@@ -223,15 +223,15 @@ public class IRMDao {
 		boolean flag = false;
 		TransactionDefinition def = new DefaultTransactionDefinition();
 		TransactionStatus status = transactionManager.getTransaction(def);
-		Calendar now = Calendar.getInstance();
-	    DateFormat df = new SimpleDateFormat("_yyMM_");
-	    String result = df.format(now.getTime());
-		 String document_no = result;
+		//Calendar now = Calendar.getInstance();
+	   // DateFormat df = new SimpleDateFormat("_yyMM_");
+	   // String result = df.format(now.getTime());
+		// String document_no = result;
 		try {
 			obj.setRisk_type("Medium");
 			String file_name = "";
-			String u_id = getUniqueID(obj);
-			obj.setDocument_code("IRM"+document_no+u_id);
+		//	String u_id = getUniqueID(obj);
+			//obj.setDocument_code("IRM"+document_no+u_id);
 			obj.setStatus("In Progress");
 			if(StringUtils.isEmpty(obj.getApprover_code())) {
 				obj.setStatus(null);
@@ -724,8 +724,12 @@ public class IRMDao {
 				qry = qry + " and  c.status is null ";
 			}
 				
-			
-			qry = qry + " order by FORMAT(c.created_date, 'dd-MMM-yy'),FORMAT(c.created_date, 'HH:mm'),approver_type desc ";
+			if(StringUtils.isEmpty(obj.getPageIndex())) {
+				obj.setPageIndex("0");
+			}
+			qry = qry + " order by FORMAT(c.created_date, 'dd-MMM-yy'),FORMAT(c.created_date, 'HH:mm'),approver_type desc  ";
+			//qry = qry + " order by FORMAT(c.created_date, 'dd-MMM-yy'),FORMAT(c.created_date, 'HH:mm'),approver_type desc OFFSET "+obj.getPageIndex()+"0 ROWS FETCH NEXT 40 ROWS ONLY ";
+
 			Object[] pValues = new Object[arrSize];
 			int i = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date()) && !StringUtils.isEmpty(obj.getTo_date())) {
@@ -1387,7 +1391,22 @@ public class IRMDao {
 		}
 		return obj;
 	}
+	 private static String removeLastComma(String inputString) {
+	        // Check if the string contains a comma
+		 if (!inputString.isEmpty() && inputString.contains(",")) {
+	            // Remove the first comma
+	            //inputString = inputString.substring(1);
 
+	            // Remove the last comma
+	            int lastCommaIndex = inputString.lastIndexOf(",");
+	            inputString = inputString.substring(0, lastCommaIndex) + inputString.substring(lastCommaIndex + 1);
+
+	            System.out.println("Original string: ," + inputString);
+	            System.out.println("String without first and last comma: " + inputString);
+	        } 
+	        // Return the original string if no comma is found
+	        return inputString;
+	    }
 	public boolean irmUpdateSubmit(IRM obj) throws Exception {
 		int count = 0;
 		boolean flag = false;
@@ -1410,7 +1429,14 @@ public class IRMDao {
 					BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
 					count = namedParamJdbcTemplate.update(updateQry, paramSource);
 					obj.setStatusChanged("Sent Back");
-					 String fileName  = null;
+					 String fileName  = "";
+					 if(!StringUtils.isEmpty(obj.getDocs())) {
+					    	for(int i =0; i < obj.getDocs().length; i++) {
+						    	fileName = fileName+","+obj.getDocs()[i]+",";
+								fileName = removeLastComma(fileName);
+								obj.setAttachment(fileName);
+						    }
+				    	}
 					    for(int i =0; i < obj.getMediaList().length; i++) {
 					    	MultipartFile multipartFile = obj.getMediaList()[i];
 							if (null != multipartFile && !multipartFile.isEmpty() || !StringUtils.isEmpty(obj.getDocs()) && obj.getDocs().length > 0) {
@@ -1421,7 +1447,8 @@ public class IRMDao {
 										FileUploads.singleFileSaving(multipartFile, saveDirectory, fileName);
 									}
 								}else {
-									fileName = obj.getDocs()[i];
+									fileName = fileName+obj.getDocs()[i]+",";
+									fileName = removeLastComma(fileName);
 								}
 								obj.setAttachment(fileName);
 							}
@@ -1463,6 +1490,13 @@ public class IRMDao {
 									arraySize = obj.getPas().length;
 								}
 							}
+					    	if(!StringUtils.isEmpty(obj.getDocs())) {
+						    	for(int i =0; i < obj.getDocs().length; i++) {
+							    	fileName = fileName+","+obj.getDocs()[i]+",";
+									fileName = removeLastComma(fileName);
+									obj.setAttachment(fileName);
+							    }
+					    	}
 					    for(int i =0; i < obj.getCas().length; i++) {
 					    	MultipartFile multipartFile = obj.getMediaList()[i];
 							if (null != multipartFile && !multipartFile.isEmpty() || !StringUtils.isEmpty(obj.getDocs()) &&  obj.getDocs().length > 0) {
@@ -1473,7 +1507,8 @@ public class IRMDao {
 										FileUploads.singleFileSaving(multipartFile, saveDirectory, fileName);
 									}
 								}else {
-									fileName = obj.getDocs()[i];
+									fileName = fileName+obj.getDocs()[i]+",";
+									fileName = removeLastComma(fileName);
 								}
 								obj.setAttachment(fileName);
 							}
@@ -1500,21 +1535,30 @@ public class IRMDao {
 			}else {
 				///////////////////////////// UPDATING LEVEL ! //////////////////////////////////////////////
 				if(!StringUtils.isEmpty(obj) && !(obj.getLevel_code().equals("IRL1"))) {
-					 String fileName  = null;
+					 String fileName  = "";
+					 String file_Name  = "";
 					    for(int i =0; i < obj.getMediaList().length; i++) {
 					    	MultipartFile multipartFile = obj.getMediaList()[i];
 							if (null != multipartFile && !multipartFile.isEmpty() || !StringUtils.isEmpty(obj.getDocs()) && obj.getDocs().length > 0) {
 								if(null != multipartFile && !multipartFile.isEmpty()) {
 									String saveDirectory = CommonConstants.SAFETY_FILE_SAVING_PATH + obj.getDocument_code() + File.separator+ obj.getApprover_type_name() + File.separator;
 									fileName = multipartFile.getOriginalFilename();
+									
 									if (null != multipartFile && !multipartFile.isEmpty()) {
 										FileUploads.singleFileSaving(multipartFile, saveDirectory, fileName);
 									}
-								}else {
-									fileName = obj.getDocs()[i];
 								}
-								obj.setAttachment(fileName);
+								file_Name = file_Name+fileName+",";
+								//file_Name = removeLastComma(file_Name);
+								fileName = file_Name;
+								obj.setAttachment(removeLastComma(fileName));
 							}
+					    }
+					    if(!StringUtils.isEmpty(obj.getDocs())) {
+						    for(int i =0; i < obj.getDocs().length; i++) {
+						    	fileName = fileName+","+obj.getDocs()[i]+",";
+								obj.setAttachment(removeLastComma(fileName));
+						    }
 					    }
 						if(!(obj.getLevel_status().equals("Closed"))) {
 							obj.setStatusChanged("In Progress");
@@ -1547,7 +1591,7 @@ public class IRMDao {
 						BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
 						count = namedParamJdbcTemplate.update(updateQry, paramSource);
 						
-						 String fileName  = null;
+						 String fileName  = "";
 							/*
 							 * for(int i =0; i < obj.getMediaList().length; i++) { MultipartFile
 							 * multipartFile = obj.getMediaList()[i]; if (null != multipartFile &&
@@ -1593,7 +1637,7 @@ public class IRMDao {
 							paramSource = new BeanPropertySqlParameterSource(obj);		 
 						    count = namedParamJdbcTemplate.update(rc_insertQry, paramSource);
 			    ///// CA & PA TABLE /////////////////////////////////////////
-						    fileName  = null;
+						    fileName  = "";
 						    int arraySize = 0;
 						    if(!StringUtils.isEmpty(obj.getCas()) && !StringUtils.isEmpty(obj.getPas())) {
 						    	if(!StringUtils.isEmpty(obj.getRemarkss()) && obj.getRemarkss().length > 0) {
@@ -1614,7 +1658,12 @@ public class IRMDao {
 										arraySize = obj.getPas().length;
 									}
 								}
-						    for(int i =0; i < obj.getCas().length; i++) {
+					
+						    	for(int i =0; i < obj.getCas().length; i++) {
+					    		if(!StringUtils.isEmpty(obj.getDocs())) {
+					    			fileName = obj.getDocs()[i];
+									obj.setAttachment(fileName);
+					    		}
 						    	MultipartFile multipartFile = obj.getMediaList()[i];
 								if (null != multipartFile && !multipartFile.isEmpty() || !StringUtils.isEmpty(obj.getDocs()) && obj.getDocs().length > 0) {
 									if(null != multipartFile && !multipartFile.isEmpty()) {
@@ -1623,8 +1672,6 @@ public class IRMDao {
 										if (null != multipartFile && !multipartFile.isEmpty()) {
 											FileUploads.singleFileSaving(multipartFile, saveDirectory, fileName);
 										}
-									}else {
-										fileName = obj.getDocs()[i];
 									}
 									obj.setAttachment(fileName);
 								}
@@ -1644,6 +1691,7 @@ public class IRMDao {
 						    	}
 						    	 
 						    }
+						    
 						}else {
 							throw new ArrayIndexOutOfBoundsException("");
 						}
@@ -2056,6 +2104,847 @@ public class IRMDao {
 		}
 		
 		return userList;
+	}
+
+	public boolean irmUpdateFilesSubmit(IRM obj) throws Exception {
+		int count = 0;
+		boolean flag = false;
+		TransactionDefinition def = new DefaultTransactionDefinition();
+		TransactionStatus status = transactionManager.getTransaction(def);
+		try {
+			String file_name = "";
+			String photo = "";
+			if(!StringUtils.isEmpty(obj.getPhoto())) {
+				photo = obj.getPhoto();
+			}
+			if(!StringUtils.isEmpty(obj.getMediaList())) {
+			for (int i = 0; i < (obj.getMediaList().length); i++) {
+				MultipartFile multipartFile = obj.getMediaList()[i];
+				if (null != multipartFile && !multipartFile.isEmpty()) {
+					String saveDirectory = CommonConstants.SAFETY_FILE_SAVING_PATH + obj.getDocument_code() + File.separator;
+					String fileName = multipartFile.getOriginalFilename();
+					//obj.setCreated_date(DateParser.parse(date));
+					if (null != multipartFile && !multipartFile.isEmpty()) {
+						FileUploads.singleFileSaving(multipartFile, saveDirectory, fileName);
+					}
+					file_name = file_name+ fileName+",";
+				}
+			}
+			}
+			if(!StringUtils.isEmpty(obj.getImage_list())) {
+				for (int i = 0; i < (obj.getImage_list().length); i++) {
+					
+					    byte[] decodedBytes = Base64.getDecoder().decode(obj.getImage_list()[i]);
+				        byte[] pdfBytes = decodedBytes; 
+				        String saveDirectory = CommonConstants.SAFETY_FILE_SAVING_PATH + obj.getDocument_code() + File.separator + File.separator;
+				        File directory = new File(saveDirectory);
+		                if (!directory.exists()) {
+		                	directory.mkdirs();
+		                	boolean flag1 = OSValidator.isUnix();
+		                	if(flag1) {
+		                    	String perm = "rwxrwxrwx";
+		    	            	Set<PosixFilePermission> permissions = PosixFilePermissions.fromString(perm);
+		    	            	Files.setPosixFilePermissions(directory.toPath(), permissions);
+		                	}
+		                }
+				        Files.write(Paths.get( saveDirectory+obj.getFilenameAndExtList()[i]), pdfBytes);
+				        file_name = file_name+ obj.getFilenameAndExtList()[i]+","+photo;
+				}
+			}
+			if(!StringUtils.isEmpty(file_name)) {
+				StringBuilder builder = new StringBuilder(file_name);
+				int lastindex = file_name.lastIndexOf(",");
+				builder.replace(lastindex, lastindex + 1, "" );
+				file_name = builder.toString();
+				obj.setPhoto(file_name+","+photo);
+			}
+			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+			String insertQry = "UPDATE [safety_ims] set photo= :photo where document_code= :document_code_files ";
+			BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
+		    count = namedParamJdbcTemplate.update(insertQry, paramSource);
+			if(count > 0) {
+				flag = true;
+		 }
+			transactionManager.commit(status);
+		}catch (Exception e) {
+			transactionManager.rollback(status);
+			e.printStackTrace();
+			throw new Exception(e);
+		}
+		return flag;
+	}
+
+	public int getTotalRecords(IRM obj, String searchParameter) throws Exception {
+		int totalRecords = 0;
+		try {
+			int arrSize = 0;
+			String qry = "select count( document_code) as total_records  from [safety_ims] c "
+				+ " left join [safety_ims_workflow] up on c.document_code = up.document_no "
+				+ " left join [project] p on c.project_code = p.project_code "
+				+ " left join [sbu] sb on p.sbu_code = sb.sbu_code"
+				+ " left join [department] d on c.department_code = d.department_code "
+				+ " left join [project_location] l on c.location = l.location_code "
+				+ " left join [incident] rm on c.incident_type = rm.incident_code "
+				+ " left join [user_profile] u on c.created_by = u.user_id "
+				+ " left join [user_profile] u1 on up.approver_code = u1.user_id "
+				+ " where  document_code is not null   ";
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
+			qry = qry + " and p.sbu_code = ? ";
+			arrSize++;
+		}
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
+			qry = qry + " and c.project_code = ? ";
+			arrSize++;
+		}
+								
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getIncident_type())) {
+			qry = qry + " and c.incident_type = ?";
+			arrSize++;
+		}	
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
+			qry = qry + " and  c.status = ? ";
+			arrSize++;
+		}
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date()) && !StringUtils.isEmpty(obj.getTo_date())) {
+			qry = qry + " and CONVERT(date, c.created_date)  BETWEEN ? and ?  ";
+			arrSize++;
+			arrSize++;
+		}
+		else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date())) {
+			qry = qry + " and  CONVERT(date, c.created_date) = ? ";
+			arrSize++;
+		}
+		else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getTo_date())) {
+			qry = qry + " and  CONVERT(date, c.created_date) = ? ";
+			arrSize++;
+		}
+		if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+			qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+			arrSize++;
+			arrSize++;
+		}
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getAdmin_incidents())) {
+			qry = qry + " and c.created_by = ?";
+			arrSize++;
+		}
+		if(!StringUtils.isEmpty(obj) && StringUtils.isEmpty(obj.getI_pending())) {
+			//qry = qry + " and DATEDIFF(day,c.created_date,GETDATE()) between  0 and 30 ";
+		}
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_pending())) {
+			qry = qry + " and  up.status = ? ";
+			arrSize++;
+		}
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed()) ) {
+			qry = qry + " and  c.status = ? and DATEDIFF(day,c.created_date,GETDATE()) between  0 and 30";
+			arrSize++;
+		}
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed())  && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+			qry = qry + " and  c.status = ? and (up.approver_code = ? or  c.created_by = ?)  and DATEDIFF(day,c.created_date,GETDATE()) between  0 and 30";
+			arrSize++;
+			arrSize++;
+			arrSize++;
+		}
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_no_reviewer())) {
+			qry = qry + " and  c.status is null ";
+		}
+			
+		if(StringUtils.isEmpty(obj.getPageIndex())) {
+			obj.setPageIndex("0");
+		}
+		if(!StringUtils.isEmpty(searchParameter)) {
+			qry = qry + " and (c.document_code like ? or c.project_code like ? or p.project_name like ?"
+					+ " or u1.user_name like ? or up.approver_code like ? or c.document_code like ? or d.department_name like ? "
+					+ "or c.risk_type like ? or c.created_by like ? or u.user_name like ? or c.status like ? or approver_type like ? )";
+			arrSize++;
+			arrSize++;
+			arrSize++;
+			arrSize++;
+			arrSize++;
+			arrSize++;
+			arrSize++;
+			arrSize++;
+			arrSize++;
+			arrSize++;
+			arrSize++;
+			arrSize++;
+			
+		}	
+		
+		Object[] pValues = new Object[arrSize];
+		int i = 0;
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date()) && !StringUtils.isEmpty(obj.getTo_date())) {
+			pValues[i++] = obj.getFrom_date();
+			pValues[i++] = obj.getTo_date();
+		}
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
+			pValues[i++] = obj.getSbu_code();
+		}
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
+			pValues[i++] = obj.getProject_code();
+		}
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
+			pValues[i++] = obj.getStatus();
+		}
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getIncident_type())) {
+			pValues[i++] = obj.getIncident_type();
+		}
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date()) && !StringUtils.isEmpty(obj.getTo_date())) {
+			pValues[i++] = obj.getFrom_date();
+			pValues[i++] = obj.getTo_date();
+		}
+		else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date())) {
+			pValues[i++] = obj.getFrom_date();
+		}
+		else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getTo_date())) {
+			pValues[i++] = obj.getTo_date();
+		}
+		if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+			pValues[i++] = obj.getUser(); pValues[i++] = obj.getUser();
+		}
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getAdmin_incidents())) {
+		pValues[i++] = obj.getAdmin_incidents();
+		}
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_pending())) {
+			pValues[i++] = obj.getI_pending();
+		}
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed())) {
+			pValues[i++] = obj.getI_completed();
+		}
+		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed())  && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+			pValues[i++] = obj.getI_completed();
+			pValues[i++] = obj.getUser();
+			pValues[i++] = obj.getUser();
+		}
+		
+		if(!StringUtils.isEmpty(searchParameter)) {
+			pValues[i++] = "%"+searchParameter+"%";
+			pValues[i++] = "%"+searchParameter+"%";
+			pValues[i++] = "%"+searchParameter+"%";
+			pValues[i++] = "%"+searchParameter+"%";
+			pValues[i++] = "%"+searchParameter+"%";
+			pValues[i++] = "%"+searchParameter+"%";
+			pValues[i++] = "%"+searchParameter+"%";
+			pValues[i++] = "%"+searchParameter+"%";
+			pValues[i++] = "%"+searchParameter+"%";
+			pValues[i++] = "%"+searchParameter+"%";
+			pValues[i++] = "%"+searchParameter+"%";
+			pValues[i++] = "%"+searchParameter+"%";
+			
+		}
+		
+			totalRecords = jdbcTemplate.queryForObject( qry,pValues,Integer.class);
+		}catch(Exception e){ 
+			e.printStackTrace();
+			throw new Exception(e);
+		}
+		return totalRecords;
+	}
+
+	public List<IRM> getIRMLAzyList(IRM obj, int startIndex,  int offset, String searchParameter) throws Exception {
+		List<IRM> objsList = null;
+		try {
+			int arrSize = 0;
+			String qry =" select c.id,c.document_code,(select count(*) from [safety_ims] where status is null) as noCounts,(select count(*) from [safety_ims] where status = 'In Progress' ";
+					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date()) && !StringUtils.isEmpty(obj.getTo_date())) {
+						qry = qry + " and CONVERT(date, created_date)  BETWEEN ? and ?  ";
+						arrSize++;
+						arrSize++;
+					}else {
+						//qry = qry + "and DATEDIFF(day,created_date,GETDATE()) between  0 and 30 ";
+					}
+					qry = qry + ") as counts,FORMAT(action_taken, 'dd-MMM-yy  HH:mm') as action_taken,incident_category,"
+					+ "(select max(role_code) from role_mapping where project = c.project_code and [department_code] = d.[department_code] and [safety_type] = c.[incident_type] ) as maxRole,"
+					+ "(select max(approver_type) from safety_ims_workflow where status = 'In Progress' and safety_ims_workflow.document_no = c.document_code) as maxRole2,";
+					qry = qry +" (select count( distinct c.document_code) from safety_ims c left join [safety_ims_workflow] up on c.document_code = up.document_no  left join [project] p on c.project_code = p.project_code left join [sbu] sb on p.sbu_code = sb.sbu_code where c.incident_type is not null   ";
+					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
+						qry = qry + " and p.sbu_code = ? ";
+						arrSize++;
+					}
+					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
+						qry = qry + " and c.project_code = ? ";
+						arrSize++;
+					}
+					
+					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
+						qry = qry + " and  c.status = ? ";
+						arrSize++;
+					}
+					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getIncident_type())) {
+						qry = qry + " and  c.incident_type = ? ";
+						arrSize++;
+					}
+					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date()) && !StringUtils.isEmpty(obj.getTo_date())) {
+						qry = qry + " and CONVERT(date, c.created_date)  BETWEEN ? and ?  ";
+						arrSize++;
+						arrSize++;
+					}
+					else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date())) {
+						qry = qry + " and  CONVERT(date, c.created_date) = ? ";
+						arrSize++;
+					}
+					else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getTo_date())) {
+						qry = qry + " and  CONVERT(date, c.created_date) = ? ";
+						arrSize++;
+					}
+					if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+						qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+						arrSize++;	arrSize++;
+					}
+					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getAdmin_incidents())) {
+						qry = qry + " and c.created_by = ?";
+						arrSize++;	
+					}
+					if(!StringUtils.isEmpty(obj) && StringUtils.isEmpty(obj.getFrom_date())) {
+						//qry = qry + " and DATEDIFF(day,c.created_date,GETDATE()) between  0 and 30 ";
+					}
+					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_pending())) {
+						qry = qry + " and  c.status = ?  ";
+						arrSize++;
+					}
+
+					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed()) ) {
+						qry = qry + " and  c.status = ? and DATEDIFF(day,c.created_date,GETDATE()) between  0 and 30";
+						arrSize++;
+					}
+					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed())  && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+						qry = qry + " and  c.status = ? and  (up.approver_code = ? or  c.created_by = ?) and DATEDIFF(day,c.created_date,GETDATE()) between  0 and 30";
+						arrSize++;
+						arrSize++;arrSize++;
+					}
+					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_no_reviewer())) {
+						qry = qry + " and  c.status is null ";
+					}
+					qry = qry +  " ) as all_irm ,"
+							+ "  (select count(*) from [safety_ims] c "
+							+ " left join [project] p on c.project_code = p.project_code "
+							+ "left join [sbu] sb on p.sbu_code = sb.sbu_code where c.[status] is null";
+							if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
+								qry = qry + " and p.sbu_code = ? ";
+								arrSize++;
+							}
+							if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
+								qry = qry + " and c.project_code = ? ";
+								arrSize++;
+							}
+			
+							if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
+								qry = qry + "  and c.status = ? ";
+								arrSize++;
+							}
+							if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getIncident_type())) {
+								qry = qry + " and c.incident_type = ? ";
+								arrSize++;
+							}
+							if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date()) && !StringUtils.isEmpty(obj.getTo_date())) {
+								qry = qry + " and CONVERT(date, c.created_date)  BETWEEN ? and ?  ";
+								arrSize++;
+								arrSize++;
+							}
+							else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date())) {
+								qry = qry + " and  CONVERT(date, c.created_date) = ? ";
+								arrSize++;
+							}
+							else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getTo_date())) {
+								qry = qry + " and  CONVERT(date, c.created_date) = ? ";
+								arrSize++;
+							}
+							if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+								qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+
+								arrSize++;	arrSize++;
+							}
+							if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getAdmin_incidents())) {
+								qry = qry + " and c.created_by = ? ";
+								arrSize++;	
+							}
+							if(!StringUtils.isEmpty(obj) && StringUtils.isEmpty(obj.getI_pending())) {
+								//qry = qry + " and DATEDIFF(day,c.created_date,GETDATE()) between  0 and 30 ";
+							}
+							if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_pending())) {
+								qry = qry + " and  c.status = ? ";
+								arrSize++;
+							}
+							if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed())) {
+								qry = qry + " and  c.status = ? and DATEDIFF(day,c.created_date,GETDATE()) between  0 and 30";
+								arrSize++;
+							}
+
+							if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed())  && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+								qry = qry + " and  c.status = ? and  (up.approver_code = ? or  c.created_by = ?) and DATEDIFF(day,c.created_date,GETDATE()) between  0 and 30";
+								arrSize++;
+								arrSize++;arrSize++;
+							}
+							if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_no_reviewer())) {
+								qry = qry + " and  c.status is null ";
+							}
+								
+							qry = qry + " ) as not_assigned,";
+							qry = qry +	"(select count( c.[document_code]) from [safety_ims] c left join [project] p on c.project_code = p.project_code left join [sbu] sb on p.sbu_code = sb.sbu_code where c.[document_code] is not null and c.status ='Resolved'  ";
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
+										qry = qry + " and p.sbu_code = ? ";
+										arrSize++;
+									}
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
+										qry = qry + " and c.project_code = ? ";
+										arrSize++;
+									}
+					
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
+										qry = qry + "  and c.status = ? ";
+										arrSize++;
+									}
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getIncident_type())) {
+										qry = qry + " and c.incident_type = ? ";
+										arrSize++;
+									}
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date()) && !StringUtils.isEmpty(obj.getTo_date())) {
+										qry = qry + " and CONVERT(date, c.created_date)  BETWEEN ? and ?  ";
+										arrSize++;
+										arrSize++;
+									}
+									else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date())) {
+										qry = qry + " and  CONVERT(date, c.created_date) = ? ";
+										arrSize++;
+									}
+									else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getTo_date())) {
+										qry = qry + " and  CONVERT(date, c.created_date) = ? ";
+										arrSize++;
+									}
+									if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+										qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+										arrSize++;
+										arrSize++;
+									}
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getAdmin_incidents())) {
+										qry = qry + " and c.created_by = ?";
+										arrSize++;
+									}
+									if(!StringUtils.isEmpty(obj) && StringUtils.isEmpty(obj.getI_pending())) {
+										//qry = qry + " and DATEDIFF(day,c.created_date,GETDATE()) between  0 and 30 ";
+									}
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_pending())) {
+										qry = qry + " and  c.status = ? ";
+										arrSize++;
+									}
+
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed()) ) {
+										qry = qry + " and  c.status = ? and DATEDIFF(day,c.created_date,GETDATE()) between  0 and 30";
+										arrSize++;
+									}
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed())  && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+										qry = qry + " and  c.status = ? and  (up.approver_code = ? or  c.created_by = ?) and DATEDIFF(day,c.created_date,GETDATE()) between  0 and 30";
+										arrSize++;
+										arrSize++;arrSize++;
+									}
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_no_reviewer())) {
+										qry = qry + " and  c.status is null ";
+									}
+										
+									qry = qry + " ) as active_irm,"
+									+ "(select count( c.[document_code]) from [safety_ims] c left join [project] p on c.project_code = p.project_code left join [sbu] sb on p.sbu_code = sb.sbu_code where c.[document_code] is not null and c.status ='In Progress' ";
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
+										qry = qry + " and p.sbu_code = ? ";
+										arrSize++;
+									}
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
+										qry = qry + " and c.project_code = ? ";
+										arrSize++;
+									}
+									
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
+										qry = qry + " and  c.status = ? ";
+										arrSize++;
+									}
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getIncident_type())) {
+										qry = qry + " and  c.incident_type = ? ";
+										arrSize++;
+									}
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date()) && !StringUtils.isEmpty(obj.getTo_date())) {
+										qry = qry + " and CONVERT(date, c.created_date)  BETWEEN ? and ?  ";
+										arrSize++;
+										arrSize++;
+									}
+									else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date())) {
+										qry = qry + " and  CONVERT(date, c.created_date) = ? ";
+										arrSize++;
+									}
+									else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getTo_date())) {
+										qry = qry + " and  CONVERT(date, c.created_date) = ? ";
+										arrSize++;
+									}
+									if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+										qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+										arrSize++;
+										arrSize++;
+									}
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getAdmin_incidents())) {
+										qry = qry + " and c.created_by = ?";
+										arrSize++;
+									}
+									if(!StringUtils.isEmpty(obj) && StringUtils.isEmpty(obj.getI_pending())) {
+										qry = qry + " ";
+									}
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_pending())) {
+										qry = qry + " and  c.status = ? ";
+										arrSize++;
+									}
+				
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed()) ) {
+										qry = qry + " and  c.status = ? and DATEDIFF(day,c.created_date,GETDATE()) between  0 and 30";
+										arrSize++;
+									}
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed())  && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+										qry = qry + " and  c.status = ? and  (up.approver_code = ? or  c.created_by = ?) and DATEDIFF(day,c.created_date,GETDATE()) between  0 and 30";
+										arrSize++;
+										arrSize++;arrSize++;
+									}
+									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_no_reviewer())) {
+										qry = qry + " and  c.status is null ";
+									}
+									
+										
+									qry = qry + " ) as inActive_irm,"
+					+ "rm.incident_code,rm.incident_type,approver_type,p.sbu_code,sb.sbu_name,	 c.project_code,p.project_name,c.risk_type,c.description,c.status,c.ptw_code,c.department_code,d.department_name,"
+					+ "	l.location_code,l.location_name,c.created_by,u.email_id,u.user_name, COALESCE(up.approver_code, 'No Reviewer Assigneds') AS approver_code,u1.user_name as approver_name,FORMAT(c.created_date, 'dd-MMM-yy  HH:mm') as created_date from [safety_ims] c "
+					+ " left join [safety_ims_workflow] up on c.document_code = up.document_no "
+					+ " left join [project] p on c.project_code = p.project_code "
+					+ " left join [sbu] sb on p.sbu_code = sb.sbu_code"
+					+ " left join [department] d on c.department_code = d.department_code "
+					+ " left join [project_location] l on c.location = l.location_code "
+					+ " left join [incident] rm on c.incident_type = rm.incident_code "
+					+ " left join [user_profile] u on c.created_by = u.user_id "
+					+ " left join [user_profile] u1 on up.approver_code = u1.user_id "
+					+ " where  document_code is not null   ";
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
+				qry = qry + " and p.sbu_code = ? ";
+				arrSize++;
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
+				qry = qry + " and c.project_code = ? ";
+				arrSize++;
+			}
+									
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getIncident_type())) {
+				qry = qry + " and c.incident_type = ?";
+				arrSize++;
+			}	
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
+				qry = qry + " and  c.status = ? ";
+				arrSize++;
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date()) && !StringUtils.isEmpty(obj.getTo_date())) {
+				qry = qry + " and CONVERT(date, c.created_date)  BETWEEN ? and ?  ";
+				arrSize++;
+				arrSize++;
+			}
+			else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date())) {
+				qry = qry + " and  CONVERT(date, c.created_date) = ? ";
+				arrSize++;
+			}
+			else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getTo_date())) {
+				qry = qry + " and  CONVERT(date, c.created_date) = ? ";
+				arrSize++;
+			}
+			if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+				qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+				arrSize++;
+				arrSize++;
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getAdmin_incidents())) {
+				qry = qry + " and c.created_by = ?";
+				arrSize++;
+			}
+			if(!StringUtils.isEmpty(obj) && StringUtils.isEmpty(obj.getI_pending())) {
+				//qry = qry + " and DATEDIFF(day,c.created_date,GETDATE()) between  0 and 30 ";
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_pending())) {
+				qry = qry + " and  up.status = ? ";
+				arrSize++;
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed()) ) {
+				qry = qry + " and  c.status = ? and DATEDIFF(day,c.created_date,GETDATE()) between  0 and 30";
+				arrSize++;
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed())  && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+				qry = qry + " and  c.status = ? and (up.approver_code = ? or  c.created_by = ?)  and DATEDIFF(day,c.created_date,GETDATE()) between  0 and 30";
+				arrSize++;
+				arrSize++;
+				arrSize++;
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_no_reviewer())) {
+				qry = qry + " and  c.status is null ";
+			}
+				
+			if(StringUtils.isEmpty(obj.getPageIndex())) {
+				obj.setPageIndex("0");
+			}
+			if(!StringUtils.isEmpty(searchParameter)) {
+				qry = qry + " and (c.document_code like ? or c.project_code like ? or p.project_name like ?"
+						+ " or u1.user_name like ? or up.approver_code like ? or c.document_code like ? or d.department_name like ? "
+						+ "or c.risk_type like ? or c.created_by like ? or u.user_name like ? or c.status like ? or approver_type like ? )";
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				
+			}	
+			if(!StringUtils.isEmpty(startIndex) && !StringUtils.isEmpty(offset)) {
+				qry = qry + " order by FORMAT(c.created_date, 'dd-MMM-yy'),FORMAT(c.created_date, 'HH:mm'),approver_type desc  offset ? rows  fetch next ? rows only  ";
+				arrSize++;
+				arrSize++;
+			}
+			//qry = qry + " order by FORMAT(c.created_date, 'dd-MMM-yy'),FORMAT(c.created_date, 'HH:mm'),approver_type desc OFFSET "+obj.getPageIndex()+"0 ROWS FETCH NEXT 40 ROWS ONLY ";
+
+			Object[] pValues = new Object[arrSize];
+			int i = 0;
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date()) && !StringUtils.isEmpty(obj.getTo_date())) {
+				pValues[i++] = obj.getFrom_date();
+				pValues[i++] = obj.getTo_date();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
+				pValues[i++] = obj.getSbu_code();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
+				pValues[i++] = obj.getProject_code();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
+				pValues[i++] = obj.getStatus();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getIncident_type())) {
+				pValues[i++] = obj.getIncident_type();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date()) && !StringUtils.isEmpty(obj.getTo_date())) {
+				pValues[i++] = obj.getFrom_date();
+				pValues[i++] = obj.getTo_date();
+			}
+			else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date())) {
+				pValues[i++] = obj.getFrom_date();
+			}
+			else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getTo_date())) {
+				pValues[i++] = obj.getTo_date();
+			}
+			if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+				pValues[i++] = obj.getUser(); pValues[i++] = obj.getUser();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getAdmin_incidents())) {
+			pValues[i++] = obj.getAdmin_incidents();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_pending())) {
+				pValues[i++] = obj.getI_pending();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed())) {
+				pValues[i++] = obj.getI_completed();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed())  && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+				pValues[i++] = obj.getI_completed();
+				pValues[i++] = obj.getUser();
+				pValues[i++] = obj.getUser();
+			}
+			
+			
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
+				pValues[i++] = obj.getSbu_code();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
+				pValues[i++] = obj.getProject_code();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
+				pValues[i++] = obj.getStatus();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getIncident_type())) {
+				pValues[i++] = obj.getIncident_type();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date()) && !StringUtils.isEmpty(obj.getTo_date())) {
+				pValues[i++] = obj.getFrom_date();
+				pValues[i++] = obj.getTo_date();
+			}
+			else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date())) {
+				pValues[i++] = obj.getFrom_date();
+			}
+			else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getTo_date())) {
+				pValues[i++] = obj.getTo_date();
+			}
+			if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+				pValues[i++] = obj.getUser(); pValues[i++] = obj.getUser();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getAdmin_incidents())) {
+			pValues[i++] = obj.getAdmin_incidents();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_pending())) {
+				pValues[i++] = obj.getI_pending();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed())) {
+				pValues[i++] = obj.getI_completed();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed())  && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+				pValues[i++] = obj.getI_completed();
+				pValues[i++] = obj.getUser();
+				pValues[i++] = obj.getUser();
+			}
+			
+			
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
+				pValues[i++] = obj.getSbu_code();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
+				pValues[i++] = obj.getProject_code();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
+				pValues[i++] = obj.getStatus();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getIncident_type())) {
+				pValues[i++] = obj.getIncident_type();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date()) && !StringUtils.isEmpty(obj.getTo_date())) {
+				pValues[i++] = obj.getFrom_date();
+				pValues[i++] = obj.getTo_date();
+			}
+			else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date())) {
+				pValues[i++] = obj.getFrom_date();
+			}
+			else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getTo_date())) {
+				pValues[i++] = obj.getTo_date();
+			}
+			if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+				pValues[i++] = obj.getUser(); pValues[i++] = obj.getUser();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getAdmin_incidents())) {
+			pValues[i++] = obj.getAdmin_incidents();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_pending())) {
+				pValues[i++] = obj.getI_pending();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed())) {
+				pValues[i++] = obj.getI_completed();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed())  && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+				pValues[i++] = obj.getI_completed();
+				pValues[i++] = obj.getUser();
+				pValues[i++] = obj.getUser();
+			}
+				
+			
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
+				pValues[i++] = obj.getSbu_code();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
+				pValues[i++] = obj.getProject_code();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
+				pValues[i++] = obj.getStatus();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getIncident_type())) {
+				pValues[i++] = obj.getIncident_type();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date()) && !StringUtils.isEmpty(obj.getTo_date())) {
+				pValues[i++] = obj.getFrom_date();
+				pValues[i++] = obj.getTo_date();
+			}
+			else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date())) {
+				pValues[i++] = obj.getFrom_date();
+			}
+			else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getTo_date())) {
+				pValues[i++] = obj.getTo_date();
+			}
+			if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+				pValues[i++] = obj.getUser(); pValues[i++] = obj.getUser();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getAdmin_incidents())) {
+			pValues[i++] = obj.getAdmin_incidents();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_pending())) {
+				pValues[i++] = obj.getI_pending();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed())) {
+				pValues[i++] = obj.getI_completed();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed())  && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+				pValues[i++] = obj.getI_completed();
+				pValues[i++] = obj.getUser();
+				pValues[i++] = obj.getUser();
+			}
+			
+				
+			
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
+				pValues[i++] = obj.getSbu_code();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
+				pValues[i++] = obj.getProject_code();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getIncident_type())) {
+				pValues[i++] = obj.getIncident_type();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
+				pValues[i++] = obj.getStatus();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date()) && !StringUtils.isEmpty(obj.getTo_date())) {
+				pValues[i++] = obj.getFrom_date();
+				pValues[i++] = obj.getTo_date();
+			}
+			else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date())) {
+				pValues[i++] = obj.getFrom_date();
+			}
+			else if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getTo_date())) {
+				pValues[i++] = obj.getTo_date();
+			}
+			if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+				pValues[i++] = obj.getUser(); pValues[i++] = obj.getUser();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getAdmin_incidents())) {
+			pValues[i++] = obj.getAdmin_incidents();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_pending())) {
+				pValues[i++] = obj.getI_pending();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed())) {
+				pValues[i++] = obj.getI_completed();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getI_completed())  && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
+				pValues[i++] = obj.getI_completed();
+				pValues[i++] = obj.getUser();
+				pValues[i++] = obj.getUser();
+			}
+			if(!StringUtils.isEmpty(searchParameter)) {
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				
+			}
+			if(!StringUtils.isEmpty(startIndex) && !StringUtils.isEmpty(offset)) {
+				pValues[i++] = startIndex;
+				pValues[i++] = offset;
+			}
+				
+			
+			objsList = jdbcTemplate.query( qry,pValues, new BeanPropertyRowMapper<IRM>(IRM.class));
+			
+			Set<String> nameSet = new HashSet<>();
+			objsList = objsList.stream()
+		            .filter(e -> nameSet.add(e.getDocument_code()))
+		            .collect(Collectors.toList());
+		}catch(Exception e){ 
+			e.printStackTrace();
+			throw new Exception(e);
+		}
+		return objsList;
 	}
 	
 }

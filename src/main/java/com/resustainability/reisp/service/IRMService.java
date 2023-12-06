@@ -104,5 +104,21 @@ public class IRMService {
 		return dao.UserActivityCheck();
 	}
 
+	public boolean irmUpdateFilesSubmit(IRM obj)  throws Exception{
+		return dao.irmUpdateFilesSubmit(obj);
+	}
+
+	public String getUniqueID(IRM obj)  throws Exception{
+		return dao.getUniqueID(obj);
+	}
+
+	public int getTotalRecords(IRM obj, String searchParameter) throws Exception {
+		return dao.getTotalRecords(obj,searchParameter);
+	}
+
+	public List<IRM> getIRMLAzyList(IRM obj, int startIndex, int offset, String searchParameter) throws Exception {
+		return dao.getIRMLAzyList(obj,startIndex,offset,searchParameter);
+	}
+
 	
 }

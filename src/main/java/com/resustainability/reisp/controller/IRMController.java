@@ -2,9 +2,11 @@ package com.resustainability.reisp.controller;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -42,14 +44,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.resustainability.reisp.common.DateParser;
 import com.resustainability.reisp.constants.PageConstants;
 import com.resustainability.reisp.model.Company;
 import com.resustainability.reisp.model.IRM;
+import com.resustainability.reisp.model.IRMPaginationObject;
 import com.resustainability.reisp.model.Project;
 import com.resustainability.reisp.model.ProjectLocation;
 import com.resustainability.reisp.model.RoleMapping;
 import com.resustainability.reisp.model.User;
+import com.resustainability.reisp.model.UserPaginationObject;
 import com.resustainability.reisp.service.IRMService;
 import com.resustainability.reisp.service.IRMService;
 
@@ -156,6 +162,104 @@ public class IRMController {
 		return companiesList;
 	}
 	
+	@RequestMapping(value = "/ajax/getIRMListLaztLoad", method = { RequestMethod.POST, RequestMethod.GET })
+	public void getUsersList(@ModelAttribute IRM obj, HttpServletRequest request,
+			HttpServletResponse response, HttpSession session) throws IOException {
+		PrintWriter pw = null;
+		//JSONObject json = new JSONObject();
+		String json2 = null;
+		String userId = null;
+		String userName = null;
+		try {
+			userId = (String) session.getAttribute("USER_ID");
+			userName = (String) session.getAttribute("USER_NAME");
+
+			pw = response.getWriter();
+			//Fetch the page number from client
+			Integer pageNumber = 0;
+			Integer pageDisplayLength = 0;
+			if (null != request.getParameter("iDisplayStart")) {
+				pageDisplayLength = Integer.valueOf(request.getParameter("iDisplayLength"));
+				pageNumber = (Integer.valueOf(request.getParameter("iDisplayStart")) / pageDisplayLength) + 1;
+			}
+			//Fetch search parameter
+			String searchParameter = request.getParameter("sSearch");
+
+			//Fetch Page display length
+			pageDisplayLength = Integer.valueOf(request.getParameter("iDisplayLength"));
+
+			List<IRM> budgetList = new ArrayList<IRM>();
+
+			//Here is server side pagination logic. Based on the page number you could make call 
+			//to the data base create new list and send back to the client. For demo I am shuffling 
+			//the same list to show data randomly
+			int startIndex = 0;
+			int offset = pageDisplayLength;
+
+			if (pageNumber == 1) {
+				startIndex = 0;
+				offset = pageDisplayLength;
+				budgetList = createPaginationData(startIndex, offset, obj, searchParameter);
+			} else {
+				startIndex = (pageNumber * offset) - offset;
+				offset = pageDisplayLength;
+				budgetList = createPaginationData(startIndex, offset, obj, searchParameter);
+			}
+
+			//Search functionality: Returns filtered list based on search parameter
+			//budgetList = getListBasedOnSearchParameter(searchParameter,budgetList);
+
+			int totalRecords = getTotalRecords(obj, searchParameter);
+
+			IRMPaginationObject personJsonObject = new IRMPaginationObject();
+			//Set Total display record
+			personJsonObject.setiTotalDisplayRecords(totalRecords);
+			//Set Total record
+			personJsonObject.setiTotalRecords(totalRecords);
+			personJsonObject.setAaData(budgetList);
+
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			json2 = gson.toJson(personJsonObject);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(
+					"getUsersList : User Id - " + userId + " - User Name - " + userName + " - " + e.getMessage());
+		}
+
+		pw.println(json2);
+	}
+
+	/**
+	 * @param searchParameter 
+	 * @param activity 
+	 * @return
+	 */
+	public int getTotalRecords(IRM obj, String searchParameter) {
+		int totalRecords = 0;
+		try {
+			totalRecords = service.getTotalRecords(obj, searchParameter);
+		} catch (Exception e) {
+			logger.error("getTotalRecords : " + e.getMessage());
+		}
+		return totalRecords;
+	}
+
+	/**
+	 * @param pageDisplayLength
+	 * @param offset 
+	 * @param activity 
+	 * @param clientId 
+	 * @return
+	 */
+	public List<IRM> createPaginationData(int startIndex, int offset, IRM obj, String searchParameter) {
+		List<IRM> objList = null;
+		try {
+			objList = service.getIRMLAzyList(obj, startIndex, offset, searchParameter);
+		} catch (Exception e) {
+			logger.error("createPaginationData : " + e.getMessage());
+		}
+		return objList;
+	}
 	@RequestMapping(value = "/ajax/getIRMListReport", method = {RequestMethod.GET,RequestMethod.POST},produces=MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<IRM> getIRMListReport(@ModelAttribute IRM obj,HttpSession session) {
@@ -525,9 +629,14 @@ public class IRMController {
 			String email = (String) session.getAttribute("USER_EMAIL");
 			obj.setEmail(email);
 			obj.setCreated_by(userId);
+			Calendar now = Calendar.getInstance();
+		    DateFormat df = new SimpleDateFormat("_yyMM_");
+		    String result = df.format(now.getTime());
+			String u_id = service.getUniqueID(obj);
+			obj.setDocument_code("IRM"+result+u_id);
 			flag = service.irmSubmit(obj);
 			if(flag == true) {
-				attributes.addFlashAttribute("success", "Incident Submitted Succesfully.");
+				attributes.addFlashAttribute("success", obj.getDocument_code()+" - Incident Created Succesfully.");
 			}
 			else {
 				attributes.addFlashAttribute("error"," Submiting Incident is failed. Try again.");
@@ -539,6 +648,36 @@ public class IRMController {
 		return model;
 	}
 	
+	@RequestMapping(value = "/submit-new-files", method = {RequestMethod.GET,RequestMethod.POST})
+	public ModelAndView irmUpdateFilesSubmit(@ModelAttribute IRM obj,RedirectAttributes attributes,HttpSession session) {
+		boolean flag = false;
+		String userId = null;
+		String userName = null;
+		ModelAndView model = new ModelAndView();
+		try {
+			model.setViewName("redirect:/irm");
+			userId = (String) session.getAttribute("USER_ID");
+			userName = (String) session.getAttribute("USER_NAME");
+			obj.setUser_id(userId);
+			obj.setUser_name(userName);
+			String email = (String) session.getAttribute("USER_EMAIL");
+			obj.setEmail(email);
+			obj.setCreated_by(userId);
+			flag = service.irmUpdateFilesSubmit(obj);
+			if(flag == true) {
+				attributes.addFlashAttribute("success", "Files Updated for Incident"+obj.getDocument_code_files()+" Succesfully.");
+			}
+			else {
+				attributes.addFlashAttribute("error","Updating Files failed. Try again.");
+			}
+		} catch (Exception e) {
+			attributes.addFlashAttribute("error","Updating Files failed. Try again.");
+			e.printStackTrace();
+		}
+		return model;
+	}
+	
+
 	@RequestMapping(value = "/irm-update-submit", method = {RequestMethod.GET,RequestMethod.POST})
 	public ModelAndView irmUpdateSubmit(@ModelAttribute IRM obj,RedirectAttributes attributes,HttpSession session) {
 		boolean flag = false;
@@ -569,6 +708,7 @@ public class IRMController {
 	}
 	
 
+	
 	@RequestMapping(value = "/export-irm", method = {RequestMethod.GET,RequestMethod.POST})
 	public void exportIRM(HttpServletRequest request, HttpServletResponse response,HttpSession session,@ModelAttribute IRM obj,RedirectAttributes attributes){
 		ModelAndView view = new ModelAndView(PageConstants.irmMain);
