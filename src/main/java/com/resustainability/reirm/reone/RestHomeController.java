@@ -82,7 +82,7 @@ public class RestHomeController {
 			User uBoj = new User();
 			uBoj.setEmail_id(email);
 			User userDetails = service.validateUser(uBoj);
-			companiesList = service2.getIRMList(obj);
+			companiesList = service2.getIRMLAzyList(obj, 0, 10, email);
 			user.setUser_id(userId);
 			List<User> rewardsList = service.getRewardsHistory(user);
 			if(("Admin").equals(role) || ("Management").equals(role)) {

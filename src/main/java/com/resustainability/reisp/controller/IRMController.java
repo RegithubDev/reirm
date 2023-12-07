@@ -163,7 +163,7 @@ public class IRMController {
 	}
 	
 	@RequestMapping(value = "/ajax/getIRMListLaztLoad", method = { RequestMethod.POST, RequestMethod.GET })
-	public void getUsersList(@ModelAttribute IRM obj, HttpServletRequest request,
+	public void getIRMListLaztLoad(@ModelAttribute IRM obj, HttpServletRequest request,
 			HttpServletResponse response, HttpSession session) throws IOException {
 		PrintWriter pw = null;
 		//JSONObject json = new JSONObject();

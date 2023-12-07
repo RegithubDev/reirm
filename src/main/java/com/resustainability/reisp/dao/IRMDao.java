@@ -2932,8 +2932,6 @@ public class IRMDao {
 				pValues[i++] = startIndex;
 				pValues[i++] = offset;
 			}
-				
-			
 			objsList = jdbcTemplate.query( qry,pValues, new BeanPropertyRowMapper<IRM>(IRM.class));
 			
 			Set<String> nameSet = new HashSet<>();
