@@ -392,16 +392,30 @@ tr td:last-child {
 
         <div class="card-body">
           <ul class="nav nav-tabs nav-justified" id="myTab2" role="tablist">
+           <c:if test="${sessionScope.BASE_ROLE eq 'Admin' || sessionScope.BASE_ROLE eq 'Management' }">
+            <li class="nav-item" onclick="getIRMList('irm');">
+              <a
+                class="nav-link active"
+                id="settings-tab-justified"
+                data-bs-toggle="tab"
+                href="#settings-just-all"
+                role="tab"
+                aria-controls="settings-just"
+                aria-selected="true"
+                >All Incidents</a
+              > 
+            </li>
+               </c:if>
           <%--  <c:if test="${sessionScope.BASE_ROLE eq 'Admin' || sessionScope.BASE_ROLE eq 'Management' }"> --%>
             <li class="nav-item" onclick="getIRMList('irm-my');">
               <a
-                class="nav-link active"
+                class="nav-link "
                 id="home-tab-justified"
                 data-bs-toggle="tab"
                 href="#home-just"
                 role="tab"
                 aria-controls="home-just"
-                aria-selected="true"
+                aria-selected="false"
                >My IR</a
               >
             </li>
@@ -414,7 +428,7 @@ tr td:last-child {
                 href="#profile-just"
                 role="tab"
                 aria-controls="profile-just"
-                aria-selected="true"
+                aria-selected="false"
                  >Pending Actions <button type="button" class="btn btn-icon btn-icon rounded-circle btn-danger waves-effect waves-float waves-light">
 <span id="counts">0</span>           </button></a
               >
@@ -446,25 +460,36 @@ tr td:last-child {
               >
             </li>
                </c:if>
-           <c:if test="${sessionScope.BASE_ROLE eq 'Admin' || sessionScope.BASE_ROLE eq 'Management' }">
-            <li class="nav-item" onclick="getIRMList('irm');">
-              <a
-                class="nav-link"
-                id="settings-tab-justified"
-                data-bs-toggle="tab"
-                href="#settings-just-all"
-                role="tab"
-                aria-controls="settings-just"
-                aria-selected="false"
-                >All Incidents</a
-              >
-            </li>
-               </c:if>
+          
           </ul>
 
           <!-- Tab panes -->
           <div class="tab-content pt-1">
-            <div class="tab-pane active" id="home-just" role="tabpanel" aria-labelledby="home-tab-justified">
+          <div class="tab-pane active" id="settings-just-all" role="tabpanel" aria-labelledby="settings-tab-justified">
+             <div class="card-datatable table-responsive">
+		        <div class="dt-buttons text-danger" style="height : 1.5em;">
+		        <!-- Last 30 Days -->
+		        </div>
+		          <table id="datatable-irm" class="invoice-list-table table" style="width: 100%; font-size:90%">
+		            <thead>
+		              <tr>
+		                <th>#</th>
+		                <th>Action</th>
+		                <th>Incident no</th>
+		                 <th>Status </th>
+		               
+		                 <th>Incident </th>
+		                <th>Project</th>
+		                <th>Department</th>
+		                <th>Level</th>
+		                <th>Reviewer  </th>
+		                <th>Raised by </th>
+		              </tr>
+		            </thead>
+		          </table>
+		        </div>
+            </div>
+            <div class="tab-pane " id="home-just" role="tabpanel" aria-labelledby="home-tab-justified">
              <div class="card-datatable table-responsive">
 		       <div class="dt-buttons text-danger" style="height : 1.5em;">
 		      <!-- Last 30 Days -->
@@ -561,30 +586,7 @@ tr td:last-child {
 		        </div>
             </div>
             
-            <div class="tab-pane" id="settings-just-all" role="tabpanel" aria-labelledby="settings-tab-justified">
-             <div class="card-datatable table-responsive">
-		        <div class="dt-buttons text-danger" style="height : 1.5em;">
-		        <!-- Last 30 Days -->
-		        </div>
-		          <table id="datatable-irm" class="invoice-list-table table" style="width: 100%; font-size:90%">
-		            <thead>
-		              <tr>
-		                <th>#</th>
-		                <th>Action</th>
-		                <th>Incident no</th>
-		                 <th>Status </th>
-		               
-		                 <th>Incident </th>
-		                <th>Project</th>
-		                <th>Department</th>
-		                <th>Level</th>
-		                <th>Reviewer  </th>
-		                <th>Raised by </th>
-		              </tr>
-		            </thead>
-		          </table>
-		        </div>
-            </div>
+            
             
             
           </div>
@@ -1440,7 +1442,7 @@ tr td:last-child {
 	    	}
 	    	clickedTags = window.localStorage.getItem("clickedTags");
 	    	if(tag == '' ){
-	    		tag = 'irm-my'
+	    		tag = 'irm'
 	    		window.localStorage.setItem("clickedTags", tag);
 	    		
 	    	}else if(tag == "searchTag"){
@@ -1772,7 +1774,7 @@ tr td:last-child {
 	    		            } },
 	    		         	{ "mData": function(data,type,row){
 	    		         		  var document_code = '';
-	    		         		  if ($.trim(data.document_code) != '') { document_code = ' - ' + $.trim(data.document_code) }    	
+	    		         		  if ($.trim(data.document_code) != '') { document_code = $.trim(data.document_code) }    	
 		                             if($.trim(data.document_code) == ''){ return '-'; }else{ return document_code; }
 	    		            } },
 	    		            { "mData": function(data,type,row){
