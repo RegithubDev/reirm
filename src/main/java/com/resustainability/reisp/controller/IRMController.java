@@ -170,9 +170,22 @@ public class IRMController {
 		String json2 = null;
 		String userId = null;
 		String userName = null;
+		String role = null;
 		try {
 			userId = (String) session.getAttribute("USER_ID");
 			userName = (String) session.getAttribute("USER_NAME");
+			role = (String) session.getAttribute("BASE_ROLE");
+			obj.setUser(userId);
+			obj.setRole(role);
+			if(!StringUtils.isEmpty(obj.getFrom_and_to())) {
+				if(obj.getFrom_and_to().contains("to")) {
+					String [] dates = obj.getFrom_and_to().split("to");
+					obj.setFrom_date(dates[0].trim());
+					obj.setTo_date(dates[1].trim());
+				}else {
+					obj.setFrom_date(obj.getFrom_and_to());
+				}
+			}
 
 			pw = response.getWriter();
 			//Fetch the page number from client

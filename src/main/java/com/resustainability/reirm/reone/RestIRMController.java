@@ -167,10 +167,23 @@ public class RestIRMController {
 		String userId = null;
 		String userName = null;
 		List<IRM> budgetList = new ArrayList<IRM>();
+		String role = null;
 		try {
 			userId = (String) session.getAttribute("USER_ID");
 			userName = (String) session.getAttribute("USER_NAME");
-			//Fetch the page number from client
+			role = (String) session.getAttribute("BASE_ROLE");
+			obj.setUser(userId);
+			obj.setRole(role);
+			if(!StringUtils.isEmpty(obj.getFrom_and_to())) {
+				if(obj.getFrom_and_to().contains("to")) {
+					String [] dates = obj.getFrom_and_to().split("to");
+					obj.setFrom_date(dates[0].trim());
+					obj.setTo_date(dates[1].trim());
+				}else {
+					obj.setFrom_date(obj.getFrom_and_to());
+				}
+			}
+
 			Integer pageNumber = 0;
 			Integer pageDisplayLength = 0;
 		
@@ -639,13 +652,14 @@ public class RestIRMController {
 	}
 
 	@RequestMapping(value = "/irm-submit", method = {RequestMethod.GET,RequestMethod.POST})
-	public ModelAndView irmSubmit(@ModelAttribute IRM obj,RedirectAttributes attributes,HttpSession session) {
+	public String  irmSubmit(@ModelAttribute IRM obj,RedirectAttributes attributes,HttpSession session) {
 		boolean flag = false;
 		String userId = null;
 		String userName = null;
+		String msg = null;
 		ModelAndView model = new ModelAndView();
 		try {
-			model.setViewName("redirect:/irm");
+			model.setViewName("redirect:/reone/irm");
 			userId = (String) session.getAttribute("USER_ID");
 			userName = (String) session.getAttribute("USER_NAME");
 			obj.setUser_id(userId);
@@ -661,15 +675,18 @@ public class RestIRMController {
 			flag = service.irmSubmit(obj);
 			if(flag == true) {
 				attributes.addFlashAttribute("success", obj.getDocument_code()+" - Incident Created Succesfully.");
+				msg ="Incident Submitted Succesfully.";
 			}
 			else {
+				msg = "Submiting Incident is failed. Try again.";
 				attributes.addFlashAttribute("error"," Submiting Incident is failed. Try again.");
 			}
 		} catch (Exception e) {
+			msg = "Submiting Incident is failed. Try again.";
 			attributes.addFlashAttribute("error"," Submiting Incident is failed. Try again.");
 			e.printStackTrace();
 		}
-		return model;
+		return msg;
 	}
 	
 	@RequestMapping(value = "/submit-new-files", method = {RequestMethod.GET,RequestMethod.POST})
