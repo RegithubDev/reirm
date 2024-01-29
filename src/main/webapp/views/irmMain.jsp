@@ -1054,7 +1054,7 @@ tr td:last-child {
          <input type="hidden" name="from_and_to" id="exportFrom_filter" />
 	</form>
 	
-	  <form action="<%=request.getContextPath()%>/update-irm-form" name="updateIRM" id="updateIRM" method="post">	
+	  <form action="<%=request.getContextPath()%>/update-irm-form" target="_blank" name="updateIRM" id="updateIRM" method="post">	
       
         <input type="hidden" name=document_code id="document_codeUpdate" />
         <input type="hidden" name=approver_type id="approver_typeUpdate" />
