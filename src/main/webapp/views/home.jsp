@@ -188,7 +188,7 @@ License: You must have a valid license purchased only from themeforest(the above
     <div class="modal-content" style=" left: 8%;">
       <div class="modal-header bg-transparent">
 	       <c:if test="${sessionScope.BASE_ROLE eq 'Admin' || sessionScope.BASE_ROLE eq 'Management' }">
-	        <img src="/reirm/resources/images/protect-favicon.png" alt="Protect Icon" text="Protect"  width="30"  /> <span>&nbsp;Rewards History</span></c:if>
+	        <img src="/reirm/resources/images/protect-favicon.png" alt="Aayush Icon" text="Aayush"  width="30"  /> <span>&nbsp;Rewards History</span></c:if>
 	       <c:if test="${sessionScope.BASE_ROLE ne 'Admin' && sessionScope.BASE_ROLE ne 'Management' }"> ${sessionScope.USER_NAME} - Rewards History </c:if>
      
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
