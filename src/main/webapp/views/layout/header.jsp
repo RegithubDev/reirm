@@ -14,9 +14,9 @@
     left: calc(3% - 56px) !important;
     }
     .card-img {
-    max-width: 70% !important;
-    margin-left: 15%;
-    margin-top: 0% !important;
+     max-width: 62% !important;
+    margin-left: 2%;
+    margin-top: 1.5% !important
 }
 .navbar-brand {
     margin-right: 0rem !important;
@@ -55,7 +55,7 @@
                   </defs>
                   <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                     <g id="Artboard" transform="translate(-400.000000, -178.000000)">
-			         <img src="<%=request.getContextPath() %>/resources/images/logo/P2-LoginPage.png" width="50" height="" class="card-img">
+			         <img src="<%=request.getContextPath() %>/resources/images/logo/P2-LoginPage.svg" width="50" height="" class="card-img">
                     </g>
                   </g>
                 </svg></span>
@@ -83,7 +83,7 @@
          </li>
          
          
-          <li class="nav-item d-none d-lg-block"><a class="nav-link nav-link-style"><i class="ficon" data-feather="moon"></i></a></li>
+         <!--  <li class="nav-item d-none d-lg-block"><a class="nav-link nav-link-style"><i class="ficon" data-feather="moon"></i></a></li>
           <li class="nav-item nav-search "><a class="nav-link nav-link-search"><i class="ficon" data-feather="search"></i></a>
             <div class="search-input">
               <div class="search-input-icon"><i data-feather="search"></i></div>
@@ -91,7 +91,7 @@
               <div class="search-input-close"><i data-feather="x"></i></div>
               <ul class="search-list search-list-main"></ul>
             </div>
-          </li>
+          </li> -->
     
          <!--  <li class="nav-item dropdown dropdown-notification me-25"><a class="nav-link" href="#" data-bs-toggle="dropdown"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell ficon"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><span class="badge rounded-pill bg-danger badge-up">5</span></a>
             <ul class="dropdown-menu dropdown-menu-media dropdown-menu-end">
