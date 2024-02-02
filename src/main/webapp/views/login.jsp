@@ -86,7 +86,7 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
     <div class="card mb-0">
       <div class="card-body">
         <a href="https://resustainability.com/" class="brand-logo">
-         <img src="<c:url value="/resources/images/logo/protect-main.png"/>" width="100" height="100" alt="logo" class="card-img">
+         <img src="<c:url value="/resources/images/logo/protect-main.svg"/>" width="100" height="100" alt="logo" class="card-img">
          <!--  <h2 class="brand-text text-primary ms-1">RE</h2> -->
         </a>
 		 <div class=" justify-content-center"><h4 class="card-title mb-1">Welcome to Idea Submission Portal! 👋</h4> </div>

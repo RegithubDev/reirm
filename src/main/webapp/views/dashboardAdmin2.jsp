@@ -105,7 +105,7 @@ License: You must have a valid license purchased only from themeforest(the above
                     </defs>
                     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                       <g id="Artboard" transform="translate(-400.000000, -178.000000)">
-                                             			         <img src="<%=request.getContextPath() %>/resources/images/logo/protect-main.png" width="50" height="40" class="card-img">
+                                             			         <img src="<%=request.getContextPath() %>/resources/images/logo/protect-main.svg" width="50" height="40" class="card-img">
 
                       </g>
                     </g>
