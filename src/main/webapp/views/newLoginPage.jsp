@@ -52,7 +52,7 @@
     padding: 0rem!important;
 }
 .ms-2 {
-    margin-left: 4.9rem!important;
+    margin-left: 2.9rem!important;
 }
 .imgDiv div {
     position: absolute;
@@ -194,7 +194,9 @@
                <!-- Login basic -->
 				 	
                 <div class="col-12 col-sm-8 col-md-6 mt-1 col-lg-12 px-xl-2 mx-auto">
-				<img src="<c:url value="/resources/images/logo/protect-main.svg"/>" href="https://resustainability.com/"  alt="logo" class="mb-2">
+				<img src="<c:url value="/resources/images/logo/protect-main.svg"/>" href="https://resustainability.com/"  alt="logo" class="mb-2 ms-2" style="
+    height: 6rem;
+">
                 <div style="color: red;" >${invalidEmail} ${multipleLoginFound}</div>
                 <h3><strong>Welcome to</strong></h3>
               
