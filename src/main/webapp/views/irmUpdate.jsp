@@ -67,7 +67,7 @@ body {
     
 }
 .card-imgs {
-    margin-left: -9.5% !important;
+    margin-left: -8.5% !important;
 }
 .textAreaColumn{
     width:100%;    
@@ -206,7 +206,7 @@ h1{
                     </defs>
                     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                       <g id="Artboard" transform="translate(-400.000000, -178.000000)">
-                                             			         <img src="<%=request.getContextPath() %>/resources/images/logo/P2-LoginPage.svg" width="" height="40" class="card-imgs">
+                                             			         <img src="<%=request.getContextPath() %>/resources/images/logo/P2-LoginPage.jpeg" width="" height="40" class="card-imgs">
 
                       </g>
                     </g> 
@@ -284,7 +284,7 @@ h1{
                   </defs>
                   <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                     <g id="Artboard" transform="translate(-400.000000, -178.000000)">
-			         <img src="<%=request.getContextPath() %>/resources/images/logo/P2-LoginPage.svg" width="" height="40" class="card-imgs" >
+			         <img src="<%=request.getContextPath() %>/resources/images/logo/P2-LoginPage.jpeg" width="" height="40" class="card-imgs" >
                     </g>
                   </g>
                 </svg>

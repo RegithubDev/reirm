@@ -652,7 +652,7 @@ public class RestIRMController {
 	}
 
 	@RequestMapping(value = "/irm-submit", method = {RequestMethod.GET,RequestMethod.POST})
-	public String  irmSubmit(@ModelAttribute IRM obj,RedirectAttributes attributes,HttpSession session) {
+	public String  irmSubmit(@RequestBody IRM obj,RedirectAttributes attributes,HttpSession session) {
 		boolean flag = false;
 		String userId = null;
 		String userName = null;
@@ -660,13 +660,13 @@ public class RestIRMController {
 		ModelAndView model = new ModelAndView();
 		try {
 			model.setViewName("redirect:/reone/irm");
-			userId = (String) session.getAttribute("USER_ID");
-			userName = (String) session.getAttribute("USER_NAME");
-			obj.setUser_id(userId);
-			obj.setUser_name(userName);
-			String email = (String) session.getAttribute("USER_EMAIL");
-			obj.setEmail(email);
-			obj.setCreated_by(userId);
+			/*
+			 * userId = (String) session.getAttribute("USER_ID"); userName = (String)
+			 * session.getAttribute("USER_NAME"); obj.setUser_id(userId);
+			 * obj.setUser_name(userName); String email = (String)
+			 * session.getAttribute("USER_EMAIL"); obj.setEmail(email);
+			 * obj.setCreated_by(userId);
+			 */
 			Calendar now = Calendar.getInstance();
 		    DateFormat df = new SimpleDateFormat("_yyMM_");
 		    String result = df.format(now.getTime());

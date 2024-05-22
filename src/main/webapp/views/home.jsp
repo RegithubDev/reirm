@@ -98,7 +98,7 @@ License: You must have a valid license purchased only from themeforest(the above
                     </defs>
                     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                       <g id="Artboard" transform="translate(-400.000000, -178.000000)">
-                                             			         <img src="<%=request.getContextPath() %>/resources/images/logo/protect-main.svg" width="50" height="40" class="card-img">
+                                             			         <img src="<%=request.getContextPath() %>/resources/images/logo/protect-main.jpeg" width="50" height="40" class="card-img">
 
                       </g>
                     </g>
@@ -155,11 +155,11 @@ License: You must have a valid license purchased only from themeforest(the above
     <h6 class="text-muted mt-3">Multiple slides</h6>
     <div class="swiper swiper-initialized swiper-horizontal swiper-backface-hidden" id="swiper-multiple-slides">
       <div class="swiper-wrapper" id="swiper-wrapper-32b8f58f7210e384e" aria-live="polite" style="transition-duration: 0ms; transform: translate3d(0px, 0px, 0px);">
-        <div class="swiper-slide swiper-slide-active" style="background-image: url(&quot;<%=request.getContextPath() %>/resources/images/logo/protect-main.svg&quot;); width: 444px; margin-right: 30px;" role="group" aria-label="1 / 5">Slide 1</div>
-        <div class="swiper-slide swiper-slide-next" style="background-image: url(&quot;<%=request.getContextPath() %>/resources/images/logo/protect-main.svg&quot;); width: 444px; margin-right: 30px;" role="group" aria-label="2 / 5">Slide 2</div>
-        <div class="swiper-slide" style="background-image: url(&quot;<%=request.getContextPath() %>/resources/images/logo/protect-main.svg&quot;); width: 444px; margin-right: 30px;" role="group" aria-label="3 / 5">Slide 3</div>
-        <div class="swiper-slide" style="background-image: url(&quot;<%=request.getContextPath() %>/resources/images/logo/protect-main.svg&quot;); width: 444px; margin-right: 30px;" role="group" aria-label="4 / 5">Slide 4</div>
-        <div class="swiper-slide" style="background-image: url(&quot;<%=request.getContextPath() %>/resources/images/logo/protect-main.svg&quot;); width: 444px; margin-right: 30px;" role="group" aria-label="5 / 5">Slide 5</div>
+        <div class="swiper-slide swiper-slide-active" style="background-image: url(&quot;<%=request.getContextPath() %>/resources/images/logo/protect-main.jpeg&quot;); width: 444px; margin-right: 30px;" role="group" aria-label="1 / 5">Slide 1</div>
+        <div class="swiper-slide swiper-slide-next" style="background-image: url(&quot;<%=request.getContextPath() %>/resources/images/logo/protect-main.jpeg&quot;); width: 444px; margin-right: 30px;" role="group" aria-label="2 / 5">Slide 2</div>
+        <div class="swiper-slide" style="background-image: url(&quot;<%=request.getContextPath() %>/resources/images/logo/protect-main.jpeg&quot;); width: 444px; margin-right: 30px;" role="group" aria-label="3 / 5">Slide 3</div>
+        <div class="swiper-slide" style="background-image: url(&quot;<%=request.getContextPath() %>/resources/images/logo/protect-main.jpeg&quot;); width: 444px; margin-right: 30px;" role="group" aria-label="4 / 5">Slide 4</div>
+        <div class="swiper-slide" style="background-image: url(&quot;<%=request.getContextPath() %>/resources/images/logo/protect-main.jpeg&quot;); width: 444px; margin-right: 30px;" role="group" aria-label="5 / 5">Slide 5</div>
       </div>
       <div class="swiper-pagination swiper-pagination-clickable swiper-pagination-bullets swiper-pagination-horizontal"><span class="swiper-pagination-bullet swiper-pagination-bullet-active" tabindex="0" role="button" aria-label="Go to slide 1" aria-current="true"></span><span class="swiper-pagination-bullet" tabindex="0" role="button" aria-label="Go to slide 2"></span><span class="swiper-pagination-bullet" tabindex="0" role="button" aria-label="Go to slide 3"></span></div>
     <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>

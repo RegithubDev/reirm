@@ -592,7 +592,7 @@ CSS Pretty Print
     <nav>
         <div class="nav-wrapper blue darken-3">
             <div class="">
-                <a href="<%=request.getContextPath() %>/home" class="brand-logo fs"><img src="<c:url value="/resources/images/logo/protect-main.svg"/>" alt="Logo"> REIS</a>
+                <a href="<%=request.getContextPath() %>/home" class="brand-logo fs"><img src="<c:url value="/resources/images/logo/protect-main.jpeg"/>" alt="Logo"> REIS</a>
                 <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="fa fa-bars"></i></a>
 
             </div>
@@ -719,7 +719,7 @@ CSS Pretty Print
         <div class="footer-copyright blue lighten-5 bottom">
             <div class="container">
                <!--  <span>Copyright 2020 @ mrvc.indianrailways.gov.in | Designed & Developed by</span> --> <img
-                    src="<c:url value="/resources/images/logo/protect-main.svg"/>" class="footer-img" alt="footer image">
+                    src="<c:url value="/resources/images/logo/protect-main.jpeg"/>" class="footer-img" alt="footer image">
             </div>
         </div>
     </div>

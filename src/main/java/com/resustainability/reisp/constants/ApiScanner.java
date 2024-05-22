@@ -11,7 +11,7 @@ import org.reflections.util.ConfigurationBuilder;
 public class ApiScanner {
 
     public static void main(String[] args) {
-        scanApis("com.resustainability.reirm.reone");
+        scanApis("com.resustainability.reisp.controller");
     }
 
     public static void scanApis(String controllerPackage) {

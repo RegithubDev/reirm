@@ -14,9 +14,9 @@
     left: calc(3% - 56px) !important;
     }
     .card-img {
-     max-width: 62% !important;
-    margin-left: 2%;
-    margin-top: 1.5% !important
+   max-width: 21% !important;
+    margin-left: 0%;
+    margin-top: -0.5% !important;
 }
 .navbar-brand {
     margin-right: 0rem !important;
@@ -55,7 +55,7 @@
                   </defs>
                   <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                     <g id="Artboard" transform="translate(-400.000000, -178.000000)">
-			         <img src="<%=request.getContextPath() %>/resources/images/logo/P2-LoginPage.svg" width="50" height="" class="card-img">
+			         <img src="<%=request.getContextPath() %>/resources/images/logo/P2-LoginPage.jpeg" width="50" height="" class="card-img">
                     </g>
                   </g>
                 </svg></span>
