@@ -37,7 +37,7 @@ public class LocationDao {
 	public List<ProjectLocation> getProjectsList(ProjectLocation obj) throws SQLException {
 		List<ProjectLocation> menuList = null;
 		try{  
-			String qry = "select project_code, project_name from [project] ";
+			String qry = "select project_code, project_name from project ";
 			menuList = jdbcTemplate.query( qry, new BeanPropertyRowMapper<ProjectLocation>(ProjectLocation.class));
 			
 		}catch(Exception e){ 
@@ -96,10 +96,10 @@ public class LocationDao {
 							qry = qry + " ) as inActive_location,"
 					+ "c.id,c.project_code,pp.project_name,location_code,location_name,c.status,"
 					+ "	FORMAT (c.created_date, 'dd-MMM-yy') as created_date,up.user_name as 	"
-					+ "created_by,FORMAT	(c.modified_date, 'dd-MMM-yy') as modified_date,up1.user_name as  modified_by from [project_location] c "
-					+ "left join [user_profile] up on c.created_by = up.user_id "
-					+ "left join [user_profile] up1 on c.modified_by = up1.user_id "
-					+ " left join [project] pp on pp.project_code = c.project_code "
+					+ "created_by,FORMAT	(c.modified_date, 'dd-MMM-yy') as modified_date,up1.user_name as  modified_by from project_location c "
+					+ "left join user_profile up on c.created_by = up.user_id "
+					+ "left join user_profile up1 on c.modified_by = up1.user_id "
+					+ " left join project pp on pp.project_code = c.project_code "
 					+ " where c.location_code is not null and c.location_code <> '' ";
 			
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
@@ -165,8 +165,8 @@ public class LocationDao {
 	public List<ProjectLocation> getProjectFilterList(ProjectLocation obj) throws Exception {
 		List<ProjectLocation> objsList = new ArrayList<ProjectLocation>();
 		try {
-			String qry = "SELECT  s.project_code,c.project_name FROM [project_location] s "
-					+ " left join [project] c on c.project_code = s.project_code "
+			String qry = "SELECT  s.project_code,c.project_name FROM project_location s "
+					+ " left join project c on c.project_code = s.project_code "
 					+ " where c.project_code is not null and c.project_code <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
@@ -204,7 +204,7 @@ public class LocationDao {
 	public List<ProjectLocation> getLocationFilterList(ProjectLocation obj) throws Exception {
 		List<ProjectLocation> objsList = new ArrayList<ProjectLocation>();
 		try {
-			String qry = "SELECT location_code, location_name FROM [project_location] s "
+			String qry = "SELECT location_code, location_name FROM project_location s "
 					+ " where location_code is not null and location_code <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
@@ -242,7 +242,7 @@ public class LocationDao {
 	public List<ProjectLocation> getStatusFilterListFromLocation(ProjectLocation obj) throws Exception {
 		List<ProjectLocation> objsList = new ArrayList<ProjectLocation>();
 		try {
-			String qry = "SELECT status FROM [project_location] s "
+			String qry = "SELECT status FROM project_location s "
 					+ " where status is not null and status <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
@@ -284,7 +284,7 @@ public class LocationDao {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		try {
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String insertQry = "INSERT INTO [project_location] (location_name,location_code,project_code,status,created_by) VALUES (:location_name,:location_code,:project_code,:status,:created_by)";
+			String insertQry = "INSERT INTO project_location (location_name,location_code,project_code,status,created_by) VALUES (:location_name,:location_code,:project_code,:status,:created_by)";
 			BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
 		    count = namedParamJdbcTemplate.update(insertQry, paramSource);
 			if(count > 0) {
@@ -306,7 +306,7 @@ public class LocationDao {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		try {
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String updateQry = "UPDATE [project_location] set location_name= :location_name,location_code= :location_code,project_code=:project_code,status= :status,modified_by= :modified_by  "
+			String updateQry = "UPDATE project_location set location_name= :location_name,location_code= :location_code,project_code=:project_code,status= :status,modified_by= :modified_by  "
 					+ " where id= :id ";
 			BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
 		    count = namedParamJdbcTemplate.update(updateQry, paramSource);
@@ -325,7 +325,7 @@ public class LocationDao {
 	public List<ProjectLocation> checkUniqueIfForlocation(ProjectLocation obj) throws Exception {
 		List<ProjectLocation> objsList = new ArrayList<ProjectLocation>();
 		try {
-			String qry = "SELECT location_code FROM [project_location]  "
+			String qry = "SELECT location_code FROM project_location  "
 					+ " where status is not null and status <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getLocation_code())) {

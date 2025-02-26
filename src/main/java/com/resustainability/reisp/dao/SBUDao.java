@@ -80,7 +80,7 @@ public class SBUDao {
 								arrSize++;
 							}
 							qry = qry + " ) as inActive_sbu,"
-					+ "s.id,s.company_code,c.company_name,sbu_code,sbu_name,s.status from [sbu] s "
+					+ "s.id,s.company_code,c.company_name,sbu_code,sbu_name,s.status from sbu s "
 					+ " left join [company] c on c.company_code = s.company_code "
 					+ " where s.sbu_code is not null and s.sbu_code <> '' ";
 			
@@ -147,8 +147,8 @@ public class SBUDao {
 	public List<SBU> getCompanyFilterList(SBU obj) throws Exception {
 		List<SBU> objsList = new ArrayList<SBU>();
 		try {
-			String qry = "SELECT  distinct s.company_code,c.company_name FROM [sbu] s "
-					+ " left join [company] c on c.company_code = s.company_code "
+			String qry = "SELECT  distinct s.company_code,c.company_name FROM sbu s "
+					+ " left join company c on c.company_code = s.company_code "
 					+ " where c.company_code is not null and c.company_code <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getCompany_code())) {
@@ -186,7 +186,7 @@ public class SBUDao {
 	public List<SBU> getSBUFilterList(SBU obj) throws Exception {
 		List<SBU> objsList = new ArrayList<SBU>();
 		try {
-			String qry = "SELECT distinct sbu_code, sbu_name FROM [sbu] s "
+			String qry = "SELECT distinct sbu_code, sbu_name FROM sbu s "
 					+ " where sbu_code is not null and sbu_code <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getCompany_code())) {
@@ -228,7 +228,7 @@ public class SBUDao {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		try {
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String insertQry = "INSERT INTO [sbu] (sbu_name,sbu_code,company_code,status) VALUES (:sbu_name,:sbu_code,:company_code,:status)";
+			String insertQry = "INSERT INTO sbu (sbu_name,sbu_code,company_code,status) VALUES (:sbu_name,:sbu_code,:company_code,:status)";
 			BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
 		    count = namedParamJdbcTemplate.update(insertQry, paramSource);
 			if(count > 0) {
@@ -251,7 +251,7 @@ public class SBUDao {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		try {
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String updateQry = "UPDATE [sbu] set sbu_name= :sbu_name,sbu_code= :sbu_code,company_code=:company_code,status= :status "
+			String updateQry = "UPDATE sbu set sbu_name= :sbu_name,sbu_code= :sbu_code,company_code=:company_code,status= :status "
 					+ " where id= :id ";
 			BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);
 		    count = namedParamJdbcTemplate.update(updateQry, paramSource);
@@ -271,7 +271,7 @@ public class SBUDao {
 	public List<SBU> getCompaniesList(SBU obj) throws SQLException {
 		List<SBU> menuList = null;
 		try{  
-			String qry = "select company_code, company_name from [company] ";
+			String qry = "select company_code, company_name from company ";
 			menuList = jdbcTemplate.query( qry, new BeanPropertyRowMapper<SBU>(SBU.class));
 			
 		}catch(Exception e){ 
@@ -284,7 +284,7 @@ public class SBUDao {
 	public List<SBU> getStatusFilterListFromSBU(SBU obj) throws Exception {
 		List<SBU> objsList = new ArrayList<SBU>();
 		try {
-			String qry = "SELECT distinct status FROM [sbu] s "
+			String qry = "SELECT distinct status FROM sbu s "
 					+ " where status is not null and status <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getCompany_code())) {
@@ -322,7 +322,7 @@ public class SBUDao {
 	public List<SBU> checkUniqueIfForSBU(SBU obj) throws Exception {
 		List<SBU> objsList = new ArrayList<SBU>();
 		try {
-			String qry = "SELECT sbu_code FROM [sbu]  "
+			String qry = "SELECT sbu_code FROM sbu  "
 					+ " where status is not null and status <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {

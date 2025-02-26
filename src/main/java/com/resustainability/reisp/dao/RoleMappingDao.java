@@ -46,7 +46,7 @@ public class RoleMappingDao {
 	public List<RoleMapping> getProjectsList(RoleMapping obj) throws SQLException {
 		List<RoleMapping> menuList = null;
 		try{  
-			String qry = "select project_code,project_name from [project] where status <> 'Inactive'  ";
+			String qry = "select project_code,project_name from project where status <> 'Inactive'  ";
 			menuList = jdbcTemplate.query( qry, new BeanPropertyRowMapper<RoleMapping>(RoleMapping.class));
 		}catch(Exception e){ 
 			e.printStackTrace();
@@ -58,7 +58,7 @@ public class RoleMappingDao {
 	public List<RoleMapping> getDeptsList(RoleMapping obj) throws SQLException {
 		List<RoleMapping> menuList = null;
 		try{  
-			String qry = "SELECT department_code ,department_name,assigned_to_sbu,project_code FROM [department] d "
+			String qry = "SELECT department_code ,department_name,assigned_to_sbu,project_code FROM department d "
 					+ "  left join project p on d.assigned_to_sbu like CONCAT('%',p.sbu_code, '%') "
 					+ " where d.department_code is not null and  d.department_code <> ''  "; 
 			int arrSize = 0;
@@ -83,7 +83,7 @@ public class RoleMappingDao {
 	public List<RoleMapping> getEmpstList(RoleMapping obj) throws SQLException {
 		List<RoleMapping> menuList = null;
 		try{  
-			String qry = "select u.user_id,email_id,u.user_name from [user_profile] u "
+			String qry = "select u.user_id,email_id,u.user_name from user_profile u "
 					+ "left join user_accounts ua on u.email_id = ua.user_name "
 					+ "where u.base_role <> 'User' and ua.status <> 'Inactive' ";
 			
@@ -109,7 +109,7 @@ public class RoleMappingDao {
 	public List<RoleMapping> getRolestList(RoleMapping obj) throws SQLException {
 		List<RoleMapping> menuList = null;
 		try{  
-			String qry = "select project_code,project_name from [project] ";
+			String qry = "select project_code,project_name from project ";
 			menuList = jdbcTemplate.query( qry, new BeanPropertyRowMapper<RoleMapping>(RoleMapping.class));
 		}catch(Exception e){ 
 			e.printStackTrace();
@@ -124,11 +124,11 @@ public class RoleMappingDao {
 			int arrSize = 0;
 			String qry =" select distinct rp.id,project,safety_type,employee_code,	role_code,rm.incident_type,rp.status,FORMAT(rp.created_date, 'dd-MMM-yy  HH:mm') as created_date"
 					+ " ,FORMAT(rp.modified_date, 'dd-MMM-yy  HH:mm') as modified_date, "
-					+ "p.project_code,p.project_name,rp.department_code,department_name,user_id,user_name from [role_mapping] rp  "
-					+ " left join [project] p on rp.project = p.project_code "
-					+ " left join [department] dt on rp.department_code = dt.department_code "
-					+ " left join [user_profile] u on  rp.employee_code = u.user_id "
-					+ " left join [role_master] rm on  rp.safety_type = rm.incident_code "
+					+ "p.project_code,p.project_name,rp.department_code,department_name,user_id,user_name from role_mapping rp  "
+					+ " left join project p on rp.project = p.project_code "
+					+ " left join department dt on rp.department_code = dt.department_code "
+					+ " left join user_profile u on  rp.employee_code = u.user_id "
+					+ " left join role_master rm on  rp.safety_type = rm.incident_code "
 					+ " where rp.id is not null and rp.id <> '' ";
 			
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
@@ -175,8 +175,8 @@ public class RoleMappingDao {
 		List<RoleMapping> objsList = new ArrayList<RoleMapping>();
 		try {
 			String qry = "SELECT  p.department_code,	c.department_name  "
-					+ " FROM [role_mapping] p  "
-					+ " left join [department] c on  p.department_code = c.department_code "
+					+ " FROM role_mapping p  "
+					+ " left join department c on  p.department_code = c.department_code "
 					+ "where p.department_code is not null and p.department_code <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
@@ -222,8 +222,8 @@ public class RoleMappingDao {
 		List<RoleMapping> objsList = new ArrayList<RoleMapping>();
 		try {
 			String qry = "SELECT  distinct p.project,	c.project_name  "
-					+ " FROM [role_mapping] p  "
-					+ " left join [project] c on  p.project = c.project_code "
+					+ " FROM role_mapping p  "
+					+ " left join project c on  p.project = c.project_code "
 					+ "where project is not null and project <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
@@ -269,8 +269,8 @@ public class RoleMappingDao {
 		List<RoleMapping> objsList = new ArrayList<RoleMapping>();
 		try {
 			String qry = "SELECT distinct p.safety_type,	c.incident_code ,c.incident_type "
-					+ " FROM [role_mapping] p  "
-					+ " left join [role_master] c on  p.safety_type = c.incident_code "
+					+ " FROM role_mapping p  "
+					+ " left join role_master c on  p.safety_type = c.incident_code "
 					+ "where safety_type is not null and safety_type <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
@@ -316,8 +316,8 @@ public class RoleMappingDao {
 		List<RoleMapping> objsList = new ArrayList<RoleMapping>();
 		try {
 			String qry = "SELECT distinct p.employee_code,	c.user_name  "
-					+ " FROM [role_mapping] p  "
-					+ " left join [user_profile] c on  p.employee_code = c.user_id "
+					+ " FROM role_mapping p  "
+					+ " left join user_profile c on  p.employee_code = c.user_id "
 					+ "where employee_code is not null and employee_code <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
@@ -366,7 +366,7 @@ public class RoleMappingDao {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		try {
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String insertQry = "INSERT INTO [role_mapping] (project,	safety_type,	department_code,	employee_code,	role_code,status,created_date)"
+			String insertQry = "INSERT INTO role_mapping (project,	safety_type,	department_code,	employee_code,	role_code,status,created_date)"
 					+ " VALUES "
 					+ "(:project,	:safety_type,	:department_code,	:employee_code,	:role_code, :status, getdate())";
 			BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
@@ -380,12 +380,12 @@ public class RoleMappingDao {
 						obj.setDocument_code(document_code);
 						obj.setStatus("In Progress");
 						namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-						String insert2Qry = "UPDATE [safety_ims_workflow] set "
+						String insert2Qry = "UPDATE safety_ims_workflow set "
 								+ "approver_type= :role_code,approver_code= :employee_code,assigned_on= getdate(),reinitiate_date= getdate(),status= :status "
 								+ " where document_no in ("+document_code+") ";
 						paramSource = new BeanPropertySqlParameterSource(obj);		 
 						count2 = namedParamJdbcTemplate.update(insert2Qry, paramSource);
-						String insert1Qry = "UPDATE [safety_ims] set status= :status  where document_code in ("+document_code+") ";
+						String insert1Qry = "UPDATE safety_ims set status= :status  where document_code in ("+document_code+") ";
 						paramSource = new BeanPropertySqlParameterSource(obj);		 
 						count2 = namedParamJdbcTemplate.update(insert1Qry, paramSource);
 					}
@@ -429,7 +429,7 @@ public class RoleMappingDao {
 		int document_code_count = 0;
 		try{
 			con = dataSource.getConnection();
-			String contract_updateQry = " SELECT count(document_no) as count FROM [safety_ims_workflow] where document_no = ? ";
+			String contract_updateQry = " SELECT count(document_no) as count FROM safety_ims_workflow where document_no = ? ";
 			int i = 1;
 			stmt = con.prepareStatement(contract_updateQry);
 			stmt.setString(i++,document_code2);
@@ -483,7 +483,7 @@ public class RoleMappingDao {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		try {
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String updateQry = "UPDATE [role_mapping] set modified_date= getdate(),status= :update_status where id= :id ";
+			String updateQry = "UPDATE role_mapping set modified_date= getdate(),status= :update_status where id= :id ";
 			BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
 		    count = namedParamJdbcTemplate.update(updateQry, paramSource);
 			if(count > 0) {
@@ -493,7 +493,7 @@ public class RoleMappingDao {
 					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(document_code) && countOfDocCOde > 1) {
 						obj.setDocument_code(document_code);
 						namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-						String insert2Qry = "UPDATE [safety_ims_workflow] set "
+						String insert2Qry = "UPDATE safety_ims_workflow set "
 								+ "approver_code= :employee_code,assigned_on= getdate(),reinitiate_date= getdate() "
 								+ " where document_no in ("+document_code+") ";
 						paramSource = new BeanPropertySqlParameterSource(obj);		 
@@ -501,7 +501,7 @@ public class RoleMappingDao {
 					}else {
 						obj.setDocument_code(document_code);
 						namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-						String insert2Qry = "UPDATE [safety_ims_workflow] set "
+						String insert2Qry = "UPDATE safety_ims_workflow set "
 								+ "approver_type= :role_code,approver_code= :employee_code,assigned_on= getdate(),reinitiate_date= getdate() "
 								+ " where document_no in ("+document_code+")  and status <> 'Reviewed' ";
 						paramSource = new BeanPropertySqlParameterSource(obj);		 
@@ -536,7 +536,7 @@ public class RoleMappingDao {
 			pValues1[j++] = obj.getSafety_type();
 			objsList2 = jdbcTemplate.query( findRolesQry, pValues1, new BeanPropertyRowMapper<RoleMapping>(RoleMapping.class));
 			
-			String qry = "SELECT t.incident_report as role_code FROM [role_master] t  "
+			String qry = "SELECT t.incident_report as role_code FROM role_master t  "
 					+ "where incident_code is not null and incident_code <> ''  "; 
 			/*
 			 * int arrSize = 0; if(!StringUtils.isEmpty(obj) &&
@@ -573,7 +573,7 @@ public class RoleMappingDao {
 	public List<RoleMapping> getMappingUserSecurity(RoleMapping obj) throws Exception {
 		List<RoleMapping> objsList = new ArrayList<RoleMapping>();
 		try {
-			String qry = "SELECT role_code,employee_code,project,department_code,safety_type  FROM [role_mapping] p  "
+			String qry = "SELECT role_code,employee_code,project,department_code,safety_type  FROM role_mapping p  "
 					+ "where status is not null and status = 'Active'  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject())) {

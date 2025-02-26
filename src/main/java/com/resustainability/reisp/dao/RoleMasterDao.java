@@ -36,7 +36,7 @@ public class RoleMasterDao {
 		List<RoleMaster> objsList = null;
 		try {
 			int arrSize = 0;
-			String qry =" select id,incident_report,incident_code,incident_type from [role_master] c "
+			String qry =" select id,incident_report,incident_code,incident_type from role_master c "
 					+ " where c.incident_type is not null and c.incident_type <> '' ";
 			
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getIncident_type())) {
@@ -63,7 +63,7 @@ public class RoleMasterDao {
 		List<RoleMaster> objsList = new ArrayList<RoleMaster>();
 		try {
 			String qry = "SELECT  incident_type,incident_code "
-					+ " FROM [role_master] where incident_type is not null and incident_type <> ''  "; 
+					+ " FROM role_master where incident_type is not null and incident_type <> ''  "; 
 			int arrSize = 0;
 			
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getIncident_type())) {
@@ -89,7 +89,7 @@ public class RoleMasterDao {
 		List<RoleMaster> objsList = new ArrayList<RoleMaster>();
 		try {
 			String qry = "SELECT  incident_type "
-					+ " FROM [role_master] where incident_type is not null and incident_type <> ''  "; 
+					+ " FROM role_master where incident_type is not null and incident_type <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getIncident_type())) {
 				qry = qry + "and incident_type = ? ";
@@ -117,7 +117,7 @@ public class RoleMasterDao {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		try {
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String insertQry = "INSERT INTO [role_master] (incident_report,incident_code,incident_type) VALUES (:incident_report,:incident_code,:incident_type)";
+			String insertQry = "INSERT INTO role_master (incident_report,incident_code,incident_type) VALUES (:incident_report,:incident_code,:incident_type)";
 			BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
 		    count = namedParamJdbcTemplate.update(insertQry, paramSource);
 			if(count > 0) {
@@ -139,7 +139,7 @@ public class RoleMasterDao {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		try {
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String updateQry = "UPDATE [role_master] set incident_code= :incident_code,incident_report= :incident_report,incident_type=:incident_type  "
+			String updateQry = "UPDATE role_master set incident_code= :incident_code,incident_report= :incident_report,incident_type=:incident_type  "
 					+ " where id= :id ";
 			BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
 		    count = namedParamJdbcTemplate.update(updateQry, paramSource);

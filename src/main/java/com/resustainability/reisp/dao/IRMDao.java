@@ -72,7 +72,7 @@ public class IRMDao {
 	public List<Project> getProjectstList(User obj) throws SQLException {
 		List<Project> menuList = null;
 		try{  
-			String qry = "select project_code,sbu_code,project_name from [project] where status <> 'Inactive' ";
+			String qry = "select project_code,sbu_code,project_name from project where status <> 'Inactive' ";
 			menuList = jdbcTemplate.query( qry, new BeanPropertyRowMapper<Project>(Project.class));
 			
 		}catch(Exception e){ 
@@ -94,7 +94,7 @@ public class IRMDao {
 			 */ 
 			
 			  String qry =
-			 "SELECT rm.department_code ,department_name,assigned_to_sbu,project_code FROM [department] d "
+			 "SELECT rm.department_code ,department_name,assigned_to_sbu,project_code FROM department d "
 			  +
 			  "  left join project p on d.assigned_to_sbu like CONCAT('%',p.sbu_code, '%') "+
 			  "  left join role_mapping rm on d.department_code = rm.department_code "
@@ -123,7 +123,7 @@ public class IRMDao {
 	public List<ProjectLocation> getLocations(ProjectLocation obj) throws Exception {
 		List<ProjectLocation> objsList = new ArrayList<ProjectLocation>();
 		try {
-			String qry = "SELECT distinct s.location_code,s.location_name FROM [project_location] s "
+			String qry = "SELECT distinct s.location_code,s.location_name FROM project_location s "
 					+ " where  s.location_code is not null and  s.location_code <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
@@ -149,8 +149,8 @@ public class IRMDao {
 	public List<RoleMapping> getRoleMappingforIRMForm(RoleMapping obj) throws Exception {
 		List<RoleMapping> objsList = new ArrayList<RoleMapping>();
 		try {
-			String qry = "SELECT distinct s.employee_code,c.user_id,c.user_name,s.role_code,c.email_id FROM [role_mapping] s "
-					+ " left join [user_profile] c on s.employee_code = c.user_id "
+			String qry = "SELECT distinct s.employee_code,c.user_id,c.user_name,s.role_code,c.email_id FROM role_mapping s "
+					+ " left join user_profile c on s.employee_code = c.user_id "
 					+ " where  s.employee_code is not null and  s.employee_code <> '' and role_code like '%L1' and status <> 'Inactive' "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject())) {
@@ -198,7 +198,7 @@ public class IRMDao {
 		String u_id = null;
 		try{
 			con = dataSource.getConnection();
-			String contract_updateQry = " SELECT ISNULL(MAX(id +1), 0 +1) as maxId FROM [safety_ims] ";
+			String contract_updateQry = " SELECT ISNULL(MAX(id +1), 0 +1) as maxId FROM safety_ims ";
 			stmt = con.prepareStatement(contract_updateQry);
 			resultSet = stmt.executeQuery();
 			while(resultSet.next()) {
@@ -278,7 +278,7 @@ public class IRMDao {
 				obj.setPhoto(file_name);
 			}
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String insertQry = "INSERT INTO [safety_ims] "
+			String insertQry = "INSERT INTO safety_ims "
 								+ "(document_code,incident_type,description,person_location,department_code,project_code,photo,location,ptw_code,risk_type,status,created_by,created_date)"
 								+ " VALUES "
 								+ "(:document_code,:incident_type,:description,:person_location,:department_code,:project_code,:photo,:location,:ptw_code,:risk_type,:status,:created_by,getdate())";
@@ -290,7 +290,7 @@ public class IRMDao {
 					 paramSource = new BeanPropertySqlParameterSource(obj);		 
 				    count = namedParamJdbcTemplate.update(rewardQry, paramSource);
 				    obj.setAction("Incident Report");
-				    String HIS_qry = "INSERT INTO [rewards_history] (action,	reward_points,	user_id,created_date) VALUES (:action,10,:created_by,getdate())";
+				    String HIS_qry = "INSERT INTO rewards_history (action,	reward_points,	user_id,created_date) VALUES (:action,10,:created_by,getdate())";
 			    	paramSource = new BeanPropertySqlParameterSource(obj);		 
 				    count = namedParamJdbcTemplate.update(HIS_qry, paramSource);
 				    
@@ -362,7 +362,7 @@ public class IRMDao {
 					 }
 					 
 				}
-				String insertQryForWorkFlow = "INSERT INTO [safety_ims_workflow] "
+				String insertQryForWorkFlow = "INSERT INTO safety_ims_workflow "
 						+ "(document_no,approver_type,approver_code,status,action_taken,assigned_on,incident_category,level_status)"
 						+ " VALUES "
 						+ "(:document_code,:approver_type,:approver_code,:status,:action_taken,getdate(),:incident_category,:status)";
@@ -372,7 +372,7 @@ public class IRMDao {
 						flag = true;
 						obj.setModule_type("IRM");
 						obj.setMessage(obj.getDocument_code() +" - Incident Created Successfully");
-						String logQry = "INSERT INTO [user_audit_log] "
+						String logQry = "INSERT INTO user_audit_log "
 								+ "(module_type,message,user_id,create_date)"
 								+ " VALUES "
 								+ "(:module_type,:message,:created_by,getdate())";
@@ -393,7 +393,7 @@ public class IRMDao {
 		List<IRM> objsList = null;
 		try {
 			int arrSize = 0;
-			String qry =" select c.id,c.document_code,(select count(*) from [safety_ims] where status is null) as noCounts,(select count(*) from [safety_ims] where status = 'In Progress' ";
+			String qry =" select c.id,c.document_code,(select count(*) from safety_ims where status is null) as noCounts,(select count(*) from safety_ims where status = 'In Progress' ";
 					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date()) && !StringUtils.isEmpty(obj.getTo_date())) {
 						qry = qry + " and CONVERT(date, created_date)  BETWEEN ? and ?  ";
 						arrSize++;
@@ -402,9 +402,9 @@ public class IRMDao {
 						//qry = qry + "and DATEDIFF(day,created_date,GETDATE()) between  0 and 30 ";
 					}
 					qry = qry + ") as counts,FORMAT(action_taken, 'dd-MMM-yy  HH:mm') as action_taken,incident_category,"
-					+ "(select max(role_code) from role_mapping where project = c.project_code and [department_code] = d.[department_code] and [safety_type] = c.[incident_type] ) as maxRole,"
+					+ "(select max(role_code) from role_mapping where project = c.project_code and department_code = d.department_code and safety_type = c.incident_type ) as maxRole,"
 					+ "(select max(approver_type) from safety_ims_workflow where status = 'In Progress' and safety_ims_workflow.document_no = c.document_code) as maxRole2,";
-					qry = qry +" (select count( distinct c.document_code) from safety_ims c left join [safety_ims_workflow] up on c.document_code = up.document_no  left join [project] p on c.project_code = p.project_code left join [sbu] sb on p.sbu_code = sb.sbu_code where c.incident_type is not null   ";
+					qry = qry +" (select count( distinct c.document_code) from safety_ims c left join safety_ims_workflow up on c.document_code = up.document_no  left join project p on c.project_code = p.project_code left join sbu sb on p.sbu_code = sb.sbu_code where c.incident_type is not null   ";
 					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
 						qry = qry + " and p.sbu_code = ? ";
 						arrSize++;
@@ -436,7 +436,7 @@ public class IRMDao {
 						arrSize++;
 					}
 					if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
-						qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+						qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from safety_ims_workflow where approver_code = ? ))";
 						arrSize++;	arrSize++;
 					}
 					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getAdmin_incidents())) {
@@ -464,9 +464,9 @@ public class IRMDao {
 						qry = qry + " and  c.status is null ";
 					}
 					qry = qry +  " ) as all_irm ,"
-							+ "  (select count(*) from [safety_ims] c "
-							+ " left join [project] p on c.project_code = p.project_code "
-							+ "left join [sbu] sb on p.sbu_code = sb.sbu_code where c.[status] is null";
+							+ "  (select count(*) from safety_ims c "
+							+ " left join project p on c.project_code = p.project_code "
+							+ "left join sbu sb on p.sbu_code = sb.sbu_code where c.[status] is null";
 							if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
 								qry = qry + " and p.sbu_code = ? ";
 								arrSize++;
@@ -498,7 +498,7 @@ public class IRMDao {
 								arrSize++;
 							}
 							if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
-								qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+								qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from safety_ims_workflow where approver_code = ? ))";
 
 								arrSize++;	arrSize++;
 							}
@@ -528,7 +528,7 @@ public class IRMDao {
 							}
 								
 							qry = qry + " ) as not_assigned,";
-							qry = qry +	"(select count( c.[document_code]) from [safety_ims] c left join [project] p on c.project_code = p.project_code left join [sbu] sb on p.sbu_code = sb.sbu_code where c.[document_code] is not null and c.status ='Resolved'  ";
+							qry = qry +	"(select count( c.document_code) from safety_ims c left join project p on c.project_code = p.project_code left join sbu sb on p.sbu_code = sb.sbu_code where c.document_code is not null and c.status ='Resolved'  ";
 									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
 										qry = qry + " and p.sbu_code = ? ";
 										arrSize++;
@@ -560,7 +560,7 @@ public class IRMDao {
 										arrSize++;
 									}
 									if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
-										qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+										qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from safety_ims_workflow where approver_code = ? ))";
 										arrSize++;
 										arrSize++;
 									}
@@ -590,7 +590,7 @@ public class IRMDao {
 									}
 										
 									qry = qry + " ) as active_irm,"
-									+ "(select count( c.[document_code]) from [safety_ims] c left join [project] p on c.project_code = p.project_code left join [sbu] sb on p.sbu_code = sb.sbu_code where c.[document_code] is not null and c.status ='In Progress' ";
+									+ "(select count( c.document_code) from safety_ims c left join project p on c.project_code = p.project_code left join sbu sb on p.sbu_code = sb.sbu_code where c.document_code is not null and c.status ='In Progress' ";
 									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
 										qry = qry + " and p.sbu_code = ? ";
 										arrSize++;
@@ -622,7 +622,7 @@ public class IRMDao {
 										arrSize++;
 									}
 									if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
-										qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+										qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from safety_ims_workflow where approver_code = ? ))";
 										arrSize++;
 										arrSize++;
 									}
@@ -654,15 +654,15 @@ public class IRMDao {
 										
 									qry = qry + " ) as inActive_irm,"
 					+ "rm.incident_code,rm.incident_type,approver_type,p.sbu_code,sb.sbu_name,	 c.project_code,p.project_name,c.risk_type,c.description,c.status,c.ptw_code,c.department_code,d.department_name,"
-					+ "	l.location_code,l.location_name,c.created_by,u.email_id,u.user_name, COALESCE(up.approver_code, 'No Reviewer Assigneds') AS approver_code,u1.user_name as approver_name,FORMAT(c.created_date, 'dd-MMM-yy  HH:mm') as created_date from [safety_ims] c "
-					+ " left join [safety_ims_workflow] up on c.document_code = up.document_no "
-					+ " left join [project] p on c.project_code = p.project_code "
-					+ " left join [sbu] sb on p.sbu_code = sb.sbu_code"
-					+ " left join [department] d on c.department_code = d.department_code "
-					+ " left join [project_location] l on c.location = l.location_code "
-					+ " left join [incident] rm on c.incident_type = rm.incident_code "
-					+ " left join [user_profile] u on c.created_by = u.user_id "
-					+ " left join [user_profile] u1 on up.approver_code = u1.user_id "
+					+ "	l.location_code,l.location_name,c.created_by,u.email_id,u.user_name, COALESCE(up.approver_code, 'No Reviewer Assigneds') AS approver_code,u1.user_name as approver_name,FORMAT(c.created_date, 'dd-MMM-yy  HH:mm') as created_date from safety_ims c "
+					+ " left join safety_ims_workflow up on c.document_code = up.document_no "
+					+ " left join project p on c.project_code = p.project_code "
+					+ " left join sbu sb on p.sbu_code = sb.sbu_code"
+					+ " left join department d on c.department_code = d.department_code "
+					+ " left join project_location l on c.location = l.location_code "
+					+ " left join incident rm on c.incident_type = rm.incident_code "
+					+ " left join user_profile u on c.created_by = u.user_id "
+					+ " left join user_profile u1 on up.approver_code = u1.user_id "
 					+ " where  document_code is not null   ";
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
 				qry = qry + " and p.sbu_code = ? ";
@@ -695,7 +695,7 @@ public class IRMDao {
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
-				qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+				qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from safety_ims_workflow where approver_code = ? ))";
 				arrSize++;
 				arrSize++;
 			}
@@ -982,7 +982,7 @@ public class IRMDao {
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
-			qry = qry + " and ( s.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+			qry = qry + " and ( s.created_by = ? or approver_code in(select distinct approver_code from safety_ims_workflow where approver_code = ? ))";
 				arrSize++;	arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getAdmin_incidents())) {
@@ -1061,7 +1061,7 @@ public class IRMDao {
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
-			qry = qry + " and ( s.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+			qry = qry + " and ( s.created_by = ? or approver_code in(select distinct approver_code from safety_ims_workflow where approver_code = ? ))";
 				arrSize++;	arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getAdmin_incidents())) {
@@ -1116,11 +1116,11 @@ public class IRMDao {
 	public List<IRM> getIncidentFilterListFromIRM(IRM obj) throws Exception {
 		List<IRM> objsList = new ArrayList<IRM>();
 		try {
-			String qry = "SELECT distinct c.incident_code , c.incident_type FROM [safety_ims] s "
-					+ " left join [safety_ims_workflow] up on s.document_code = up.document_no "
-					+ " left join [incident] c on s.incident_type = c.incident_code "
-					+ " left join [project] p on s.project_code = p.project_code"
-					+ " left join [sbu] sb on p.sbu_code = sb.sbu_code"
+			String qry = "SELECT distinct c.incident_code , c.incident_type FROM safety_ims s "
+					+ " left join safety_ims_workflow up on s.document_code = up.document_no "
+					+ " left join incident c on s.incident_type = c.incident_code "
+					+ " left join project p on s.project_code = p.project_code"
+					+ " left join sbu sb on p.sbu_code = sb.sbu_code"
 					+ " where  s.incident_type is not null and  s.incident_type <> '' "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
@@ -1141,7 +1141,7 @@ public class IRMDao {
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
-			qry = qry + " and ( s.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+			qry = qry + " and ( s.created_by = ? or approver_code in(select distinct approver_code from safety_ims_workflow where approver_code = ? ))";
 				arrSize++;	arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getAdmin_incidents())) {
@@ -1196,10 +1196,10 @@ public class IRMDao {
 	public List<IRM> getStatusFilterListFromIRM(IRM obj) throws Exception {
 		List<IRM> objsList = new ArrayList<IRM>();
 		try {
-			String qry = "SELECT distinct s.status  FROM [safety_ims] s "
-					+ " left join [safety_ims_workflow] up on s.document_code = up.document_no "
-					+ " left join [project] p on s.project_code = p.project_code"
-					+ " left join [sbu] sb on p.sbu_code = sb.sbu_code"
+			String qry = "SELECT distinct s.status  FROM safety_ims s "
+					+ " left join safety_ims_workflow up on s.document_code = up.document_no "
+					+ " left join project p on s.project_code = p.project_code"
+					+ " left join sbu sb on p.sbu_code = sb.sbu_code"
 					+ " where  s.status is not null and  s.status <> '' "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
@@ -1220,7 +1220,7 @@ public class IRMDao {
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && ( !CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
-			qry = qry + " and ( s.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow]   where approver_code = ? ))";
+			qry = qry + " and ( s.created_by = ? or approver_code in(select distinct approver_code from safety_ims_workflow   where approver_code = ? ))";
 				arrSize++;	arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getAdmin_incidents())) {
@@ -1276,7 +1276,7 @@ public class IRMDao {
 	public List<IRM> getProjectstListIRMUpdate(IRM irm) throws SQLException {
 		List<IRM> menuList = null;
 		try{  
-			String qry = "select project_code,project_name from [project] where status <> 'Inactive' ";
+			String qry = "select project_code,project_name from project where status <> 'Inactive' ";
 			menuList = jdbcTemplate.query( qry, new BeanPropertyRowMapper<IRM>(IRM.class));
 			
 		}catch(Exception e){ 
@@ -1289,7 +1289,7 @@ public class IRMDao {
 	public List<IRM> getDepartmentsIRMUpdate(IRM irm) throws SQLException {
 		List<IRM> menuList = null;
 		try{  
-			String qry = "select department_code,department_name from [department] where status <> 'Inactive' ";
+			String qry = "select department_code,department_name from department where status <> 'Inactive' ";
 			menuList = jdbcTemplate.query( qry, new BeanPropertyRowMapper<IRM>(IRM.class));
 			
 		}catch(Exception e){ 
@@ -1302,7 +1302,7 @@ public class IRMDao {
 	public List<IRM> getLocationstListIRMUpdate(IRM irm) throws SQLException {
 		List<IRM> menuList = null;
 		try{  
-			String qry = "select location_code,location_name from [project_location] where status <> 'Inactive' ";
+			String qry = "select location_code,location_name from project_location where status <> 'Inactive' ";
 			menuList = jdbcTemplate.query( qry, new BeanPropertyRowMapper<IRM>(IRM.class));
 			
 		}catch(Exception e){ 
@@ -1317,16 +1317,16 @@ public class IRMDao {
 		try {
 			String qry = "select TOP(1) rm.incident_code,i.incident_type,approver_type,u1.email_id,p.sbu_code,up.incident_category,	c.document_code, c.project_code,p.project_name,c.risk_type,c.description,up.status,c.status as mainStatus,c.ptw_code,c.department_code,d.department_name,"
 					+"	l.location_code,l.location_name,c.created_by,u.user_name, up.approver_code,u1.user_name as approver_name,"
-					+ "FORMAT(up.action_taken, 'dd-MMM-yy  HH:mm') as action_taken,FORMAT(c.created_date, 'dd-MMM-yy  HH:mm') as created_date,photo from [safety_ims] c "
-					+" left join [safety_ims_workflow] up on c.document_code = up.document_no "
-					+" left join [project] p on c.project_code = p.project_code "
-					+ " left join [sbu] sb on p.sbu_code = sb.sbu_code"
-					+" left join [department] d on c.department_code = d.department_code "
-					+" left join [project_location] l on c.location = l.location_code "
-					+" left join [incident] rm on c.incident_type = rm.incident_code "
-					+" left join [incident] i on c.incident_type = i.incident_code "
-					+" left join [user_profile] u on c.created_by = u.user_id "
-					+" left join [user_profile] u1 on up.approver_code = u1.user_id "
+					+ "FORMAT(up.action_taken, 'dd-MMM-yy  HH:mm') as action_taken,FORMAT(c.created_date, 'dd-MMM-yy  HH:mm') as created_date,photo from safety_ims c "
+					+" left join safety_ims_workflow up on c.document_code = up.document_no "
+					+" left join project p on c.project_code = p.project_code "
+					+ " left join sbu sb on p.sbu_code = sb.sbu_code"
+					+" left join department d on c.department_code = d.department_code "
+					+" left join project_location l on c.location = l.location_code "
+					+" left join incident rm on c.incident_type = rm.incident_code "
+					+" left join incident i on c.incident_type = i.incident_code "
+					+" left join user_profile u on c.created_by = u.user_id "
+					+" left join user_profile u1 on up.approver_code = u1.user_id "
 					+" where  document_code is not null  " ; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(irm) && !StringUtils.isEmpty(irm.getDocument_code())) {
@@ -1345,20 +1345,20 @@ public class IRMDao {
 				List<IRM> objsList = null;
 				String qryDetails = "select distinct w.approver_type,r.id as rca_id,investigation_team,r.incident_type,level_status,incident_seviourity,ua_type,uc_type,management_type, document_no as document_code,w.approver_code,incident_category,w.status,FORMAT(w.assigned_on, 'dd-MMM-yy  HH:mm') as assigned_on,sb_notes,"
 						+ "FORMAT(w.action_taken, 'dd-MMM-yy  HH:mm') as action_taken,FORMAT(w.sb_date, 'dd-MMM-yy  HH:mm') as sb_date,u.user_name as approver_name,u.email_id,w.corrective_action,w.preventive_action,w.remarks,w.attachment from safety_ims_workflow w "
-						+ " left join [safety_ims] s on w.document_no = s.document_code "
+						+ " left join safety_ims s on w.document_no = s.document_code "
 						+ " left join rca r on w.document_no = r.document_code  "
-						+ "left join [incident] rm on s.incident_type = rm.incident_code  "
-						+ "left join [user_profile] u on w.approver_code = u.user_id where w.document_no = ? and w.status in('Reviewed','In Progress')  and r.status <> 'Inactive'  "
+						+ "left join incident rm on s.incident_type = rm.incident_code  "
+						+ "left join user_profile u on w.approver_code = u.user_id where w.document_no = ? and w.status in('Reviewed','In Progress')  and r.status <> 'Inactive'  "
 						+ "order by w.approver_type asc ";
 				
 				objsList = jdbcTemplate.query(qryDetails, new Object[] {irm.getDocument_code()}, new BeanPropertyRowMapper<IRM>(IRM.class));	
 				if(objsList.size() == 0) {
 					String qryDetails2 = "select distinct w.approver_type,r.id as rca_id,investigation_team,r.incident_type,incident_seviourity,ua_type,uc_type,level_status,management_type, document_no as document_code,w.approver_code,incident_category,w.status,FORMAT(w.assigned_on, 'dd-MMM-yy  HH:mm') as assigned_on,sb_notes,"
 							+ "FORMAT(w.action_taken, 'dd-MMM-yy  HH:mm') as action_taken,FORMAT(w.sb_date, 'dd-MMM-yy  HH:mm') as sb_date,u.user_name as approver_name,u.email_id,w.corrective_action,w.preventive_action,w.remarks,w.attachment from safety_ims_workflow w "
-							+ " left join [safety_ims] s on w.document_no = s.document_code "
+							+ " left join safety_ims s on w.document_no = s.document_code "
 							+ " left join rca r on w.document_no = r.document_code  "
-							+ "left join [incident] rm on s.incident_type = rm.incident_code  "
-							+ "left join [user_profile] u on w.approver_code = u.user_id where w.document_no = ? and w.status in('Reviewed','In Progress')  "
+							+ "left join incident rm on s.incident_type = rm.incident_code  "
+							+ "left join user_profile u on w.approver_code = u.user_id where w.document_no = ? and w.status in('Reviewed','In Progress')  "
 							+ "order by w.approver_type asc ";
 					
 					objsList = jdbcTemplate.query(qryDetails2, new Object[] {irm.getDocument_code()}, new BeanPropertyRowMapper<IRM>(IRM.class));
@@ -1367,17 +1367,17 @@ public class IRMDao {
 				List<IRM> objsList2 = null;
 				for(IRM details : obj.getIrmIncidentsList()) {
 					String qryCAPADetails = "select w.id as capa_id,w.document_code,ca,pa,w.person_responsible,u.user_name, "
-							+ " FORMAT(w.tentative_date, 'yyyy-MM-dd') as tentative_date,remarks,attachments as attachment from [capa] w "
-							+ "left join [user_profile] u on w.person_responsible = u.user_id "
+							+ " FORMAT(w.tentative_date, 'yyyy-MM-dd') as tentative_date,remarks,attachments as attachment from capa w "
+							+ "left join user_profile u on w.person_responsible = u.user_id "
 							+ " where w.document_code = ? and w.status <> 'Inactive' ";
 					
 					objsList2 = jdbcTemplate.query(qryCAPADetails, new Object[] {irm.getDocument_code()}, new BeanPropertyRowMapper<IRM>(IRM.class));	
 					details.setCapaList(objsList2);
 				}
 				List<IRM> objsList1 = null;
-				String qryRoleDetails = "select distinct role_code,employee_code,u.email_id,u.user_id,u.user_name as next_level_user from [role_mapping] w "
-						+ " left join [safety_ims] s on w.safety_type = s.incident_type "
-						+ "left join [user_profile] u on w.employee_code = u.user_id "
+				String qryRoleDetails = "select distinct role_code,employee_code,u.email_id,u.user_id,u.user_name as next_level_user from role_mapping w "
+						+ " left join safety_ims s on w.safety_type = s.incident_type "
+						+ "left join user_profile u on w.employee_code = u.user_id "
 						+ " where w.project = ?  and w.status <> 'Inactive' and role_code not like '%L1' ";
 				
 				objsList1 = jdbcTemplate.query(qryRoleDetails, new Object[] {obj.getProject_code()}, new BeanPropertyRowMapper<IRM>(IRM.class));	
@@ -1423,7 +1423,7 @@ public class IRMDao {
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 ///////////////////////////// Send back Condition //////////////////////////////////////////////
 			if(!StringUtils.isEmpty(obj.getSb_notes())) {
-				String updateQry = "Update [safety_ims_workflow] set "
+				String updateQry = "Update safety_ims_workflow set "
 						+ " status= :statusChanged "
 						+ "where document_no = :document_code and approver_type= :type_prevs and approver_code= :approver_prvs ";
 					BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
@@ -1453,7 +1453,7 @@ public class IRMDao {
 								obj.setAttachment(fileName);
 							}
 					    }
-					String updateQryNext = "Update [safety_ims_workflow] set "
+					String updateQryNext = "Update safety_ims_workflow set "
 							+ " status= :statusChanged,sb_date= getdate(),corrective_action= :ca_before,level_status= :level_status,"
 							+ "preventive_action= :pa_before,remarks= :remarks_before,attachment= :doc_before,sb_notes= :sb_notes "
 							+ "where document_no = :document_code and approver_type= :approver_type_before and approver_code= :employee_code_before and status = 'In Progress' ";
@@ -1463,7 +1463,7 @@ public class IRMDao {
 					if(count > 0 && !StringUtils.isEmpty(obj.getEmployee_code_before()) ) {
 					
 						obj.setStatus("In Progress");
-						String insertQry = "INSERT INTO [safety_ims_workflow] "
+						String insertQry = "INSERT INTO safety_ims_workflow "
 											+ "(document_no,approver_type,approver_code,incident_category,status,assigned_on,corrective_action,preventive_action,remarks,attachment,level_status,sb_notes,sb_date)"
 											+ " VALUES "
 											+ "(:document_code,:type_prevs,:approver_prvs,:incident_category,:status,getdate(),:ca_before,:pa_before,:remarks_before,:doc_before,:status,:sb_notes,getdate())";
@@ -1517,7 +1517,7 @@ public class IRMDao {
 				    		obj.setRemarks((!StringUtils.isEmpty(obj.getRemarkss()[i])?obj.getRemarkss()[i]:null));
 					    	obj.setTentative_date(obj.getTentative_dates()[i]);
 					    	if(!StringUtils.isEmpty(obj.getCa()) && !StringUtils.isEmpty(obj.getPa())) {
-					    		String ca_pa_insertQry = "INSERT INTO [capa] "
+					    		String ca_pa_insertQry = "INSERT INTO capa "
 							    		+ "(document_code,ca,pa,person_responsible,tentative_date,remarks,attachments,status)"
 										+ " VALUES "
 										+ "(:document_code,:ca,:pa,:employee_code_before,:tentative_date,:remarks,:attachment,:status)";
@@ -1525,7 +1525,7 @@ public class IRMDao {
 							    count = namedParamJdbcTemplate.update(ca_pa_insertQry, paramSource);
 					    	}
 					    }
-					    String updatercaQryNext = "Update [rca] set "
+					    String updatercaQryNext = "Update rca set "
 								+ " incident_type= :incident_type,investigation_team= :investigation_team,incident_seviourity= :incident_seviourity,ua_type= :ua_type,uc_type= :uc_type,management_type= :management_type "
 								+ "where document_code = :document_code and id= :rca_id ";
 							paramSource = new BeanPropertySqlParameterSource(obj);		 
@@ -1563,7 +1563,7 @@ public class IRMDao {
 						if(!(obj.getLevel_status().equals("Closed"))) {
 							obj.setStatusChanged("In Progress");
 						}
-					String updateQry = "Update [safety_ims_workflow] set "
+					String updateQry = "Update safety_ims_workflow set "
 							+ " status= :statusChanged,action_taken= getdate(),corrective_action= :corrective_action,level_status= :level_status,"
 							+ "preventive_action= :preventive_action,remarks= :remarks,attachment= :attachment "
 							+ "where document_no = :document_code and approver_type= :approver_type_before and approver_code= :employee_code_before and status <> 'Send Back' and status <> 'Sent Back' ";
@@ -1575,7 +1575,7 @@ public class IRMDao {
 					if(obj.getLevel_status().equals("Closed")) {
 						if(count > 0 && !StringUtils.isEmpty(obj.getEmployee_code()) ) {
 							obj.setStatus("In Progress");
-							String insertQry = "INSERT INTO [safety_ims_workflow] "
+							String insertQry = "INSERT INTO safety_ims_workflow "
 												+ "(document_no,approver_type,approver_code,incident_category,status,assigned_on,level_status)"
 												+ " VALUES "
 												+ "(:document_code,:approver_type,:employee_code,:incident_category,:status,getdate(),:status)";
@@ -1584,7 +1584,7 @@ public class IRMDao {
 						}
 					}	
 				}else {
-					String updateQry = "Update [safety_ims_workflow] set "
+					String updateQry = "Update safety_ims_workflow set "
 							+ " status= :statusChanged,action_taken= getdate(),corrective_action= :corrective_action,level_status= :level_status,"
 							+ "preventive_action= :preventive_action,remarks= :remarks,attachment= :attachment "
 							+ "where document_no = :document_code and approver_type= :approver_type_before and approver_code= :employee_code_before and status <> 'Send Back' and status <> 'Sent Back' ";
@@ -1610,7 +1610,7 @@ public class IRMDao {
 						if(count > 0 && !StringUtils.isEmpty(obj.getEmployee_code()) || !StringUtils.isEmpty(obj.getEmployee_code_before())) {
 							if(count > 0 && !StringUtils.isEmpty(obj.getEmployee_code())) {
 								obj.setStatus("In Progress");
-								String insertQry = "INSERT INTO [safety_ims_workflow] "
+								String insertQry = "INSERT INTO safety_ims_workflow "
 													+ "(document_no,approver_type,approver_code,incident_category,status,assigned_on,level_status)"
 													+ " VALUES "
 													+ "(:document_code,:approver_type,:employee_code,:incident_category,:status,getdate(),:status)";
@@ -1621,16 +1621,16 @@ public class IRMDao {
 						    
 				///// ROOT CAUSE TABLE  /////////////////////////////////////////  
 						    obj.setStatusChanged("Inactive");
-							String inactiveQry = "Update [capa] set status= :statusChanged where document_code = :document_code";
+							String inactiveQry = "Update capa set status= :statusChanged where document_code = :document_code";
 								paramSource = new BeanPropertySqlParameterSource(obj);		 
 								count = namedParamJdbcTemplate.update(inactiveQry, paramSource);
 								
-								String inactiveraQry = "Update [rca] set status= :statusChanged where document_code = :document_code";
+								String inactiveraQry = "Update rca set status= :statusChanged where document_code = :document_code";
 								paramSource = new BeanPropertySqlParameterSource(obj);		 
 								count = namedParamJdbcTemplate.update(inactiveraQry, paramSource);
 								
 						    obj.setStatus("Active");
-						    String rc_insertQry = "INSERT INTO [rca] "
+						    String rc_insertQry = "INSERT INTO rca "
 									+ "(document_code,incident_type,incident_seviourity,ua_type,uc_type,management_type,status,investigation_team)"
 									+ " VALUES "
 									+ "(:document_code,:incident_types,:incident_seviourity,:ua_type,:uc_type,:management_type,:status,:investigation_team)";
@@ -1682,7 +1682,7 @@ public class IRMDao {
 							    	 obj.setTentative_date(null);
 								     obj.setTentative_date(DateParser.parse(obj.getTentative_dates()[i]));
 							    	
-						    		String ca_pa_insertQry = "INSERT INTO [capa] "
+						    		String ca_pa_insertQry = "INSERT INTO capa "
 								    		+ "(document_code,ca,pa,person_responsible,tentative_date,remarks,attachments,status)"
 											+ " VALUES "
 											+ "(:document_code,:ca,:pa,:employee_code_before,:tentative_date,:remarks,:attachment,:status)";
@@ -1729,7 +1729,7 @@ public class IRMDao {
 				
 				if(StringUtils.isEmpty(obj.getEmployee_code()) && StringUtils.isEmpty(obj.getSb_notes()) && "Closed".equals(obj.getLevel_status()) ) {
 					obj.setStatusChanged("Resolved");
-					String finalStatusUpdateQry = "Update [safety_ims] set "
+					String finalStatusUpdateQry = "Update safety_ims set "
 							+ " status= :statusChanged,modified_by= :user_id,mdified_date= getdate() where document_code = :document_code";
 					BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
 						count = namedParamJdbcTemplate.update(finalStatusUpdateQry, paramSource);
@@ -1765,10 +1765,10 @@ public class IRMDao {
 					+ "      ,corrective_action"
 					+ "      ,preventive_action"
 					+ "      ,remarks,u.user_name,sb_notes,FORMAT(sb_date, 'dd-MMM-yy  HH:mm') as sb_date"
-					+ "      ,attachment FROM [safety_ims_workflow] s "
-					+ "left join [safety_ims] ss on s.document_no = ss.document_code "
-					+ " left join [user_profile] u on s.approver_code = u.user_id "
-					+ " inner join [user_profile] u1 on ss.created_by = u1.user_id "
+					+ "      ,attachment FROM safety_ims_workflow s "
+					+ "left join safety_ims ss on s.document_no = ss.document_code "
+					+ " left join user_profile u on s.approver_code = u.user_id "
+					+ " inner join user_profile u1 on ss.created_by = u1.user_id "
 					+ " where  s.document_no is not null and  s.document_no <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getDocument_code())) {
@@ -1785,7 +1785,7 @@ public class IRMDao {
 			
 			String qry2 = "select document_code as document_no,u.base_role as approver_type, s.created_by as approver_code "
 					+ " ,FORMAT(s.created_date, 'dd-MMM-yy  HH:mm') as assigned_on,u.user_name from safety_ims s "
-					+ "left join [user_profile] u on s.created_by = u.user_id where document_code is not null ";
+					+ "left join user_profile u on s.created_by = u.user_id where document_code is not null ";
 			int arrSize1 = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getDocument_code())) {
 				qry2 = qry2 + " and s.document_code = ? ";
@@ -1851,7 +1851,7 @@ public class IRMDao {
 	public List<IRM> getUserListIRMUpdate(IRM irm) throws SQLException {
 		List<IRM> menuList = null;
 		try{  
-			String qry = "select user_id,user_name,base_department,base_role from [user_profile] ";
+			String qry = "select user_id,user_name,base_department,base_role from user_profile ";
 			menuList = jdbcTemplate.query( qry, new BeanPropertyRowMapper<IRM>(IRM.class));
 			
 		}catch(Exception e){ 
@@ -1888,18 +1888,18 @@ public class IRMDao {
 
 				}
 				String qry =" SELECT top (1) "
-						+ "(select count([document_no]) from safety_ims_workflow n left join safety_ims c on c.document_code = n.document_no "
-						+ "where  "+subQry+" c.[incident_type] = 'AC'  and created_date >= DATEADD(DAY, -1, GETDATE()) AND created_date <  GETDATE()) as AC  "
-						+ ",(select count([document_no]) from safety_ims_workflow n left join safety_ims c on c.document_code = n.document_no "
-						+ "where  "+subQry+" c.[incident_type] = 'NM'  and created_date >= DATEADD(DAY, -1, GETDATE()) AND created_date <  GETDATE()) as NM  "
-				 		+ ",(select count([document_no]) from safety_ims_workflow n left join safety_ims c on c.document_code = n.document_no "
-						+ "where  "+subQry+" c.[incident_type] = 'UA'  and created_date >= DATEADD(DAY, -1, GETDATE()) AND created_date <  GETDATE())  as UA  "
-						+ ",(select count([document_no]) from safety_ims_workflow n left join safety_ims c on c.document_code = n.document_no "
-						+ "where  "+subQry+" c.[incident_type] = 'UC'  and created_date >= DATEADD(DAY, -1, GETDATE()) AND created_date <  GETDATE())  as UC  "
-						+ "  FROM [safetyDB].[dbo].[safety_ims_workflow] n "
+						+ "(select count(document_no) from safety_ims_workflow n left join safety_ims c on c.document_code = n.document_no "
+						+ "where  "+subQry+" c.incident_type = 'AC'  and created_date >= DATEADD(DAY, -1, GETDATE()) AND created_date <  GETDATE()) as AC  "
+						+ ",(select count(document_no) from safety_ims_workflow n left join safety_ims c on c.document_code = n.document_no "
+						+ "where  "+subQry+" c.incident_type = 'NM'  and created_date >= DATEADD(DAY, -1, GETDATE()) AND created_date <  GETDATE()) as NM  "
+				 		+ ",(select count(document_no) from safety_ims_workflow n left join safety_ims c on c.document_code = n.document_no "
+						+ "where  "+subQry+" c.incident_type = 'UA'  and created_date >= DATEADD(DAY, -1, GETDATE()) AND created_date <  GETDATE())  as UA  "
+						+ ",(select count(document_no) from safety_ims_workflow n left join safety_ims c on c.document_code = n.document_no "
+						+ "where  "+subQry+" c.incident_type = 'UC'  and created_date >= DATEADD(DAY, -1, GETDATE()) AND created_date <  GETDATE())  as UC  "
+						+ "  FROM safetyDB.dbo.safety_ims_workflow n "
 						+ "  left join safety_ims c on c.document_code = n.document_no "
-						+ "  left join [role_master] r on n.approver_type = r.[incident_report] or n.approver_type <> r.[incident_report] "
-						+ "  group by c.[incident_type]";
+						+ "  left join role_master r on n.approver_type = r.incident_report or n.approver_type <> r.incident_report "
+						+ "  group by c.incident_type";
 				alert_levels = jdbcTemplate.query( qry, new BeanPropertyRowMapper<IRM>(IRM.class));
 				if(!StringUtils.isEmpty(alert_levels) && alert_levels.size() > 0) {
 					alerts.put(statusPList[i], alert_levels);
@@ -1975,33 +1975,33 @@ public class IRMDao {
 
 				}
 				String qry =" SELECT top (1) "
-						+ "(select count([document_no]) from safety_ims_workflow n left join safety_ims c on c.document_code = n.document_no "
-						+ "where  "+subQry+" c.[incident_type] = 'AC'  and DATEDIFF(day,created_date,GETDATE()) between  0 and 30) as AC  "
-						+ ",(select count([document_no]) from safety_ims_workflow n left join safety_ims c on c.document_code = n.document_no "
-						+ "where  "+subQry+" c.[incident_type] = 'NM'  and DATEDIFF(day,created_date,GETDATE()) between  0 and 30) as NM  "
-				 		+ ",(select count([document_no]) from safety_ims_workflow n left join safety_ims c on c.document_code = n.document_no "
-						+ "where  "+subQry+" c.[incident_type] = 'UA'  and DATEDIFF(day,created_date,GETDATE()) between  0 and 30)  as UA  "
-						+ ",(select count([document_no]) from safety_ims_workflow n left join safety_ims c on c.document_code = n.document_no "
-						+ "where  "+subQry+" c.[incident_type] = 'UC'  and DATEDIFF(day,created_date,GETDATE()) between  0 and 30)  as UC  "
-						+ "  FROM [safetyDB].[dbo].[safety_ims_workflow] n "
+						+ "(select count(document_no) from safety_ims_workflow n left join safety_ims c on c.document_code = n.document_no "
+						+ "where  "+subQry+" c.incident_type = 'AC'  and DATEDIFF(day,created_date,GETDATE()) between  0 and 30) as AC  "
+						+ ",(select count(document_no) from safety_ims_workflow n left join safety_ims c on c.document_code = n.document_no "
+						+ "where  "+subQry+" c.incident_type = 'NM'  and DATEDIFF(day,created_date,GETDATE()) between  0 and 30) as NM  "
+				 		+ ",(select count(document_no) from safety_ims_workflow n left join safety_ims c on c.document_code = n.document_no "
+						+ "where  "+subQry+" c.incident_type = 'UA'  and DATEDIFF(day,created_date,GETDATE()) between  0 and 30)  as UA  "
+						+ ",(select count(document_no) from safety_ims_workflow n left join safety_ims c on c.document_code = n.document_no "
+						+ "where  "+subQry+" c.incident_type = 'UC'  and DATEDIFF(day,created_date,GETDATE()) between  0 and 30)  as UC  "
+						+ "  FROM safetyDB.dbo.safety_ims_workflow n "
 						+ "  left join safety_ims c on c.document_code = n.document_no "
-						+ "  left join [role_master] r on n.approver_type = r.[incident_report] or n.approver_type <> r.[incident_report] "
-						+ "  group by c.[incident_type]";
+						+ "  left join role_master r on n.approver_type = r.incident_report or n.approver_type <> r.incident_report "
+						+ "  group by c.incident_type";
 				if(("Total".contentEquals(roleList[i]))) {
 					 subQry = "  ";
 					 qry =" SELECT top (1) "
-								+ "(select count([document_code]) from  safety_ims c "
-								+ "where  "+subQry+" c.[incident_type] = 'AC'  and DATEDIFF(day,created_date,GETDATE()) between  0 and 30) as AC  "
-								+ ",(select count([document_code]) from safety_ims c  "
-								+ "where  "+subQry+" c.[incident_type] = 'NM'  and DATEDIFF(day,created_date,GETDATE()) between  0 and 30) as NM  "
-						 		+ ",(select count([document_code]) from  safety_ims c  "
-								+ "where  "+subQry+" c.[incident_type] = 'UA'  and DATEDIFF(day,created_date,GETDATE()) between  0 and 30)  as UA  "
-								+ ",(select count([document_code]) from safety_ims c  "
-								+ "where  "+subQry+" c.[incident_type] = 'UC'  and DATEDIFF(day,created_date,GETDATE()) between  0 and 30)  as UC  "
-								+ "  FROM [safetyDB].[dbo].[safety_ims_workflow] n "
+								+ "(select count(document_code) from  safety_ims c "
+								+ "where  "+subQry+" c.incident_type = 'AC'  and DATEDIFF(day,created_date,GETDATE()) between  0 and 30) as AC  "
+								+ ",(select count(document_code) from safety_ims c  "
+								+ "where  "+subQry+" c.incident_type = 'NM'  and DATEDIFF(day,created_date,GETDATE()) between  0 and 30) as NM  "
+						 		+ ",(select count(document_code]) from  safety_ims c  "
+								+ "where  "+subQry+" c.incident_type = 'UA'  and DATEDIFF(day,created_date,GETDATE()) between  0 and 30)  as UA  "
+								+ ",(select count(document_code) from safety_ims c  "
+								+ "where  "+subQry+" c.incident_type = 'UC'  and DATEDIFF(day,created_date,GETDATE()) between  0 and 30)  as UC  "
+								+ "  FROM safetyDB.dbo.safety_ims_workflow n "
 								+ "  left join safety_ims c on c.document_code = n.document_no "
-								+ "  left join [role_master] r on n.approver_type = r.[incident_report] or n.approver_type <> r.[incident_report] "
-								+ "  group by c.[incident_type]";
+								+ "  left join role_master r on n.approver_type = r.incident_report or n.approver_type <> r.incident_report "
+								+ "  group by c.incident_types";
 				}
 				alert_levels = jdbcTemplate.query( qry, new BeanPropertyRowMapper<IRM>(IRM.class));
 				if(!StringUtils.isEmpty(alert_levels) && alert_levels.size() > 0) {
@@ -2050,20 +2050,20 @@ public class IRMDao {
 		try {
 			String qry =" SELECT u.user_id,(select user_Name from user_profile where user_id = u.user_id ) as user_name, "
 					+ "(select email_id from user_profile where user_id = u.user_id ) as email_id, "
-					+ "(select count([document_no]) from safety_ims_workflow where  approver_code = u.user_id and [action_taken] is null and status <> 'Reviewed') as incidents_count, "
-					+ "DATEDIFF(day,MAX([assigned_on]),GETDATE() )  AS 'daysNotLogined' "
-					+ "FROM [user_audit_log] u "
+					+ "(select count(document_no) from safety_ims_workflow where  approver_code = u.user_id and action_taken is null and status <> 'Reviewed') as incidents_count, "
+					+ "DATEDIFF(day,MAX(assigned_on),GETDATE() )  AS 'daysNotLogined' "
+					+ "FROM user_audit_log u "
 					+ "	left join safety_ims_workflow rm on rm.approver_code = u.user_id  "
 					+ "    left join user_profile up on rm.approver_code = u.user_id "
-					+ "    where rm.status <> 'Reviewed' and rm.status not like '%back%' and [action_taken] is null  "
-					+ "	and  [assigned_on] < DateAdd(day,-15,GETDATE() )  "
-					+ "    group by u.user_id order by MAX([user_login_time]) desc";
+					+ "    where rm.status <> 'Reviewed' and rm.status not like '%back%' and action_taken is null  "
+					+ "	and  assigned_on < DateAdd(day,-15,GETDATE() )  "
+					+ "    group by u.user_id order by MAX(user_login_time) desc";
 			
 			userList = jdbcTemplate.query( qry, new BeanPropertyRowMapper<IRM>(IRM.class));
 			if(userList.size() > 0) {
 				for(IRM obj : userList) {
-					String qry2 =" SELECT STRING_AGG([document_no],', ')  as [document_code] "
-							+ "  FROM [safety_ims_workflow] where approver_code is not null   ";
+					String qry2 =" SELECT STRING_AGG(document_no,', ')  as document_code "
+							+ "  FROM safety_ims_workflow where approver_code is not null   ";
 					int arrSize = 0;
 					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_id())) {
 						qry2 = qry2 + " and approver_code = ? ";
@@ -2159,7 +2159,7 @@ public class IRMDao {
 				obj.setPhoto(file_name+","+photo);
 			}
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String insertQry = "UPDATE [safety_ims] set photo= :photo where document_code= :document_code_files ";
+			String insertQry = "UPDATE safety_ims set photo= :photo where document_code= :document_code_files ";
 			BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
 		    count = namedParamJdbcTemplate.update(insertQry, paramSource);
 			if(count > 0) {
@@ -2178,15 +2178,15 @@ public class IRMDao {
 		int totalRecords = 0;
 		try {
 			int arrSize = 0;
-			String qry = "select count( document_code) as total_records  from [safety_ims] c "
-				+ " left join [safety_ims_workflow] up on c.document_code = up.document_no "
-				+ " left join [project] p on c.project_code = p.project_code "
-				+ " left join [sbu] sb on p.sbu_code = sb.sbu_code"
-				+ " left join [department] d on c.department_code = d.department_code "
-				+ " left join [project_location] l on c.location = l.location_code "
-				+ " left join [incident] rm on c.incident_type = rm.incident_code "
-				+ " left join [user_profile] u on c.created_by = u.user_id "
-				+ " left join [user_profile] u1 on up.approver_code = u1.user_id "
+			String qry = "select count( document_code) as total_records  from safety_ims c "
+				+ " left join safety_ims_workflow up on c.document_code = up.document_no "
+				+ " left join project p on c.project_code = p.project_code "
+				+ " left join sbu sb on p.sbu_code = sb.sbu_code"
+				+ " left join department d on c.department_code = d.department_code "
+				+ " left join project_location l on c.location = l.location_code "
+				+ " left join incident rm on c.incident_type = rm.incident_code "
+				+ " left join user_profile u on c.created_by = u.user_id "
+				+ " left join user_profile u1 on up.approver_code = u1.user_id "
 				+ " where  document_code is not null   ";
 		if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
 			qry = qry + " and p.sbu_code = ? ";
@@ -2219,7 +2219,7 @@ public class IRMDao {
 			arrSize++;
 		}
 		if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
-			qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+			qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from safety_ims_workflow where approver_code = ? ))";
 			arrSize++;
 			arrSize++;
 		}
@@ -2344,7 +2344,7 @@ public class IRMDao {
 		List<IRM> objsList = null;
 		try {
 			int arrSize = 0;
-			String qry =" select c.id,c.document_code,(select count(*) from [safety_ims] where status is null) as noCounts,(select count(*) from [safety_ims] where status = 'In Progress' ";
+			String qry =" select c.id,c.document_code,(select count(*) from safety_ims where status is null) as noCounts,(select count(*) from safety_ims where status = 'In Progress' ";
 					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getFrom_date()) && !StringUtils.isEmpty(obj.getTo_date())) {
 						qry = qry + " and CONVERT(date, created_date)  BETWEEN ? and ?  ";
 						arrSize++;
@@ -2353,9 +2353,9 @@ public class IRMDao {
 						//qry = qry + "and DATEDIFF(day,created_date,GETDATE()) between  0 and 30 ";
 					}
 					qry = qry + ") as counts,FORMAT(action_taken, 'dd-MMM-yy  HH:mm') as action_taken,incident_category,"
-					+ "(select max(role_code) from role_mapping where project = c.project_code and [department_code] = d.[department_code] and [safety_type] = c.[incident_type] ) as maxRole,"
+					+ "(select max(role_code) from role_mapping where project = c.project_code and department_code = d.department_code and safety_type = c.incident_type ) as maxRole,"
 					+ "(select max(approver_type) from safety_ims_workflow where status = 'In Progress' and safety_ims_workflow.document_no = c.document_code) as maxRole2,";
-					qry = qry +" (select count( distinct c.document_code) from safety_ims c left join [safety_ims_workflow] up on c.document_code = up.document_no  left join [project] p on c.project_code = p.project_code left join [sbu] sb on p.sbu_code = sb.sbu_code where c.incident_type is not null   ";
+					qry = qry +" (select count( distinct c.document_code) from safety_ims c left join safety_ims_workflow up on c.document_code = up.document_no  left join project p on c.project_code = p.project_code left join sbu sb on p.sbu_code = sb.sbu_code where c.incident_type is not null   ";
 					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
 						qry = qry + " and p.sbu_code = ? ";
 						arrSize++;
@@ -2387,7 +2387,7 @@ public class IRMDao {
 						arrSize++;
 					}
 					if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
-						qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+						qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from safety_ims_workflow where approver_code = ? ))";
 						arrSize++;	arrSize++;
 					}
 					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getAdmin_incidents())) {
@@ -2415,9 +2415,9 @@ public class IRMDao {
 						qry = qry + " and  c.status is null ";
 					}
 					qry = qry +  " ) as all_irm ,"
-							+ "  (select count(*) from [safety_ims] c "
-							+ " left join [project] p on c.project_code = p.project_code "
-							+ "left join [sbu] sb on p.sbu_code = sb.sbu_code where c.[status] is null";
+							+ "  (select count(*) from safety_ims c "
+							+ " left join project p on c.project_code = p.project_code "
+							+ "left join sbu sb on p.sbu_code = sb.sbu_code where c.status is null";
 							if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
 								qry = qry + " and p.sbu_code = ? ";
 								arrSize++;
@@ -2449,7 +2449,7 @@ public class IRMDao {
 								arrSize++;
 							}
 							if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
-								qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+								qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from safety_ims_workflow where approver_code = ? ))";
 
 								arrSize++;	arrSize++;
 							}
@@ -2479,7 +2479,7 @@ public class IRMDao {
 							}
 								
 							qry = qry + " ) as not_assigned,";
-							qry = qry +	"(select count( c.[document_code]) from [safety_ims] c left join [project] p on c.project_code = p.project_code left join [sbu] sb on p.sbu_code = sb.sbu_code where c.[document_code] is not null and c.status ='Resolved'  ";
+							qry = qry +	"(select count( c.document_code) from safety_ims c left join project p on c.project_code = p.project_code left join sbu sb on p.sbu_code = sb.sbu_code where c.document_code is not null and c.status ='Resolved'  ";
 									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
 										qry = qry + " and p.sbu_code = ? ";
 										arrSize++;
@@ -2511,7 +2511,7 @@ public class IRMDao {
 										arrSize++;
 									}
 									if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
-										qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+										qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from safety_ims_workflow where approver_code = ? ))";
 										arrSize++;
 										arrSize++;
 									}
@@ -2541,7 +2541,7 @@ public class IRMDao {
 									}
 										
 									qry = qry + " ) as active_irm,"
-									+ "(select count( c.[document_code]) from [safety_ims] c left join [project] p on c.project_code = p.project_code left join [sbu] sb on p.sbu_code = sb.sbu_code where c.[document_code] is not null and c.status ='In Progress' ";
+									+ "(select count( c.document_code) from safety_ims c left join project p on c.project_code = p.project_code left join sbu sb on p.sbu_code = sb.sbu_code where c.document_code is not null and c.status ='In Progress' ";
 									if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
 										qry = qry + " and p.sbu_code = ? ";
 										arrSize++;
@@ -2573,7 +2573,7 @@ public class IRMDao {
 										arrSize++;
 									}
 									if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
-										qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+										qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from safety_ims_workflow where approver_code = ? ))";
 										arrSize++;
 										arrSize++;
 									}
@@ -2605,15 +2605,15 @@ public class IRMDao {
 										
 									qry = qry + " ) as inActive_irm,"
 					+ "rm.incident_code,rm.incident_type,approver_type,p.sbu_code,sb.sbu_name,	 c.project_code,p.project_name,c.risk_type,c.description,c.status,c.ptw_code,c.department_code,d.department_name,"
-					+ "	l.location_code,l.location_name,c.created_by,u.email_id,u.user_name, COALESCE(up.approver_code, 'No Reviewer Assigneds') AS approver_code,u1.user_name as approver_name,FORMAT(c.created_date, 'dd-MMM-yy  HH:mm') as created_date from [safety_ims] c "
-					+ " left join [safety_ims_workflow] up on c.document_code = up.document_no "
-					+ " left join [project] p on c.project_code = p.project_code "
-					+ " left join [sbu] sb on p.sbu_code = sb.sbu_code"
-					+ " left join [department] d on c.department_code = d.department_code "
-					+ " left join [project_location] l on c.location = l.location_code "
-					+ " left join [incident] rm on c.incident_type = rm.incident_code "
-					+ " left join [user_profile] u on c.created_by = u.user_id "
-					+ " left join [user_profile] u1 on up.approver_code = u1.user_id "
+					+ "	l.location_code,l.location_name,c.created_by,u.email_id,u.user_name, COALESCE(up.approver_code, 'No Reviewer Assigneds') AS approver_code,u1.user_name as approver_name,FORMAT(c.created_date, 'dd-MMM-yy  HH:mm') as created_date from safety_ims c "
+					+ " left join safety_ims_workflow up on c.document_code = up.document_no "
+					+ " left join project p on c.project_code = p.project_code "
+					+ " left join sbu sb on p.sbu_code = sb.sbu_code"
+					+ " left join department d on c.department_code = d.department_code "
+					+ " left join project_location l on c.location = l.location_code "
+					+ " left join incident rm on c.incident_type = rm.incident_code "
+					+ " left join user_profile u on c.created_by = u.user_id "
+					+ " left join user_profile u1 on up.approver_code = u1.user_id "
 					+ " where  document_code is not null   ";
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
 				qry = qry + " and p.sbu_code = ? ";
@@ -2646,7 +2646,7 @@ public class IRMDao {
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && (!CommonConstants.ADMIN.equals(obj.getRole()) && !CommonConstants.MANAGEMENT.equals(obj.getRole())) && !StringUtils.isEmpty(obj.getUser())) {
-				qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from [safety_ims_workflow] where approver_code = ? ))";
+				qry = qry + " and ( c.created_by = ? or approver_code in(select distinct approver_code from safety_ims_workflow where approver_code = ? ))";
 				arrSize++;
 				arrSize++;
 			}

@@ -34,7 +34,7 @@ public class DepartmentDao {
 	public List<Department> getSBUList(Department obj) throws SQLException {
 		List<Department> menuList = null;
 		try{  
-			String qry = "select sbu_code,sbu_name from [sbu] where status <> 'Inactive' ";
+			String qry = "select sbu_code,sbu_name from sbu where status <> 'Inactive' ";
 			menuList = jdbcTemplate.query( qry, new BeanPropertyRowMapper<Department>(Department.class));
 			
 		}catch(Exception e){ 
@@ -92,7 +92,7 @@ public class DepartmentDao {
 							}
 							qry = qry + " ) as inActive_department,"
 					+ "s.id,s.department_code,s.created_by,FORMAT(s.created_date, 'dd-MMM-yy  HH:mm') as created_date,FORMAT(s.modified_date, 'dd-MMM-yy  HH:mm') as modified_date,"
-					+ "s.modified_by,s.department_name,p.user_name,p1.user_name as  modified_by,assigned_to_sbu as assigned_to_sbu_multiple,s.status from [department] s "
+					+ "s.modified_by,s.department_name,p.user_name,p1.user_name as  modified_by,assigned_to_sbu as assigned_to_sbu_multiple,s.status from department s "
 					+ "left join user_profile p on s.created_by = p.user_id "//cross apply STRING_SPLIT ([assigned_to_sbu], ',')
 					+ "left join user_profile p1 on s.modified_by = p1.user_id "
 					+ " where s.department_code is not null and s.department_code <> '' ";
@@ -152,8 +152,8 @@ public class DepartmentDao {
 	public List<Department> getSBUsFilterList(Department obj) throws Exception {
 		List<Department> objsList = new ArrayList<Department>();
 		try {
-			String qry = "SELECT  Value as sbu_code,c.sbu_name FROM [department] s cross apply STRING_SPLIT ([assigned_to_sbu], ',') "
-					+ " left join [sbu] c on Value = c.sbu_code "
+			String qry = "SELECT  Value as sbu_code,c.sbu_name FROM department s cross apply STRING_SPLIT (assigned_to_sbu, ',') "
+					+ " left join sbu c on Value = c.sbu_code "
 					+ " where Value is not null and Value <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getDepartment_code())) {
@@ -189,7 +189,7 @@ public class DepartmentDao {
 	public List<Department> getDepartmentFilterList(Department obj) throws Exception {
 		List<Department> objsList = new ArrayList<Department>();
 		try {
-			String qry = "SELECT department_code, department_name FROM [department] s "
+			String qry = "SELECT department_code, department_name FROM department s "
 					+ " where department_code is not null and department_code <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getDepartment_code())) {
@@ -225,7 +225,7 @@ public class DepartmentDao {
 	public List<Department> getStatusFilterListFromDepartment(Department obj) throws Exception {
 		List<Department> objsList = new ArrayList<Department>();
 		try {
-			String qry = "SELECT status FROM [department] s "
+			String qry = "SELECT status FROM department s "
 					+ " where status is not null and status <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getDepartment_code())) {
@@ -265,7 +265,7 @@ public class DepartmentDao {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		try {
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String insertQry = "INSERT INTO [department] (assigned_to_sbu,department_code,department_name,status,created_by,created_date) VALUES (:assigned_to_sbu,:department_code,:department_name,:status,:craeted_by,getdate())";
+			String insertQry = "INSERT INTO department (assigned_to_sbu,department_code,department_name,status,created_by,created_date) VALUES (:assigned_to_sbu,:department_code,:department_name,:status,:craeted_by,getdate())";
 			BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
 		    count = namedParamJdbcTemplate.update(insertQry, paramSource);
 			if(count > 0) {
@@ -287,7 +287,7 @@ public class DepartmentDao {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		try {
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String updateQry = "UPDATE [department] set assigned_to_sbu= :assigned_to_sbu,department_code= :department_code,department_name=:department_name,status= :status, modified_by= :modified_by,modified_date= getdate() "
+			String updateQry = "UPDATE department set assigned_to_sbu= :assigned_to_sbu,department_code= :department_code,department_name=:department_name,status= :status, modified_by= :modified_by,modified_date= getdate() "
 					+ " where id= :id ";
 			BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
 		    count = namedParamJdbcTemplate.update(updateQry, paramSource);
@@ -306,7 +306,7 @@ public class DepartmentDao {
 	public List<Department> checkUniqueIfForDept(Department obj) throws Exception {
 		List<Department> objsList = new ArrayList<Department>();
 		try {
-			String qry = "SELECT department_code FROM [department]  "
+			String qry = "SELECT department_code FROM department  "
 					+ " where status is not null and status <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getDepartment_code())) {

@@ -48,19 +48,19 @@ public class UserDao {
 		try {
 			int arrSize = 0;
 			jdbcTemplate = new JdbcTemplate(dataSource);
-			String qry = "SELECT distinct (up.user_id),(select sum((DATEDIFF(minute,(ual.[user_login_time] ) ,(ual.[user_logout_time] ) )))/60 "
-					+ "FROM [user_audit_log] ual where ual.user_id = up.user_id) as minutes,";
-					qry = qry +"(select DATEDIFF(DAY,min([user_login_time] ) ,max([user_login_time] ) )  FROM [user_audit_log] ual where user_id is not null ";
+			String qry = "SELECT distinct (up.user_id),(select sum((DATEDIFF(minute,(ual.user_login_time ) ,(ual.user_logout_time ) )))/60 "
+					+ "FROM user_audit_log ual where ual.user_id = up.user_id) as minutes,";
+					qry = qry +"(select DATEDIFF(DAY,min(user_login_time ) ,max(user_login_time) )  FROM user_audit_log ual where user_id is not null ";
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_id())) {
 				qry = qry + " and  ual.user_id = ? ";
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() != 0  && obj.getTime_period() != 13) {
-				qry = qry + " and [user_login_time] >= DATEADD(day, ?, GETDATE()) ";
+				qry = qry + " and user_login_time >= DATEADD(day, ?, GETDATE()) ";
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() == 13) {
-				qry = qry + " and [user_login_time] is null ";
+				qry = qry + " and user_login_time is null ";
 			}
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
 				qry = qry + " and ua.status = ? ";
@@ -82,17 +82,17 @@ public class UserDao {
 			
 			
 			
-			qry = qry +"(select sum((DATEDIFF(minute,([user_login_time] ) ,([user_logout_time]))))/60 FROM [user_audit_log] ual where user_id is not null ";
+			qry = qry +"(select sum((DATEDIFF(minute,(user_login_time ) ,(user_logout_time))))/60 FROM user_audit_log ual where user_id is not null ";
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_id())) {
 				qry = qry + " and  ual.user_id = ? ";
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() != 0  && obj.getTime_period() != 13) {
-				qry = qry + " and [user_login_time] >= DATEADD(day, ?, GETDATE()) ";
+				qry = qry + " and user_login_time >= DATEADD(day, ?, GETDATE()) ";
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() == 13) {
-				qry = qry + " and [user_login_time] is null ";
+				qry = qry + " and user_login_time is null ";
 			}
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
 				qry = qry + " and ua.status = ? ";
@@ -113,18 +113,18 @@ public class UserDao {
 			qry = qry +  " ) as hours ,";
 			
 			
-			qry = qry +	"(select count( up.user_id) from [user_profile] up left join [user_accounts] ua on up.user_id = ua.user_id where up.user_id <> ''"
+			qry = qry +	"(select count( up.user_id) from user_profile up left join user_accounts ua on up.user_id = ua.user_id where up.user_id <> ''"
 					+ " and ua.status = 'Active' ";
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_id())) {
 				qry = qry + " and  up.user_id = ? ";
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() != 0  && obj.getTime_period() != 13) {
-				qry = qry + " and [user_login_time] >= DATEADD(day, ?, GETDATE()) ";
+				qry = qry + " and user_login_time >= DATEADD(day, ?, GETDATE()) ";
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() == 13) {
-				qry = qry + " and [user_login_time] is null ";
+				qry = qry + " and user_login_time is null ";
 			}
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
 				qry = qry + " and ua.status = ? ";
@@ -143,18 +143,18 @@ public class UserDao {
 				arrSize++;
 			}
 			qry = qry + " ) as active_users,"
-			+ "(select count( up.user_id) from [user_profile] up left join [user_accounts] ua on up.user_id = ua.user_id where up.user_id <> '' "
+			+ "(select count( up.user_id) from user_profile up left join user_accounts ua on up.user_id = ua.user_id where up.user_id <> '' "
 			+ " and ua.status <> 'Active' ";
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_id())) {
 				qry = qry + " and  up.user_id = ? ";
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() != 0  && obj.getTime_period() != 13) {
-				qry = qry + " and [user_login_time] >= DATEADD(day, ?, GETDATE()) ";
+				qry = qry + " and user_login_time >= DATEADD(day, ?, GETDATE()) ";
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() == 13) {
-				qry = qry + " and [user_login_time] is null ";
+				qry = qry + " and user_login_time is null ";
 			}
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
 				qry = qry + " and ua.status = ? ";
@@ -175,32 +175,32 @@ public class UserDao {
 			
 			qry = qry + " ) as inActive_users,up.base_sbu,up.base_project as project_code,up.email_id,up.contact_number,up.base_role as user_role,up.base_department as department_code,"
 					+ "project_name as base_project,sbu_name,dd.department_name as base_department,up.base_role,(select max(user_login_time) "
-					+ "from [user_audit_log] uuu where uuu.user_id =  up.user_id) as last_login,"
+					+ "from user_audit_log uuu where uuu.user_id =  up.user_id) as last_login,"
 			+ "up.id,up.user_id,up.user_name,up.email_id,up.contact_number,up3.user_name as reporting_to,ua.status,up.reporting_to as reporting_to_id, "
 			+"FORMAT (up.created_date, 'dd-MMM-yy') as created_date,up1.user_name as 	"
 			+ "created_by,FORMAT	(up.modified_date, 'dd-MMM-yy') as modified_date,up2.user_name as  modified_by "
-			+ "FROM [user_profile] up "
-			+ "left join [user_accounts] ua on up.user_id = ua.user_id  "
-			+ "left join [user_audit_log] ual on up.user_id = ual.user_id  "
+			+ "FROM user_profile up "
+			+ "left join user_accounts ua on up.user_id = ua.user_id  "
+			+ "left join user_audit_log ual on up.user_id = ual.user_id  "
 			
-			+ "left join [project] p on up.base_project = p.project_code  "
-			+ "left join [sbu] ss on up.base_sbu = ss.sbu_code  "
-			+ "left join [department] dd on up.base_department = dd.department_code  "
+			+ "left join project p on up.base_project = p.project_code  "
+			+ "left join sbu ss on up.base_sbu = ss.sbu_code  "
+			+ "left join department dd on up.base_department = dd.department_code  "
 			
-			+ "left join [user_profile] up1 on up.created_by = up1.user_id "
-			+ "left join [user_profile] up3 on up.reporting_to = up3.user_id "
-			+ "left join [user_profile] up2 on up.modified_by = up2.user_id  where up.user_id <> '' ";
+			+ "left join user_profile up1 on up.created_by = up1.user_id "
+			+ "left join user_profile up3 on up.reporting_to = up3.user_id "
+			+ "left join user_profile up2 on up.modified_by = up2.user_id  where up.user_id <> '' ";
 			
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_id())) {
 				qry = qry + " and up.user_id = ? ";
 				arrSize++;
 			}	
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() != 0  && obj.getTime_period() != 13) {
-				qry = qry + " and [user_login_time] >= DATEADD(day, ?, GETDATE()) ";
+				qry = qry + " and user_login_time >= DATEADD(day, ?, GETDATE()) ";
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() == 13) {
-				qry = qry + " and [user_login_time] is null ";
+				qry = qry + " and user_login_time is null ";
 			}
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
 				qry = qry + " and ua.status = ? ";
@@ -342,14 +342,14 @@ public class UserDao {
 				obj.setPassword(encryptPwd);
 			}
 			obj.setReward_points("100");
-			String insertQry = "INSERT INTO [user_profile] "
+			String insertQry = "INSERT INTO user_profile "
 					+ "(user_id,user_name,email_id,contact_number,base_role,base_project,base_sbu,base_department,reporting_to,created_by,end_date,created_date,reward_points)"
 					+ " VALUES "
 					+ "(:user_id,:user_name,:email_id,:contact_number,:base_role,:base_project,:base_sbu,:base_department,:reporting_to,:created_by,:end_date,getdate(),:reward_points)";
 			BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
 		    count = namedParamJdbcTemplate.update(insertQry, paramSource);
 		    if(count > 0) {
-		    	String UA_qry = "INSERT INTO [user_accounts] (user_id,user_name,status) VALUES (:user_id,:email_id,:status)";
+		    	String UA_qry = "INSERT INTO user_accounts (user_id,user_name,status) VALUES (:user_id,:email_id,:status)";
 		    	paramSource = new BeanPropertySqlParameterSource(obj);		 
 			    count = namedParamJdbcTemplate.update(UA_qry, paramSource);
 			    obj.setAction("User Creation Reward");
@@ -391,7 +391,7 @@ public class UserDao {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		try {
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String updateQry = "UPDATE [user_profile] set user_name=:user_name,email_id=:email_id,contact_number=:contact_number,"
+			String updateQry = "UPDATE user_profile set user_name=:user_name,email_id=:email_id,contact_number=:contact_number,"
 					+ "base_sbu= :base_sbu,base_project= :base_project,base_department= :base_department,base_role= :base_role,reporting_to= :reporting_to,"
 					+ "modified_by=:modified_by,modified_date= getdate()  "
 					+ "where user_id = :user_id ";
@@ -400,7 +400,7 @@ public class UserDao {
 			if(count > 0) {
 				updateUserAccounts(obj);
 				flag = true;
-				String updateAuditQry = "UPDATE [user_accounts] set status=:status where user_id = :user_id ";
+				String updateAuditQry = "UPDATE user_accounts set status=:status where user_id = :user_id ";
 				paramSource = new BeanPropertySqlParameterSource(obj);		 
 			    count = namedParamJdbcTemplate.update(updateAuditQry, paramSource);
 			}
@@ -416,7 +416,7 @@ public class UserDao {
 	public List<User> getDeptList(User obj) throws Exception {
 		List<User> objsList = new ArrayList<User>();
 		try {
-			String qry = "SELECT user_role FROM [user_role] "; 
+			String qry = "SELECT user_role FROM user_role "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_role())) {
 				qry = qry + "and user_role = ? ";
@@ -444,10 +444,10 @@ public class UserDao {
 		try{  
 			con = dataSource.getConnection();
 			String qry = "select up.id,up.user_id,up.user_name,up.base_role,up.contact_number,up.email_id,up.base_department,department_name,up.base_sbu,up.base_project,"
-					+ "up.reward_points,p.project_name,s.sbu_name,up.reporting_to,up1.user_name as reporting_user_name,up.version_no from [user_profile] up "
+					+ "up.reward_points,p.project_name,s.sbu_name,up.reporting_to,up1.user_name as reporting_user_name,up.version_no from user_profile up "
 					+ "LEFT JOIN project p on up.base_project = p.project_code  "
 					+ "LEFT JOIN sbu s on up.base_sbu = s.sbu_code  "
-					+ "LEFT JOIN [department] d on up.base_department = d.department_code  "
+					+ "LEFT JOIN department d on up.base_department = d.department_code  "
 					+ "LEFT JOIN user_accounts ua on up.user_id = ua.user_id  "
 					+ "LEFT JOIN user_profile up1 on up.reporting_to = up1.user_id  "
 					+ "where  up.user_name <> '' and ua.status = 'Active' and (Format( CURRENT_TIMESTAMP,'yyyy-MM-dd') <= up.end_date or up.end_date is null) ";
@@ -502,7 +502,7 @@ public class UserDao {
 		User userPermissions = null;
 		try{  
 			con = dataSource.getConnection();
-			String qry = "select role,p_add,p_view,p_edit,p_approvals,p_reports,p_dashboards,p_auto_email from [base_role_permissions] "
+			String qry = "select role,p_add,p_view,p_edit,p_approvals,p_reports,p_dashboards,p_auto_email from base_role_permissions "
 					+ "where  role <> '' ";
 			if(!StringUtils.isEmpty(base_role)){
 				qry = qry + "AND role = ? "; 
@@ -539,7 +539,7 @@ public class UserDao {
 			if(!StringUtils.isEmpty(obj.getDevice_type())  && obj.getDevice_type().equals("mobile")) {
 				subQry = " and device_type_no = 1";
 			}
-			String qry = "select count(user_id) from [user_audit_log] where user_logout_time is null or  user_logout_time = '' "+ subQry;
+			String qry = "select count(user_id) from user_audit_log where user_logout_time is null or  user_logout_time = '' "+ subQry;
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_session_id())) {
 				qry = qry + " and user_session_id = ? ";
@@ -571,13 +571,13 @@ public class UserDao {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		try {
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String insertQry = "if exists(SELECT * from [user_accounts] where user_id= :user_id and user_name= :email_id)            "
+			String insertQry = "if exists(SELECT * from user_accounts where user_id= :user_id and user_name= :email_id)            "
 					+ "BEGIN            "
-					+ " update [user_accounts] set last_login_date_time=GETDATE()  where user_id= :user_id  "
+					+ " update user_accounts set last_login_date_time=GETDATE()  where user_id= :user_id  "
 					+ "End                    "
 					+ "else  "
 					+ "begin  "
-					+ "INSERT INTO [user_accounts] (user_id,user_name,last_login_date_time) values (:user_id,:email_id,GETDATE())  "
+					+ "INSERT INTO user_accounts (user_id,user_name,last_login_date_time) values (:user_id,:email_id,GETDATE())  "
 					+ "end ";
 			BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(userDetails);		 
 		    namedParamJdbcTemplate.update(insertQry, paramSource);
@@ -594,28 +594,28 @@ public class UserDao {
 		int totalRecords = 0;
 		try {
 			int arrSize = 0;
-			String qry = "select count(DISTINCT up.user_id) as total_records FROM [user_profile] up "
-			+ "left join [user_accounts] ua on up.user_id = ua.user_id  "
-			+ "left join [user_audit_log] ual on up.user_id = ual.user_id  "
+			String qry = "select count(DISTINCT up.user_id) as total_records FROM user_profile up "
+			+ "left join user_accounts ua on up.user_id = ua.user_id  "
+			+ "left join user_audit_log ual on up.user_id = ual.user_id  "
 			
-			+ "left join [project] p on up.base_project = p.project_code  "
-			+ "left join [sbu] ss on up.base_sbu = ss.sbu_code  "
-			+ "left join [department] dd on up.base_department = dd.department_code  "
+			+ "left join project p on up.base_project = p.project_code  "
+			+ "left join sbu ss on up.base_sbu = ss.sbu_code  "
+			+ "left join department dd on up.base_department = dd.department_code  "
 			
-			+ "left join [user_profile] up1 on up.created_by = up1.user_id "
-			+ "left join [user_profile] up3 on up.reporting_to = up3.user_id "
-			+ "left join [user_profile] up2 on up.modified_by = up2.user_id  where up.user_id <> '' ";
+			+ "left join user_profile up1 on up.created_by = up1.user_id "
+			+ "left join user_profile up3 on up.reporting_to = up3.user_id "
+			+ "left join user_profile up2 on up.modified_by = up2.user_id  where up.user_id <> '' ";
 			
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_id())) {
 				qry = qry + " and up.user_id = ? ";
 				arrSize++;
 			}	
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() != 0  && obj.getTime_period() != 13) {
-				qry = qry + " and [user_login_time] >= DATEADD(day, ?, GETDATE()) ";
+				qry = qry + " and user_login_time >= DATEADD(day, ?, GETDATE()) ";
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() == 13) {
-				qry = qry + " and [user_login_time] is null ";
+				qry = qry + " and user_login_time is null ";
 			}
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
 				qry = qry + " and ua.status = ? ";
@@ -702,19 +702,19 @@ public class UserDao {
 		try {
 			int arrSize = 0;
 			jdbcTemplate = new JdbcTemplate(dataSource);
-			String qry = "SELECT distinct (up.user_id),(select sum((DATEDIFF(minute,(ual.[user_login_time] ) ,(ual.[user_logout_time] ) )))/60 "
-					+ "FROM [user_audit_log] ual where ual.user_id = up.user_id) as minutes,";
-					qry = qry +"(select DATEDIFF(DAY,min([user_login_time] ) ,max([user_login_time] ) )  FROM [user_audit_log] ual where user_id is not null ";
+			String qry = "SELECT distinct (up.user_id),(select sum((DATEDIFF(minute,(ual.user_login_time ) ,(ual.user_logout_time) )))/60 "
+					+ "FROM user_audit_log ual where ual.user_id = up.user_id) as minutes,";
+					qry = qry +"(select DATEDIFF(DAY,min(user_login_time ) ,max(user_login_time ) )  FROM user_audit_log ual where user_id is not null ";
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_id())) {
 				qry = qry + " and  ual.user_id = ? ";
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() != 0  && obj.getTime_period() != 13) {
-				qry = qry + " and [user_login_time] >= DATEADD(day, ?, GETDATE()) ";
+				qry = qry + " and user_login_time >= DATEADD(day, ?, GETDATE()) ";
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() == 13) {
-				qry = qry + " and [user_login_time] is null ";
+				qry = qry + " and user_login_time is null ";
 			}
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
 				qry = qry + " and ua.status = ? ";
@@ -736,17 +736,17 @@ public class UserDao {
 			
 			
 			
-			qry = qry +"(select sum((DATEDIFF(minute,([user_login_time] ) ,([user_logout_time]))))/60 FROM [user_audit_log] ual where user_id is not null ";
+			qry = qry +"(select sum((DATEDIFF(minute,(user_login_time) ,(user_logout_time))))/60 FROM user_audit_log ual where user_id is not null ";
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_id())) {
 				qry = qry + " and  ual.user_id = ? ";
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() != 0  && obj.getTime_period() != 13) {
-				qry = qry + " and [user_login_time] >= DATEADD(day, ?, GETDATE()) ";
+				qry = qry + " and user_login_time >= DATEADD(day, ?, GETDATE()) ";
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() == 13) {
-				qry = qry + " and [user_login_time] is null ";
+				qry = qry + " and user_login_time is null ";
 			}
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
 				qry = qry + " and ua.status = ? ";
@@ -767,18 +767,18 @@ public class UserDao {
 			qry = qry +  " ) as hours ,";
 			
 			
-			qry = qry +	"(select count( up.user_id) from [user_profile] up left join [user_accounts] ua on up.user_id = ua.user_id where up.user_id <> ''"
+			qry = qry +	"(select count( up.user_id) from user_profile up left join user_accounts ua on up.user_id = ua.user_id where up.user_id <> ''"
 					+ " and ua.status = 'Active' ";
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_id())) {
 				qry = qry + " and  up.user_id = ? ";
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() != 0  && obj.getTime_period() != 13) {
-				qry = qry + " and [user_login_time] >= DATEADD(day, ?, GETDATE()) ";
+				qry = qry + " and user_login_time >= DATEADD(day, ?, GETDATE()) ";
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() == 13) {
-				qry = qry + " and [user_login_time] is null ";
+				qry = qry + " and user_login_time is null ";
 			}
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
 				qry = qry + " and ua.status = ? ";
@@ -797,18 +797,18 @@ public class UserDao {
 				arrSize++;
 			}
 			qry = qry + " ) as active_users,"
-			+ "(select count( up.user_id) from [user_profile] up left join [user_accounts] ua on up.user_id = ua.user_id where up.user_id <> '' "
+			+ "(select count( up.user_id) from user_profile up left join user_accounts ua on up.user_id = ua.user_id where up.user_id <> '' "
 			+ " and ua.status <> 'Active' ";
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_id())) {
 				qry = qry + " and  up.user_id = ? ";
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() != 0  && obj.getTime_period() != 13) {
-				qry = qry + " and [user_login_time] >= DATEADD(day, ?, GETDATE()) ";
+				qry = qry + " and user_login_time >= DATEADD(day, ?, GETDATE()) ";
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() == 13) {
-				qry = qry + " and [user_login_time] is null ";
+				qry = qry + " and user_login_time is null ";
 			}
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
 				qry = qry + " and ua.status = ? ";
@@ -829,32 +829,32 @@ public class UserDao {
 			
 			qry = qry + " ) as inActive_users,up.base_sbu,up.base_project as project_code,up.base_role as user_role,up.base_department as department_code,"
 					+ "project_name as base_project,sbu_name,dd.department_name as base_department,up.base_role,(select max(user_login_time) "
-					+ "from [user_audit_log] uuu where uuu.user_id =  up.user_id) as last_login,"
+					+ "from user_audit_log uuu where uuu.user_id =  up.user_id) as last_login,"
 			+ "up.id,up.user_id,up.user_name,up.email_id,up.contact_number,up3.user_name as reporting_to,ua.status,up.reporting_to as reporting_to_id, "
 			+"FORMAT (up.created_date, 'dd-MMM-yy') as created_date,up1.user_name as 	"
 			+ "created_by,FORMAT	(up.modified_date, 'dd-MMM-yy') as modified_date,up2.user_name as  modified_by "
 			+ "FROM [user_profile] up "
-			+ "left join [user_accounts] ua on up.user_id = ua.user_id  "
-			+ "left join [user_audit_log] ual on up.user_id = ual.user_id  "
+			+ "left join user_accounts ua on up.user_id = ua.user_id  "
+			+ "left join user_audit_log ual on up.user_id = ual.user_id  "
 			
-			+ "left join [project] p on up.base_project = p.project_code  "
-			+ "left join [sbu] ss on up.base_sbu = ss.sbu_code  "
-			+ "left join [department] dd on up.base_department = dd.department_code  "
+			+ "left join project p on up.base_project = p.project_code  "
+			+ "left join sbu ss on up.base_sbu = ss.sbu_code  "
+			+ "left join department dd on up.base_department = dd.department_code  "
 			
-			+ "left join [user_profile] up1 on up.created_by = up1.user_id "
-			+ "left join [user_profile] up3 on up.reporting_to = up3.user_id "
-			+ "left join [user_profile] up2 on up.modified_by = up2.user_id  where up.user_id <> '' ";
+			+ "left join user_profile up1 on up.created_by = up1.user_id "
+			+ "left join user_profile up3 on up.reporting_to = up3.user_id "
+			+ "left join user_profile up2 on up.modified_by = up2.user_id  where up.user_id <> '' ";
 			
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_id())) {
 				qry = qry + " and up.user_id = ? ";
 				arrSize++;
 			}	
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() != 0  && obj.getTime_period() != 13) {
-				qry = qry + " and [user_login_time] >= DATEADD(day, ?, GETDATE()) ";
+				qry = qry + " and user_login_time >= DATEADD(day, ?, GETDATE()) ";
 				arrSize++;
 			}
 			if(!StringUtils.isEmpty(obj) && obj.getTime_period() == 13) {
-				qry = qry + " and [user_login_time] is null ";
+				qry = qry + " and user_login_time is null ";
 			}
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getStatus())) {
 				qry = qry + " and ua.status = ? ";
@@ -1032,13 +1032,13 @@ public class UserDao {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		try {
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String insertQry = "if exists(SELECT * from [user_accounts] where user_id= :user_id )            "
+			String insertQry = "if exists(SELECT * from user_accounts where user_id= :user_id )            "
 					+ "BEGIN            "
-					+ " update [user_accounts] set user_name= :email_id,status= :status  where user_id= :user_id  "
+					+ " update user_accounts set user_name= :email_id,status= :status  where user_id= :user_id  "
 					+ "End                    "
 					+ "else  "
 					+ "begin  "
-					+ "INSERT INTO [user_accounts] (user_id,user_name,status) values (:user_id,:email_id,:status)  "
+					+ "INSERT INTO user_accounts (user_id,user_name,status) values (:user_id,:email_id,:status)  "
 					+ "end ";
 			BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(userDetails);		 
 		    namedParamJdbcTemplate.update(insertQry, paramSource);
@@ -1054,7 +1054,7 @@ public class UserDao {
 	public boolean deleteProject(User obj) throws Exception {
 		boolean flag = false;
 		try {
-			String sql = "DELETE FROM [user_profile] WHERE user_id = ?";
+			String sql = "DELETE FROM user_profile WHERE user_id = ?";
 		    Object[] args = new Object[] {obj.getUser_id()};
 		    flag =  jdbcTemplate.update(sql, args) == 1;
 		}catch (Exception e) {
@@ -1067,7 +1067,7 @@ public class UserDao {
 	public List<User> getDeptFilterList(User obj) throws Exception {
 		List<User> objsList = new ArrayList<User>();
 		try {
-			String qry = "SELECT  count(user_role) as count ,(select count(user_name) from [user_profile]) as totalCount, user_role FROM [user_profile] where user_role is not null and user_role <> '' group by user_role "; 
+			String qry = "SELECT  count(user_role) as count ,(select count(user_name) from user_profile) as totalCount, user_role FROM user_profile where user_role is not null and user_role <> '' group by user_role "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_role())) {
 				qry = qry + "and user_role = ? ";
@@ -1099,7 +1099,7 @@ public class UserDao {
 				obj.setDevice_type_no("2");
 			}
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String insertQry = "INSERT INTO [user_audit_log] (module_id,module_type,message,user_id,user_session_id,device_type,device_type_no,user_login_time)"
+			String insertQry = "INSERT INTO user_audit_log (module_id,module_type,message,user_id,user_session_id,device_type,device_type_no,user_login_time)"
 					+ " values (:id,:module_type,:message,:user_id,:user_session_id,:device_type,:device_type_no,GETDATE())";
 			BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
 		    namedParamJdbcTemplate.update(insertQry, paramSource);
@@ -1119,8 +1119,8 @@ public class UserDao {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		try {
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String insertQry = "Update  [user_audit_log] set user_logout_time = GETDATE() where "
-					+ " user_login_time IN (SELECT max([user_login_time]) FROM[user_audit_log] )  and  module_id = :id";
+			String insertQry = "Update  user_audit_log set user_logout_time = GETDATE() where "
+					+ " user_login_time IN (SELECT max(user_login_time) FROM user_audit_log )  and  module_id = :id";
 			BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
 		    namedParamJdbcTemplate.update(insertQry, paramSource);
 			transactionManager.commit(status);
@@ -1149,8 +1149,8 @@ public class UserDao {
 	public List<User> getUserFilterList(User obj) throws Exception {
 		List<User> objsList = new ArrayList<User>();
 		try {
-			String qry = "SELECT up.user_id,up.user_name FROM [user_profile] up "
-					+ "left join [user_accounts] ua on up.user_id = ua.user_id where up.user_id <> '' ";
+			String qry = "SELECT up.user_id,up.user_name FROM user_profile up "
+					+ "left join user_accounts ua on up.user_id = ua.user_id where up.user_id <> '' ";
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_id())) {
 				qry = qry + " and up.user_id = ? ";
@@ -1201,8 +1201,8 @@ public class UserDao {
 	public List<User> getStatusFilterListFromUser(User obj) throws Exception {
 		List<User> objsList = new ArrayList<User>();
 		try {
-			String qry = "SELECT ua.status FROM [user_profile] up "
-					+ "left join [user_accounts] ua on up.user_id = ua.user_id where up.user_id <> '' ";
+			String qry = "SELECT ua.status FROM user_profile up "
+					+ "left join user_accounts ua on up.user_id = ua.user_id where up.user_id <> '' ";
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_id())) {
 				qry = qry + " and up.user_id = ? ";
@@ -1255,7 +1255,7 @@ public class UserDao {
 	public List<User> getReportingTosList(User obj) throws SQLException {
 		List<User> menuList = null;
 		try{  
-			String qry = "select user_id,user_name from [user_profile]";
+			String qry = "select user_id,user_name from user_profile";
 			menuList = jdbcTemplate.query( qry, new BeanPropertyRowMapper<User>(User.class));
 			
 		}catch(Exception e){ 
@@ -1268,7 +1268,7 @@ public class UserDao {
 	public List<RoleMapping> getDeptsList() throws SQLException {
 		List<RoleMapping> menuList = null;
 		try{  
-			String qry = "SELECT department_code ,department_name FROM [department] d "
+			String qry = "SELECT department_code ,department_name FROM department d "
 					+ " where d.department_code is not null and  d.department_code <> ''  "; 
 			menuList = jdbcTemplate.query( qry, new BeanPropertyRowMapper<RoleMapping>(RoleMapping.class));
 		}catch(Exception e){ 
@@ -1281,8 +1281,8 @@ public class UserDao {
 	public List<User> getRoleFilterListInUser(User obj) throws Exception {
 		List<User> objsList = new ArrayList<User>();
 		try {
-			String qry = "SELECT up.base_role FROM [user_profile] up "
-					+ "left join [user_accounts] ua on up.user_id = ua.user_id  "
+			String qry = "SELECT up.base_role FROM user_profile up "
+					+ "left join user_accounts ua on up.user_id = ua.user_id  "
 					+ " where up.base_role <> '' and up.base_role is not null  ";
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_id())) {
@@ -1336,9 +1336,9 @@ public class UserDao {
 	public List<User> getSBUFilterListInUser(User obj) throws Exception {
 		List<User> objsList = new ArrayList<User>();
 		try {
-			String qry = "SELECT s.sbu_code,sbu_name FROM [user_profile] up "
-					+ "left join [user_accounts] ua on up.user_id = ua.user_id  "
-					+ "left join [sbu] s on up.base_sbu = s.sbu_code  "
+			String qry = "SELECT s.sbu_code,sbu_name FROM user_profile up "
+					+ "left join user_accounts ua on up.user_id = ua.user_id  "
+					+ "left join sbu s on up.base_sbu = s.sbu_code  "
 					+ " where up.base_sbu <> '' and up.base_sbu is not null ";
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_id())) {
@@ -1392,9 +1392,9 @@ public class UserDao {
 	public List<User> getProjectFilterListInUser(User obj) throws Exception {
 		List<User> objsList = new ArrayList<User>();
 		try {
-			String qry = "SELECT p.project_code,project_name FROM [user_profile] up "
-					+ "left join [user_accounts] ua on up.user_id = ua.user_id  "
-					+ "left join [project] p on p.project_code = up.base_project   "
+			String qry = "SELECT p.project_code,project_name FROM user_profile up "
+					+ "left join user_accounts ua on up.user_id = ua.user_id  "
+					+ "left join project p on p.project_code = up.base_project   "
 					+ " where up.base_project <> '' and up.base_project is not null ";
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_id())) {
@@ -1448,7 +1448,7 @@ public class UserDao {
 	public List<User> getRewardsHistory(User user) throws Exception {
 		List<User> objsList = new ArrayList<User>();
 		try {
-			String qry = "SELECT[action],sum(rh.[reward_points]) + 100 as [reward_points],up.[user_name],up.user_id FROM [rewards_history] rh "
+			String qry = "SELECT action,sum(rh.reward_points) + 100 as reward_points,up.user_name,up.user_id FROM rewards_history rh "
 					+ "left join user_profile up on rh.user_id = up.user_id where action like '%Incident%' "
 					+ " and up.user_id is not null   ";
 			int arrSize = 0;
@@ -1458,7 +1458,7 @@ public class UserDao {
 				arrSize++;
 			}
 			
-			qry = qry + "group by up.user_id,action,[user_name] order by sum(rh.[reward_points]) + 100 desc ";
+			qry = qry + "group by up.user_id,action,user_name order by sum(rh.reward_points) + 100 desc ";
 			Object[] pValues = new Object[arrSize];
 			int i = 0;
 			if(!StringUtils.isEmpty(user) && (!CommonConstants.ADMIN.equals(user.getRole()) && !CommonConstants.MANAGEMENT.equals(user.getRole()))
@@ -1481,7 +1481,7 @@ public class UserDao {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		try {
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String updateQry = "UPDATE [user_profile] set contact_number=:contact_number,"
+			String updateQry = "UPDATE user_profile set contact_number=:contact_number,"
 					+ "base_sbu= :base_sbu,base_project= :base_project,base_department= :base_department,reporting_to= :reporting_to,"
 					+ "modified_by=:modified_by,modified_date= getdate()  "
 					+ "where user_id = :user_id ";
@@ -1491,7 +1491,7 @@ public class UserDao {
 				flag = true;
 				obj.setModule_type("Profile");
 				obj.setMessage("Profile Updated Successfully");
-				String logQry = "INSERT INTO [user_audit_log] "
+				String logQry = "INSERT INTO user_audit_log "
 						+ "(module_type,message,user_id,create_date)"
 						+ " VALUES "
 						+ "(:module_type,:message,:modified_by,getdate())";
@@ -1510,7 +1510,7 @@ public class UserDao {
 	public List<User> getProjectListForUser(User obj) throws Exception {
 		List<User> objsList = new ArrayList<User>();
 		try {
-			String qry = "SELECT p.project_code,project_name FROM [project] p "
+			String qry = "SELECT p.project_code,project_name FROM project p "
 					+ "left join [sbu] s on p.sbu_code = s.sbu_code  "
 					+ " where p.project_code <> '' and p.project_code is not null ";
 			int arrSize = 0;
@@ -1535,7 +1535,7 @@ public class UserDao {
 	public List<User> getDeptListForUser(User obj) throws Exception {
 		List<User> objsList = new ArrayList<User>();
 		try {
-			String qry = "SELECT d.department_code ,department_name,assigned_to_sbu FROM [department] d "
+			String qry = "SELECT d.department_code ,department_name,assigned_to_sbu FROM department d "
 					+ " where d.department_code <> '' and d.department_code is not null ";
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getBase_sbu())) {
 				qry = qry + "and  d.assigned_to_sbu like ('%"+obj.getBase_sbu()+"%') ";
@@ -1552,7 +1552,7 @@ public class UserDao {
 	public List<User> getUserActionsForNotification(User obj) throws Exception {
 		List<User> objsList = new ArrayList<User>();
 		try {
-			String qry = "SELECT TOP (10) module_type,message,user_id,create_date FROM [user_audit_log]  "
+			String qry = "SELECT TOP (10) module_type,message,user_id,create_date FROM user_audit_log  "
 					+ " where user_id <> '' and user_id is not null ";
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getUser_id())) {
@@ -1588,7 +1588,7 @@ public class UserDao {
 		try {
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 			
-			String insertQry = "INSERT INTO [otp_log] "
+			String insertQry = "INSERT INTO otp_log "
 					+ "(email_id,otp_code,created_datetime,expired_datetime)"
 					+ " VALUES "
 					+ "(:email_id,:otp_code,getdate(),DATEADD(MINUTE, 15, GETDATE()))";
@@ -1612,7 +1612,7 @@ public class UserDao {
 		boolean flag = false ;
 		try {
 			String qry = "SELECT TOP (1)  * FROM otp_log "
-					+ "WHERE (select max(expired_datetime) from  [otp_log]) > GETDATE()  and email_id ='"+irm.getEmail_id()+"' and otp_code ='"+irm.getOtp_code()+"'  order by expired_datetime desc ";
+					+ "WHERE (select max(expired_datetime) from  otp_log) > GETDATE()  and email_id ='"+irm.getEmail_id()+"' and otp_code ='"+irm.getOtp_code()+"'  order by expired_datetime desc ";
 		
 			objsList = jdbcTemplate.query( qry, new BeanPropertyRowMapper<User>(User.class));
 			if(objsList.size() > 0) {
