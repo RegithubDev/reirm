@@ -62,7 +62,7 @@ public class DepartmentDao {
 					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSbu_code())) {
 						qry = qry + " and  assigned_to_sbu like '"+obj.getSbu_code()+"%'  ";
 					}
-					qry = qry +  " ) as all_department ,";
+			 		qry = qry +  " ) as all_department ,";
 					qry = qry +	"(select count( department_code) from department where department_code is not null and status = 'Active' ";
 					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getDepartment_code())) {
 						qry = qry + " and department_code = ?";
