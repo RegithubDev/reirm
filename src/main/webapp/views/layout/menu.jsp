@@ -15,6 +15,13 @@ div.main-menu-content {
   position: sticky;
  
 }
+
+.buy-now {
+    position: fixed;
+     bottom: 81% !important; 
+    right: 79px;
+    z-index: 1031;
+}
 </style>
 </head>
 <body>
@@ -67,11 +74,11 @@ div.main-menu-content {
            </li>
         </c:if>
              <li class="dropdown nav-item " data-menu id="irm" url="irm">
-			    <a class="dropdown-item d-flex align-items-center" href="<%=request.getContextPath() %>/irm" data-bs-toggle=""
+			    <a class="dropdown-item d-flex align-items-center " href="<%=request.getContextPath() %>/irm" data-bs-toggle=""
 			     data-i18n="Analytics"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
 			      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity">
 			      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-			      <span data-i18n="Analytics">Incident Report</span></a>
+			      <span data-i18n="Analytics">Incident Details</span></a>
 	         </li>
 			<%-- <c:if test="${sessionScope.R_DASHBOARD eq 'Yes' }">
 			 <li class="dropdown nav-item " data-menu id="home">
@@ -85,11 +92,11 @@ div.main-menu-content {
 			 <li class="dropdown nav-item " data-menu id="reports" url="irm-report">
 			    <a class="dropdown-item d-flex align-items-center" href="<%=request.getContextPath() %>/irm-report" data-bs-toggle=""
 			     data-i18n="Analytics"><i data-feather='layers'></i>
-			      <span data-i18n="Analytics">Reports</span></a>
+			      <span data-i18n="Analytics">Incident Reports</span></a>
 			</li>
 			
 			<li class="dropdown nav-item " data-menu id="help" url="help">
-			    <a class="dropdown-item d-flex align-items-center" href="<%=request.getContextPath() %>/help-center" data-bs-toggle=""
+			    <a class="dropdown-item d-flex align-items-center" href="<%=request.getContextPath() %>/help-center" data-bs-toggle="" 
 			     data-i18n="Analytics"><i data-feather='help-circle'></i>
 			      <span data-i18n="Analytics">Help Center</span></a>
 			</li>
@@ -99,9 +106,19 @@ div.main-menu-content {
 			     data-i18n="Analytics"><i data-feather='codesandbox'></i>
 			      <span data-i18n="Analytics">BrainBox </span></a>
 			</li>  --%>
-				
+			
+         
           </ul>
+         
         </div>
+       <div class="buy-now">
+    <div class="position-relative d-inline-block">
+               <a href="/reirm/irm-add-incident" class="btn btn-danger waves-effect waves-float waves-light">Raise New Incident</a>
+              <span class="badge rounded-pill bg-primary badge-up">New</span>
+            </div>
+  
+
+    </div>
         <script>
         var option = window.localStorage.getItem("selectedOption");
         var child_option = window.localStorage.getItem("selectedOptionChild");

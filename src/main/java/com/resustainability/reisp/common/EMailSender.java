@@ -247,6 +247,72 @@ private static Logger logger = Logger.getLogger(EMailSender.class);
 		return isSend;
 		
 	}
+	public void sendIRMEmailAlerts(Mail mail, List<IRM> records, String today_date, String yesterday_date,
+			String current_year, String emailSubjectName) throws Exception {
+		boolean isSend = false;		
+		try {
+			MimeMessage message = new MimeMessage(getSession());
+			 Multipart multipart = new MimeMultipart( "alternative" );
+			 VelocityEngine velocityEngine = new VelocityEngine();
+			  Properties p = new Properties();
+			  //p.setProperty("resource.loader", "class");
+			  //p.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+			  
+			  p.setProperty("resource.loader", "class");
+			  p.setProperty("class.resource.loader.description", "Velocity Classpath Resource Loader");
+			  p.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+			  
+			  p.setProperty("runtime.log.logsystem.class", "org.apache.velocity.runtime.log.NullLogSystem");
+			  
+			  //p.setProperty(Velocity.RUNTIME_LOG_LOGSYSTEM_CLASS,    NullLogChute.class.getName());
+			  try {
+				  velocityEngine.init( p );    
+			  }catch (Exception e) {
+				  throw new Exception(e);
+			  }
+			     
+			  Template template = velocityEngine.getTemplate("templates/"+ mail.getTemplateName());
+				
+			  VelocityContext velocityContext = new VelocityContext();
+			  velocityContext.put("today_date", today_date);
+			  velocityContext.put("current_year", current_year);
+			  
+			  StringWriter stringWriter = new StringWriter();
+			  
+			  template.merge(velocityContext, stringWriter);
+			  MimeBodyPart htmlPart = new MimeBodyPart();
+			  htmlPart.setContent( stringWriter.toString(), "text/html; charset=utf-8" );
+			  
+			  ArrayList<String> recipientsArray = new ArrayList<String>();
+			  StringTokenizer stringTokenizer = new StringTokenizer(mail.getMailTo(), ",");
+			  message.setFrom(new InternetAddress(mailId, emailSubjectName));
+			  while (stringTokenizer.hasMoreTokens()) {
+				 recipientsArray.add(stringTokenizer.nextToken());
+			  }
+			  int sizeTo = recipientsArray.size();
+			  InternetAddress[] addressTo = new InternetAddress[sizeTo];
+			  for (int i = 0; i < sizeTo; i++) {
+				 addressTo[i] = new InternetAddress(recipientsArray.get(i).toString());
+			  }	 
+			  message.setRecipients(Message.RecipientType.TO, addressTo);
+			  message.setRecipients(Message.RecipientType.BCC,InternetAddress.parse(mailId));
+			
+			message.setSubject("IRM Report","UTF-8");
+			Multipart mp = new MimeMultipart();
+			
+			mp.addBodyPart(htmlPart);
+			message.setContent(mp);
+			message.setSubject(mail.getMailSubject());
+
+			Transport.send(message);
+			logger.info("Email sent successfully");
+			isSend = true;
+		} catch (MessagingException e) {
+			e.printStackTrace();
+			logger.error("Exception occured while sending an email: "+e.getMessage());			
+		}
+		
+	}
 	
 	
 }

@@ -64,6 +64,24 @@ body {
     left: -8px !important;
     border-style: none !important;
 }
+.input-field .searchable_label{
+      		font-size:0.85rem;
+        } 
+        td,th{
+        	box-sizing:content-box !important;
+        }
+ 	 .dataTables_filter label{
+         	content:'';
+         }
+         .right-btns .fa{
+         	position:relative;
+         	top:-35px;
+         	right: 32px !important;
+         }
+         .right-btns .fa+.fa{
+         	right: 18px !important;
+         }
+         
 </style>
  	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -178,6 +196,10 @@ body {
           </div>
         </div>
         <div class="content-body"><!-- Dashboard Analytics Start -->
+        
+        
+   
+        
 <section id="dashboard-analytics">
 <div class="row match-height" >
 <div class="col-lg-6 col-sm-6 col-12"  style="box-sizing:border-box; display:table;">
@@ -346,37 +368,40 @@ body {
         </div>
         <form id="addCompanyForm" class="row gy-1 pt-75" action="<%=request.getContextPath() %>/add-role-mapping" method="post" class="form-horizontal" role="form" >
 		<input type="hidden" name="email_id" id="email_id"  />
-		<div class="col-12 col-md-6">
-            <label class="form-label" for="select2-basic">Project</label><span class="required"> *</span>
-            <select 
-              id="select2-project_add-container"
-              name="project"
-              class="select2 form-select formSelect"
-              aria-label="Default select example" onchange="filterRoles_add(); deptFilter(); empFilter();"
-            >
-              <option value="">Select Project</option>
-             	<c:forEach var="obj" items="${projectsList}">
-					<option value="${obj.project_code }" >[${obj.project_code }] - ${obj.project_name }</option>
-				</c:forEach>
-            </select>
-             <span id="select2-project_add-containerError" class="error-msg" ></span>
-          </div>
-          <div class="col-12 col-md-6">
-            <label class="form-label" for="select2-basic">Department</label><span class="required"> *</span>
-            <select 
-              id="select2-department_code_add-container"
-              name="department_code"
-              class="select2 form-select formSelect"
-              aria-label="Default select example"  onchange="filterRoles_add(); setRole();"
-            >
-              <option value="">Select Department</option>
-             	<%-- <c:forEach var="obj" items="${deptList}">
-					<option value="${obj.department_code }" >[${obj.department_code }] - ${obj.department_name }</option>
-				</c:forEach> --%>
-            </select>
-             <span id="select2-department_code_add-containerError" class="error-msg" ></span>
-          </div>
-
+		<div class="form-check form-check-info">
+              <input type="checkbox" class="form-check-input" id="hideNSeek" >
+              <label class="form-check-label" for="colorCheck6">Level 2 </label>
+            </div>
+				<div class="col-12 col-md-6 hideNSeek">
+		            <label class="form-label" for="select2-basic">Project</label><span class="required"> *</span>
+		            <select 
+		              id="select2-project_add-container"
+		              name="project"  
+		              class="select2 form-select formSelect"
+		              aria-label="Default select example" onchange="filterRoles_add(); "
+		            >
+		              <option value="">Select project</option>
+		             	<c:forEach var="obj" items="${projectsList}">
+							<option value="${obj.project_code }" >[${obj.project_code }] - ${obj.project_name }</option>
+						</c:forEach>
+		            </select>
+		             <span id="select2-project_add-containerError" class="error-msg" ></span>   <!-- deptFilter(); -->
+		          </div>
+		          <div class="col-12 col-md-6 hideNSeek">
+		            <label class="form-label" for="select2-basic">Department</label><span class="required"> *</span>
+		            <select 
+		              id="select2-department_code_add-container"
+		              name="department_code"
+		              class="select2 form-select formSelect"
+		              aria-label="Default select example"  onchange="filterRoles_add(); setRole();"
+		            >
+		              <option value="">Select Department</option>
+		              <c:forEach var="obj" items="${deptList}">
+							<option value="${obj.department_code }" >[${obj.department_code }] - ${obj.department_name }</option>
+						</c:forEach> 
+		            </select>
+		             <span id="select2-department_code_add-containerError" class="error-msg" ></span>
+		          </div>
 	   <div class="col-12 col-md-6">
             <label class="form-label" for="select2-basic">Incident Type</label><span class="required"> *</span>
             <select 
@@ -395,7 +420,8 @@ body {
             </select>
              <span id="select2-safety_type_add-containerError" class="error-msg" ></span>
           </div>
-   		  <div class="col-12 col-md-6">
+   		  <div class="col-12 col-md-6 hideNSeekRole">
+   		  <div id="hideRoleSelect">
             <label class="form-label" for="select2-basic">Roles</label><span class="required"> *</span>
             <select 
               id="select2-roles_add-container"
@@ -407,6 +433,10 @@ body {
              
             </select>
              <span id="select2-roles_add-containerError" class="error-msg" ></span>
+             </div>
+               <div id="hideRoleInput">
+              	 <span class="badge badge-light-dark" >Level-2 Role Selected</span>
+               </div>
           </div>
           
           
@@ -419,9 +449,9 @@ body {
               aria-label="Default select example"  onchange="setEmail();"
             >
               <option value="">Select Employees</option>
-             	<%-- <c:forEach var="obj" items="${empList}">
+             	 <c:forEach var="obj" items="${empList}">
 					<option email ="${obj.email_id }" value="${obj.user_id }" >[${obj.user_id }] - ${obj.user_name }</option>
-				</c:forEach> --%>
+				</c:forEach> 
             </select>
              <span id="select2-employee_code_add-containerError" class="error-msg" ></span>
           </div>
@@ -465,6 +495,11 @@ body {
         </div>
         <form id="updateCompanyForm" class="row gy-1 pt-75" action="<%=request.getContextPath() %>/update-role-mapping" method="post" class="form-horizontal" role="form" >
         <input type="hidden" id="id" name="id" />
+        
+        
+     
+        
+        
 				<div class="col-12 col-md-6">
             <label class="form-label" for="select2-basic">Project</label><span class="required"> *</span>
          <%--    <select 
@@ -787,7 +822,8 @@ body {
     <!-- BEGIN: Vendor JS-->
     <script src="/reirm/resources/vendors/js/vendors.min.js"></script>
     <!-- BEGIN Vendor JS-->
-
+ 	<script src="/reirm/resources/app-assets/js/scripts/forms/form-repeater.min.js"></script>
+ 	  <script src="/reirm/resources/app-assets/vendors/js/forms/repeater/jquery.repeater.min.js"></script>
     <!-- BEGIN: Page Vendor JS-->
     <script src="/reirm/resources/vendors/js/ui/jquery.sticky.js"></script>
     <script src="/reirm/resources/vendors/js/forms/select/select2.full.min.js"></script>
@@ -851,6 +887,7 @@ body {
           }
           $('.modal').modal({ dismissible: false });
           getRolemappingList();
+          $('#hideRoleInput').css('display', 'none');
          }));
       document.getElementById("currentYear").innerHTML = new Date().getFullYear();
       
@@ -1110,7 +1147,158 @@ body {
 	     	 $("#exportCompanyForm ").submit();
 	  	}
 	    
-	    function getRolemappingList(){
+	    function getRolemappingList(safety_type,employee_code,p_name,id,c_code,s_code,c_name,role_code,status) {
+	    	getDeptFilterList('');
+	    	getempFilterList('');
+	    	getProjectFilter('');
+	    	//getRoleMasterFilterList('');
+	    	var project_code = $("#select2-project-filter-container").val();
+	        var employee_code = $("#select2-roles_filter-container").val();
+	    	var department_code = $("#select2-department_filter-container").val();
+	    	//var safety_type = $("#select2-incident-filter-container").val();
+	     
+	     	table = $('#datatable-company').DataTable();
+			table.destroy();
+				var i = 0;
+	    		$.fn.dataTable.moment('DD-MMM-YYYY');
+	    		var rowLen = 0;
+	    		var myParams =  "project_code="
+	    				+ project_code + "&employee_code="+ employee_code+ "&department_code="+ department_code;
+
+	    		/***************************************************************************************************/
+
+	    		$("#datatable-company")
+	    				.DataTable(
+	    						{
+	    							"bProcessing" : true,
+	    							"bServerSide" : true,
+	    							"sort" : "position",
+	    							//bStateSave variable you can use to save state on client cookies: set value "true" 
+	    							"bStateSave" : false,
+	    							 stateSave: true,
+	    							 "fnStateSave": function (oSettings, oData) {
+	    							 	localStorage.setItem('MRVCDataTables', JSON.stringify(oData));
+	    							},
+	    							 "fnStateLoad": function (oSettings) {
+	    								return JSON.parse(localStorage.getItem('MRVCDataTables'));
+	    							 },
+	    							//Default: Page display length
+	    							"iDisplayLength" : 10,
+	    							"iData" : {
+	    								"start" : 52
+	    							},
+	    							//We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
+	    							"iDisplayStart" : 0,
+	    							"fnDrawCallback" : function() {
+	    								//Get page numer on client. Please note: number start from 0 So
+	    								//for the first page you will see 0 second page 1 third page 2...
+	    								//Un-comment below alert to see page number
+	    								//alert("Current page number: "+this.fnPagingInfo().iPage);
+	    							},
+	    							//"sDom": 'l<"toolbar">frtip',
+	    							"initComplete" : function() {
+	    								$('.dataTables_filter input[type="search"]')
+	    										.attr('placeholder', 'Search')
+	    										.css({
+	    											'width' : '350px ',
+	    											'display' : 'inline-block'
+	    										});
+
+	    								var input = $('.dataTables_filter input')
+	    										.unbind()
+	    										.bind('keyup',function(e){
+	    										    if (e.which == 13){
+	    										    	self.search(input.val()).draw();
+	    										    }
+	    										}), self = this.api(), $searchButton = $(
+	    										'<i class="fa fa-search" title="Go" >')
+	    								//.text('Go')
+	    								.click(function() {
+	    									self.search(input.val()).draw();
+	    								}), $clearButton = $(
+	    										'<i class="fa fa-close" title="Reset">')
+	    								//.text('X')
+	    								.click(function() {
+	    									input.val('');
+	    									$searchButton.click();
+	    								})
+	    								$('.dataTables_filter').append(
+	    										'<div class="right-btns"></div>');
+	    								$('.dataTables_filter div').append(
+	    										$searchButton, $clearButton);
+	    								rowLen = $('#datatable-user tbody tr:visible').length
+	    								/* var input = $('.dataTables_filter input').unbind(),
+	    								self = this.api(),
+	    								$searchButton = $('<i class="fa fa-search">')
+	    								           //.text('Go')
+	    								           .click(function() {			   	                    	 
+	    								              self.search(input.val()).draw();
+	    								           })			   	        
+	    								  $('.dataTables_filter label').append($searchButton); */
+	    							}
+	    							,
+	    							columnDefs : [ {
+	    								"targets" : '',
+	    								"orderable" : false,
+	    							}
+	    			                ],
+	    							"sScrollX" : "100%",
+	    							"sScrollXInner" : "100%",
+	    							"ordering":false,
+	    							"bScrollCollapse" : true,
+	    							"language" : {
+	    								"info" : "_START_ - _END_ of _TOTAL_",
+	    								paginate : {
+	    									next : '<i class="fa fa-angle-right"></i>', 
+	    									previous : '<i class="fa fa-angle-left"></i>'  
+	    								}
+	    							},
+	    							
+	    							"bDestroy" : true,
+	    							"sAjaxSource" : "	<%=request.getContextPath()%>/ajax/getRoleMappings?"+myParams,
+	    		        "aoColumns": [
+	    		        
+	      		         	{ "mData": function(data,type,row){
+
+	                             if($.trim(data.id) == ''){ return '-'; }else{ return data.id ; }
+	      		            } },
+	      		          { "mData": function(data,type,row){
+			         			var company_data = "'"+data.safety_type+"','"+data.employee_code+"','"+data.project_name+"','"+data.id+"','"+data.department_code+"','"+data.department_name+"','"+data.project+"','"+data.role_code+"','"+data.status+"'";
+			                    var actions = '<a href="javascript:void(0);"  onclick="getRoleMapping('+company_data+');" class="btn btn-primary"  title="Edit"><i class="fa fa-pencil"></i></a>';  	                   	
+	    		            	return actions;
+	    		            } },
+	    		         	{ "mData": function(data,type,row){
+		                             if($.trim(data.status) == ''){ return '-'; }else{ return data.status; }
+	    		            } },
+	    		         	{ "mData": function(data,type,row){
+	    		         		 var base_project = '';
+	    		         		  if ($.trim(data.base_project) != '') { base_project = ' - ' + $.trim(data.base_project) }    	
+		                             if($.trim(data.project_code) == ''){ return '-'; }else{ return data.project_code +base_project; }
+	    		            } },
+	    		            { "mData": function(data,type,row){
+	    		            	 var base_department = '';
+	    		            	 if ($.trim(data.department_name) != '') { base_department = ' - ' + $.trim(data.department_name) }    	
+	                             if($.trim(data.department_code) == ''){ return '-'; }else{ return data.department_code +base_department; }
+	    		            } }, 
+	    		            { "mData": function(data,type,row){
+	                             if($.trim(data.role_code) == ''){ return '-'; }else{ return data.role_code ; }
+   		            		} },
+   		            	 	
+	    		            { "mData": function(data,type,row){
+	    		            	 var user_name = '';
+	    		            	  if ($.trim(data.user_name) != '') { user_name = ' - ' + $.trim(data.user_name) }    	
+		                             if($.trim(data.employee_code) == ''){ return '-'; }else{ return data.employee_code +user_name; }
+	    		            }}
+	    		        ]
+	    		    });
+	    	
+	    	
+		  $(".page-loader-2").hide();  		     
+	  	
+	 }
+
+	    
+	    function getRolemappingList1(){
 	    	getDeptFilterList('');
 	    	getempFilterList('');
 	    	getProjectFilter('');
@@ -1396,6 +1584,50 @@ body {
 	  	function setRole(){
 	  		
 	  	}
+	  	
+	  	$("#hideNSeek").change(function() {
+	  	    if (this.checked) {
+	  	        // Enable multiple selection
+	  	        $('#select2-project_add-container').attr('multiple', 'multiple');
+	  	        // Remove null/empty selected options
+	  	        $('#select2-project_add-container option:selected').each(function() {
+	  	            if ($(this).val() === '' || $(this).val() === null) {
+	  	                $(this).prop('selected', false);
+	  	            }
+	  	        });
+
+	  	        // Show/hide elements
+	  	        $('#hideRoleSelect').hide();
+	  	        $('#hideRoleInput').show();
+
+	  	        // Select the "EHS" option if it exists
+	  	        var optionId = 'EHS';
+	  	        if ($('#select2-department_code_add-container option[value="' + optionId + '"]').length) {
+	  	            $('#select2-department_code_add-container').val(optionId).trigger('change');
+	  	        }
+
+	  	    } else {
+	  	        // Remove selection
+	  	        $('#select2-department_code_add-container').val(null).trigger('change');
+
+	  	        // Show/hide elements
+	  	        $('#hideRoleSelect').show();
+	  	        $('#hideRoleInput').hide();
+
+	  	        // Disable multiple selection
+	  	        $('#select2-project_add-container').removeAttr('multiple').val(null);
+	  	    }
+
+	  	    // Check if Select2 is initialized before destroying and reinitializing
+	  	    if ($.fn.select2 && $("#select2-project_add-container").hasClass("select2-hidden-accessible")) {
+	  	        $("#select2-project_add-container").select2('destroy').select2();
+	  	    }
+
+	  	    // Reinitialize Select2 after changes
+	  	   
+	  	});
+
+
     </script>
   </body>
   <!-- END: Body-->

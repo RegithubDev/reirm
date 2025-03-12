@@ -17,6 +17,7 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -46,7 +47,7 @@ public class RoleMappingDao {
 	public List<RoleMapping> getProjectsList(RoleMapping obj) throws SQLException {
 		List<RoleMapping> menuList = null;
 		try{  
-			String qry = "select project_code,project_name from project where status <> 'Inactive'  ";
+			String qry = "select project_code,project_name from [project] where status <> 'Inactive'  ";
 			menuList = jdbcTemplate.query( qry, new BeanPropertyRowMapper<RoleMapping>(RoleMapping.class));
 		}catch(Exception e){ 
 			e.printStackTrace();
@@ -58,7 +59,7 @@ public class RoleMappingDao {
 	public List<RoleMapping> getDeptsList(RoleMapping obj) throws SQLException {
 		List<RoleMapping> menuList = null;
 		try{  
-			String qry = "SELECT department_code ,department_name,assigned_to_sbu,project_code FROM department d "
+			String qry = "SELECT department_code ,department_name,assigned_to_sbu,project_code FROM [department] d "
 					+ "  left join project p on d.assigned_to_sbu like CONCAT('%',p.sbu_code, '%') "
 					+ " where d.department_code is not null and  d.department_code <> ''  "; 
 			int arrSize = 0;
@@ -83,7 +84,7 @@ public class RoleMappingDao {
 	public List<RoleMapping> getEmpstList(RoleMapping obj) throws SQLException {
 		List<RoleMapping> menuList = null;
 		try{  
-			String qry = "select u.user_id,email_id,u.user_name from user_profile u "
+			String qry = "select u.user_id,email_id,u.user_name from [user_profile] u "
 					+ "left join user_accounts ua on u.email_id = ua.user_name "
 					+ "where u.base_role <> 'User' and ua.status <> 'Inactive' ";
 			
@@ -109,7 +110,7 @@ public class RoleMappingDao {
 	public List<RoleMapping> getRolestList(RoleMapping obj) throws SQLException {
 		List<RoleMapping> menuList = null;
 		try{  
-			String qry = "select project_code,project_name from project ";
+			String qry = "select project_code,project_name from [project] ";
 			menuList = jdbcTemplate.query( qry, new BeanPropertyRowMapper<RoleMapping>(RoleMapping.class));
 		}catch(Exception e){ 
 			e.printStackTrace();
@@ -124,11 +125,11 @@ public class RoleMappingDao {
 			int arrSize = 0;
 			String qry =" select distinct rp.id,project,safety_type,employee_code,	role_code,rm.incident_type,rp.status,FORMAT(rp.created_date, 'dd-MMM-yy  HH:mm') as created_date"
 					+ " ,FORMAT(rp.modified_date, 'dd-MMM-yy  HH:mm') as modified_date, "
-					+ "p.project_code,p.project_name,rp.department_code,department_name,user_id,user_name from role_mapping rp  "
-					+ " left join project p on rp.project = p.project_code "
-					+ " left join department dt on rp.department_code = dt.department_code "
-					+ " left join user_profile u on  rp.employee_code = u.user_id "
-					+ " left join role_master rm on  rp.safety_type = rm.incident_code "
+					+ "p.project_code,p.project_name,rp.department_code,department_name,user_id,user_name from [role_mapping] rp  "
+					+ " left join [project] p on rp.project = p.project_code "
+					+ " left join [department] dt on rp.department_code = dt.department_code "
+					+ " left join [user_profile] u on  rp.employee_code = u.user_id "
+					+ " left join [role_master] rm on  rp.safety_type = rm.incident_code "
 					+ " where rp.id is not null and rp.id <> '' ";
 			
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
@@ -175,8 +176,8 @@ public class RoleMappingDao {
 		List<RoleMapping> objsList = new ArrayList<RoleMapping>();
 		try {
 			String qry = "SELECT  p.department_code,	c.department_name  "
-					+ " FROM role_mapping p  "
-					+ " left join department c on  p.department_code = c.department_code "
+					+ " FROM [role_mapping] p  "
+					+ " left join [department] c on  p.department_code = c.department_code "
 					+ "where p.department_code is not null and p.department_code <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
@@ -222,8 +223,8 @@ public class RoleMappingDao {
 		List<RoleMapping> objsList = new ArrayList<RoleMapping>();
 		try {
 			String qry = "SELECT  distinct p.project,	c.project_name  "
-					+ " FROM role_mapping p  "
-					+ " left join project c on  p.project = c.project_code "
+					+ " FROM [role_mapping] p  "
+					+ " left join [project] c on  p.project = c.project_code "
 					+ "where project is not null and project <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
@@ -269,8 +270,8 @@ public class RoleMappingDao {
 		List<RoleMapping> objsList = new ArrayList<RoleMapping>();
 		try {
 			String qry = "SELECT distinct p.safety_type,	c.incident_code ,c.incident_type "
-					+ " FROM role_mapping p  "
-					+ " left join role_master c on  p.safety_type = c.incident_code "
+					+ " FROM [role_mapping] p  "
+					+ " left join [role_master] c on  p.safety_type = c.incident_code "
 					+ "where safety_type is not null and safety_type <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
@@ -316,8 +317,8 @@ public class RoleMappingDao {
 		List<RoleMapping> objsList = new ArrayList<RoleMapping>();
 		try {
 			String qry = "SELECT distinct p.employee_code,	c.user_name  "
-					+ " FROM role_mapping p  "
-					+ " left join user_profile c on  p.employee_code = c.user_id "
+					+ " FROM [role_mapping] p  "
+					+ " left join [user_profile] c on  p.employee_code = c.user_id "
 					+ "where employee_code is not null and employee_code <> ''  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
@@ -366,53 +367,111 @@ public class RoleMappingDao {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		try {
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String insertQry = "INSERT INTO role_mapping (project,	safety_type,	department_code,	employee_code,	role_code,status,created_date)"
-					+ " VALUES "
-					+ "(:project,	:safety_type,	:department_code,	:employee_code,	:role_code, :status, getdate())";
-			BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
-		    count = namedParamJdbcTemplate.update(insertQry, paramSource);
-			if(count > 0) {
-				int count2 = 0;
-				String document_code = getDocCode(obj);
-				if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(document_code)) {
-					//int countOfDocCOde = getCountOfDocCOde(document_code);
-					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(document_code)) {
-						obj.setDocument_code(document_code);
-						obj.setStatus("In Progress");
-						namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-						String insert2Qry = "UPDATE safety_ims_workflow set "
-								+ "approver_type= :role_code,approver_code= :employee_code,assigned_on= getdate(),reinitiate_date= getdate(),status= :status "
-								+ " where document_no in ("+document_code+") ";
-						paramSource = new BeanPropertySqlParameterSource(obj);		 
-						count2 = namedParamJdbcTemplate.update(insert2Qry, paramSource);
-						String insert1Qry = "UPDATE safety_ims set status= :status  where document_code in ("+document_code+") ";
-						paramSource = new BeanPropertySqlParameterSource(obj);		 
-						count2 = namedParamJdbcTemplate.update(insert1Qry, paramSource);
-					}
-					if(count > 0) {
-						if(!StringUtils.isEmpty(obj.getEmployee_code()) ) {
-							EMailSender emailSender = new EMailSender();
-							String link_url =CommonConstants.HOST+"/reirm/" ;
-							Mail mail = new Mail();
-							mail.setMailTo(obj.getEmail_id());
-							mail.setMailSubject("Approver Against Incident");
-							String body = "Hi There,"
-									+ "<br><br> You are Initiated for Role of Approver for the Safety Incident by "+obj.getUser_name()+"( "+obj.getUser_id()+" )"
-									+ "<br>For more details Please follow the link <a href="+link_url+"><button>Click Here</button></a>"
-									+ "<br><br>"
-									+ "<br> Kind regards,"
-									+ "<p style='color : red'><b>AAYUSH</b></p>"
-									+ "<b>Re Sustainability</b>";
-							String subject = "AAYUSH | IRM ";
-							emailSender.sendAdd(mail.getMailTo(), mail.getMailSubject(), body,obj,subject);
+			
+			if(!StringUtils.isEmpty(obj.getProject()) && obj.getProject().contains(",") ) {
+				String project [] = obj.getProject().split(",");
+				for(String p : project) {
+					obj.setProject(p);
+					obj.setRole_code("IRL2");
+					String insertQry = "INSERT INTO [role_mapping] (project,	safety_type,	department_code,	employee_code,	role_code,status,created_date)"
+							+ " VALUES "
+							+ "(:project,	:safety_type,	:department_code,	:employee_code,	:role_code, :status, getdate())";
+					BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
+				    count = namedParamJdbcTemplate.update(insertQry, paramSource);
+				    if(count > 0) {
+						int count2 = 0;
+						String document_code = getDocCode(obj);
+						if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(document_code)) {
+							//int countOfDocCOde = getCountOfDocCOde(document_code);
+							if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(document_code)) {
+								obj.setDocument_code(document_code);
+								obj.setStatus("In Progress");
+								namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+								String insert2Qry = "UPDATE [safety_ims_workflow] set "
+										+ "approver_type= :role_code,approver_code= :employee_code,assigned_on= getdate(),reinitiate_date= getdate(),status= :status "
+										+ " where document_no in ("+document_code+") ";
+								paramSource = new BeanPropertySqlParameterSource(obj);		 
+								count2 = namedParamJdbcTemplate.update(insert2Qry, paramSource);
+								String insert1Qry = "UPDATE [safety_ims] set status= :status  where document_code in ("+document_code+") ";
+								paramSource = new BeanPropertySqlParameterSource(obj);		 
+								count2 = namedParamJdbcTemplate.update(insert1Qry, paramSource);
+							}
+							if(false) {
+								if(!StringUtils.isEmpty(obj.getEmployee_code()) ) {
+									EMailSender emailSender = new EMailSender();
+									String link_url =CommonConstants.HOST+"/reirm/" ;
+									Mail mail = new Mail();
+									mail.setMailTo(obj.getEmail_id());
+									mail.setMailSubject("Approver Against Incident");
+									String body = "Hi There,"
+											+ "<br><br> You are Initiated for Role of Approver for the Safety Incident by "+obj.getUser_name()+"( "+obj.getUser_id()+" )"
+											+ "<br>For more details Please follow the link <a href="+link_url+"><button>Click Here</button></a>"
+											+ "<br><br>"
+											+ "<br> Kind regards,"
+											+ "<p style='color : red'><b>AAYUSH</b></p>"
+											+ "<b>Re Sustainability</b>";
+									String subject = "AAYUSH | IRM ";
+									emailSender.sendAdd(mail.getMailTo(), mail.getMailSubject(), body,obj,subject);
+								}
+							}
 						}
+					
+						flag = true;
+						
+						
 					}
 				}
-			
-				flag = true;
+			}else {
+				String insertQry = "INSERT INTO [role_mapping] (project,	safety_type,	department_code,	employee_code,	role_code,status,created_date)"
+						+ " VALUES "
+						+ "(:project,	:safety_type,	:department_code,	:employee_code,	:role_code, :status, getdate())";
+				BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
+			    count = namedParamJdbcTemplate.update(insertQry, paramSource);
+			    if(count > 0) {
+					int count2 = 0;
+					String document_code = getDocCode(obj);
+					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(document_code)) {
+						//int countOfDocCOde = getCountOfDocCOde(document_code);
+						if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(document_code)) {
+							obj.setDocument_code(document_code);
+							obj.setStatus("In Progress");
+							namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+							String insert2Qry = "UPDATE [safety_ims_workflow] set "
+									+ "approver_type= :role_code,approver_code= :employee_code,assigned_on= getdate(),reinitiate_date= getdate(),status= :status "
+									+ " where document_no in ("+document_code+") ";
+						    paramSource = new BeanPropertySqlParameterSource(obj);		 
+							count2 = namedParamJdbcTemplate.update(insert2Qry, paramSource);
+							String insert1Qry = "UPDATE [safety_ims] set status= :status  where document_code in ("+document_code+") ";
+							paramSource = new BeanPropertySqlParameterSource(obj);		 
+							count2 = namedParamJdbcTemplate.update(insert1Qry, paramSource);
+						}
+						if(false) {
+							if(!StringUtils.isEmpty(obj.getEmployee_code()) ) {
+								EMailSender emailSender = new EMailSender();
+								String link_url =CommonConstants.HOST+"/reirm/" ;
+								Mail mail = new Mail();
+								mail.setMailTo(obj.getEmail_id());
+								mail.setMailSubject("Approver Against Incident");
+								String body = "Hi There,"
+										+ "<br><br> You are Initiated for Role of Approver for the Safety Incident by "+obj.getUser_name()+"( "+obj.getUser_id()+" )"
+										+ "<br>For more details Please follow the link <a href="+link_url+"><button>Click Here</button></a>"
+										+ "<br><br>"
+										+ "<br> Kind regards,"
+										+ "<p style='color : red'><b>AAYUSH</b></p>"
+										+ "<b>Re Sustainability</b>";
+								String subject = "AAYUSH | IRM ";
+								emailSender.sendAdd(mail.getMailTo(), mail.getMailSubject(), body,obj,subject);
+							}
+						}
+					}
 				
-				
+					flag = true;
+					
+					
+				}
 			}
+			
+			
 			transactionManager.commit(status);
 		}catch (Exception e) {
 			transactionManager.rollback(status);
@@ -429,7 +488,7 @@ public class RoleMappingDao {
 		int document_code_count = 0;
 		try{
 			con = dataSource.getConnection();
-			String contract_updateQry = " SELECT count(document_no) as count FROM safety_ims_workflow where document_no = ? ";
+			String contract_updateQry = " SELECT count(document_no) as count FROM [safety_ims_workflow] where document_no = ? ";
 			int i = 1;
 			stmt = con.prepareStatement(contract_updateQry);
 			stmt.setString(i++,document_code2);
@@ -483,17 +542,20 @@ public class RoleMappingDao {
 		TransactionStatus status = transactionManager.getTransaction(def);
 		try {
 			NamedParameterJdbcTemplate namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			String updateQry = "UPDATE role_mapping set modified_date= getdate(),status= :update_status where id= :id ";
+			String updateQry = "UPDATE [role_mapping] set modified_date= getdate(),status= :update_status where id= :id ";
 			BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(obj);		 
 		    count = namedParamJdbcTemplate.update(updateQry, paramSource);
 			if(count > 0) {
+				flag = true;
+			}
+			if(false) {
 				String document_code = getDocCode(obj);
 				if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(document_code)) {
 					int countOfDocCOde = getCountOfDocCOde(document_code);
 					if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(document_code) && countOfDocCOde > 1) {
 						obj.setDocument_code(document_code);
 						namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-						String insert2Qry = "UPDATE safety_ims_workflow set "
+						String insert2Qry = "UPDATE [safety_ims_workflow] set "
 								+ "approver_code= :employee_code,assigned_on= getdate(),reinitiate_date= getdate() "
 								+ " where document_no in ("+document_code+") ";
 						paramSource = new BeanPropertySqlParameterSource(obj);		 
@@ -501,7 +563,7 @@ public class RoleMappingDao {
 					}else {
 						obj.setDocument_code(document_code);
 						namedParamJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-						String insert2Qry = "UPDATE safety_ims_workflow set "
+						String insert2Qry = "UPDATE [safety_ims_workflow] set "
 								+ "approver_type= :role_code,approver_code= :employee_code,assigned_on= getdate(),reinitiate_date= getdate() "
 								+ " where document_no in ("+document_code+")  and status <> 'Reviewed' ";
 						paramSource = new BeanPropertySqlParameterSource(obj);		 
@@ -509,7 +571,7 @@ public class RoleMappingDao {
 					}
 				
 				}
-				flag = true;
+				
 				
 				
 			}
@@ -536,7 +598,7 @@ public class RoleMappingDao {
 			pValues1[j++] = obj.getSafety_type();
 			objsList2 = jdbcTemplate.query( findRolesQry, pValues1, new BeanPropertyRowMapper<RoleMapping>(RoleMapping.class));
 			
-			String qry = "SELECT t.incident_report as role_code FROM role_master t  "
+			String qry = "SELECT t.incident_report as role_code FROM [role_master] t  "
 					+ "where incident_code is not null and incident_code <> ''  "; 
 			/*
 			 * int arrSize = 0; if(!StringUtils.isEmpty(obj) &&
@@ -573,7 +635,7 @@ public class RoleMappingDao {
 	public List<RoleMapping> getMappingUserSecurity(RoleMapping obj) throws Exception {
 		List<RoleMapping> objsList = new ArrayList<RoleMapping>();
 		try {
-			String qry = "SELECT role_code,employee_code,project,department_code,safety_type  FROM role_mapping p  "
+			String qry = "SELECT role_code,employee_code,project,department_code,safety_type  FROM [role_mapping] p  "
 					+ "where status is not null and status = 'Active'  "; 
 			int arrSize = 0;
 			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject())) {
@@ -608,6 +670,185 @@ public class RoleMappingDao {
 			}
 			objsList = jdbcTemplate.query( qry, pValues, new BeanPropertyRowMapper<RoleMapping>(RoleMapping.class));
 		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception(e);
+		}
+		return objsList;
+	}
+
+	public int getTotalRecords(RoleMapping obj, String searchParameter) throws Exception {
+		int totalRecords = 0;
+		try {
+			int arrSize = 0;
+			//createIndexes();
+			String qry =" select  count(rp.id) from [role_mapping] rp  \r\n"
+					+ " left join [project] p on rp.project = p.project_code \r\n"
+					+ " left join [department] dt on rp.department_code = dt.department_code  \r\n"
+					+ " left join [user_profile] u on  rp.employee_code = u.user_id\r\n"
+					+ " left join [role_master] rm on  rp.safety_type = rm.incident_code \r\n"
+					+ " where rp.id is not null and rp.id <> '' \r\n"
+					+ "  ";
+			
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
+				qry = qry + " and project = ? ";
+				arrSize++;
+			}	
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSafety_type())) {
+				qry = qry + " and safety_type = ? ";
+				arrSize++;
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getDepartment_code())) {
+				qry = qry + "and rp.department_code = ? ";
+				arrSize++;
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getEmployee_code())) {
+				qry = qry + " and employee_code = ? ";
+				arrSize++;
+			}
+			if(!StringUtils.isEmpty(searchParameter)) {
+				qry = qry + " and ( p.project_code like ? or p.project_name like ?"
+						+ " or u.user_name like ? or u.user_id like ? or dt.department_code like ? or dt.department_name like ? "
+						+ "or rp.status like ? or u.user_name like ? or rp.status like ? or rp.role_code like ? )";
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+			
+			}
+		
+			Object[] pValues = new Object[arrSize];
+			int i = 0;
+			
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
+				pValues[i++] = obj.getProject_code();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSafety_type())) {
+				pValues[i++] = obj.getSafety_type();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getDepartment_code())) {
+				pValues[i++] = obj.getDepartment_code();
+			}	
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getEmployee_code())) {
+				pValues[i++] = obj.getEmployee_code();
+			}
+			if(!StringUtils.isEmpty(searchParameter)) {
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				
+			}
+			
+			totalRecords = jdbcTemplate.queryForObject( qry,pValues,Integer.class);
+		
+		}catch(Exception e){ 
+			e.printStackTrace();
+			throw new Exception(e);
+		}
+		return totalRecords;
+	}
+
+	
+	public List<RoleMapping> getRoleMappingsList(RoleMapping obj, int startIndex, int offset, String searchParameter) throws Exception {
+		List<RoleMapping> objsList = null;
+		try {
+			int arrSize = 0;
+			//createIndexes();
+			String qry =" select  rp.id,project,safety_type,employee_code,	role_code,rm.incident_type,rp.status,\r\n"
+					+ " FORMAT(rp.created_date, 'dd-MMM-yy  HH:mm') as created_date ,\r\n"
+					+ " FORMAT(rp.modified_date, 'dd-MMM-yy  HH:mm') as modified_date, p.project_code,p.project_name,rp.department_code,\r\n"
+					+ " department_name,user_id,user_name from [role_mapping] rp  \r\n"
+					+ " left join [project] p on rp.project = p.project_code \r\n"
+					+ " left join [department] dt on rp.department_code = dt.department_code  \r\n"
+					+ " left join [user_profile] u on  rp.employee_code = u.user_id\r\n"
+					+ " left join [role_master] rm on  rp.safety_type = rm.incident_code \r\n"
+					+ " where rp.id is not null and rp.id <> '' \r\n"
+					+ "  ";
+			
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
+				qry = qry + " and project = ? ";
+				arrSize++;
+			}	
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSafety_type())) {
+				qry = qry + " and safety_type = ? ";
+				arrSize++;
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getDepartment_code())) {
+				qry = qry + "and rp.department_code = ? ";
+				arrSize++;
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getEmployee_code())) {
+				qry = qry + " and employee_code = ? ";
+				arrSize++;
+			}
+			if(!StringUtils.isEmpty(searchParameter)) {
+				qry = qry + " and ( p.project_code like ? or p.project_name like ?"
+						+ " or u.user_name like ? or u.user_id like ? or dt.department_code like ? or dt.department_name like ? "
+						+ "or rp.status like ? or u.user_name like ? or rp.status like ? or rp.role_code like ? )";
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+				arrSize++;
+			
+			}
+			if(!StringUtils.isEmpty(startIndex) && !StringUtils.isEmpty(offset)) {
+				qry = qry + " ORDER BY rp.status asc offset ? rows  fetch next ? rows only";	
+				arrSize++;
+				arrSize++;
+			}
+			Object[] pValues = new Object[arrSize];
+			int i = 0;
+			
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getProject_code())) {
+				pValues[i++] = obj.getProject_code();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getSafety_type())) {
+				pValues[i++] = obj.getSafety_type();
+			}
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getDepartment_code())) {
+				pValues[i++] = obj.getDepartment_code();
+			}	
+			if(!StringUtils.isEmpty(obj) && !StringUtils.isEmpty(obj.getEmployee_code())) {
+				pValues[i++] = obj.getEmployee_code();
+			}
+			if(!StringUtils.isEmpty(searchParameter)) {
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				pValues[i++] = "%"+searchParameter+"%";
+				
+			}
+			if(!StringUtils.isEmpty(startIndex) && !StringUtils.isEmpty(offset)) {
+				pValues[i++] = startIndex;
+				pValues[i++] = offset;
+			}
+			objsList = jdbcTemplate.query( qry,pValues, new BeanPropertyRowMapper<RoleMapping>(RoleMapping.class));
+		
+		}catch(Exception e){ 
 			e.printStackTrace();
 			throw new Exception(e);
 		}

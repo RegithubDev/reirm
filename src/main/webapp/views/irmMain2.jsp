@@ -309,81 +309,9 @@ tr td:last-child {
          <button class="btn btn-danger col-md-12" style="margin-top: 10px; width: 45%;     background-color: gainsboro"  onclick="clearFilter();"><i class="fa fa-undo" aria-hidden="true"></i></button>
      </div>
 </div>
-<%--   <div class="col-lg-2 col-sm-4 col-12"style="
-    display: flex;
-    align-items: center;
-">
-    <div class="col-lg-8 col-sm-6 col-6">
-    <a type="button" class="btn " href="<%=request.getContextPath() %>/irm-add-incident"  style="margin-top: 17px; color: white !important; background-color: orange !important; width: 42%;"><i class="fa fa-add" aria-hidden="true"></i> Submit Incident</a>
-         <button class="btn col-md-12" style="margin-top: 17px; width: 42%;     background-color: #14e014 !important;color: white !important;"  onclick="exportIRM();"><i class="fa fa-download" aria-hidden="true"></i> Download</button>
-     </div>
-  
-  </div> --%>
+
 </div> 
- <div class="row">
-    <div class="col-lg-3 col-sm-6 col-12">
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <h2 class="fw-bolder mb-0"><span id= "allIncidents"></span></h2>
-             <p class="card-text badge badge-light-dark" >Total Incidents</p>
-          </div>
-          <div class="avatar bg-light-dark p-50 m-0">
-            <div class="avatar-content">
-              <i data-feather="clipboard" class="font-medium-5"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-lg-3 col-sm-6 col-12">
-      <div class="card">
-        <div class="card-header">
-          <div>
-           <h2 class="fw-bolder mb-0"><span id= "activeApprovers"></span></h2>
-          <p class="card-text badge badge-light-success">Resolved</p>
-          </div>
-          <div class="avatar bg-light-success p-50 m-0" style=" background-color: #ceffce !important;">
-            <div class="avatar-content">
-              <i data-feather="check" class="font-medium-5"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-   
-    <div class="col-lg-3 col-sm-6 col-12">
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <h2 class="fw-bolder mb-0"><span id= "inActiveApprovers"></span></h2>
-          <p class="card-text badge badge-light-warning ">In Progress</p>
-          </div>
-          <div class="avatar bg-light-warning p-50 m-0">
-            <div class="avatar-content ">
-              <i data-feather="clock" class="font-medium-5"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="col-lg-3 col-sm-6 col-12">
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <h2 class="fw-bolder mb-0"><span id="not_assigned"></span></h2> 
-            <p class="card-text badge badge-light-danger">No Reviewer Assigned</p>
-          </div>
-          <div class="avatar bg-light-danger p-50 m-0 ">
-            <div class="avatar-content">
-              <i data-feather="alert-octagon" class="font-medium-5"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div> 
+
  
   <!-- List DataTable -->
   <div>
@@ -391,83 +319,7 @@ tr td:last-child {
       <div class="card">
 
         <div class="card-body">
-          <ul class="nav nav-tabs nav-justified" id="myTab2" role="tablist">
-            <li class="nav-item" onclick="getIRMList('irm-my');">
-              <a
-                class="nav-link active"
-                id="home-tab-justified"
-                data-bs-toggle="tab"
-                href="#home-just"
-                role="tab"
-                aria-controls="home-just"
-                aria-selected="true"
-               >My IR</a
-              >
-            </li>
-           <c:if test="${sessionScope.BASE_ROLE eq 'Admin' || sessionScope.BASE_ROLE eq 'Management' }">
-            <li class="nav-item" onclick="getIRMList('irm');">
-              <a
-                class="nav-link "
-                id="settings-tab-justified"
-                data-bs-toggle="tab"
-                href="#settings-just-all"
-                role="tab"
-                aria-controls="settings-just"
-                aria-selected="false"
-                >All Incidents</a
-              > 
-            </li>
-               </c:if>
-          <%--  <c:if test="${sessionScope.BASE_ROLE eq 'Admin' || sessionScope.BASE_ROLE eq 'Management' }"> --%>
-          
-         <%--   </c:if> --%>
-             <li class="nav-item"  onclick="getIRMList('irm-pending');">
-              <a
-                class="nav-link"
-                id="profile-tab-justified"
-                data-bs-toggle="tab"
-                href="#profile-just"
-                role="tab"
-                aria-controls="profile-just"
-                aria-selected="false"
-                 >Pending Actions <button type="button" class="btn btn-icon btn-icon rounded-circle btn-danger waves-effect waves-float waves-light">
-<span id="counts">0</span>           </button></a
-              >
-            </li>
-            <li class="nav-item"  onclick="getIRMList('irm-completed');">
-              <a
-                class="nav-link"
-                id="messages-tab-justified"
-                data-bs-toggle="tab"
-                href="#messages-just"
-                role="tab"
-                aria-controls="messages-just"
-                aria-selected="false"
-                >Action Taken</a
-              >
-            </li>
-            <c:if test="${sessionScope.BASE_ROLE eq 'Admin' }">
-            <li class="nav-item" onclick="getIRMList('irm-no-reviewer');">
-              <a
-                class="nav-link"
-                id="settings-tab-norevirwer"
-                data-bs-toggle="tab"
-                href="#settings-just"
-                role="tab"
-                aria-controls="settings-just"
-                aria-selected="false"
-                >No Reviewer Found <button type="button" class="btn btn-icon btn-icon rounded-circle btn-danger waves-effect waves-float waves-light">
-<span id="noCounts">0</span>           </button></a
-              >
-            </li>
-               </c:if>
-          
-          </ul>
-
-          <!-- Tab panes -->
-          <div class="tab-content pt-1">
-          <div class="tab-pane active" id="home-just" role="tabpanel" aria-labelledby="home-tab-justified">
-             <div class="card-datatable table-responsive">
+           <div class="card-datatable table-responsive">
 		       <div class="dt-buttons text-danger" style="height : 1.5em;">
 		      <!-- Last 30 Days -->
 		        </div>
@@ -489,109 +341,7 @@ tr td:last-child {
 		            </thead>
 		          </table>
 		        </div>
-            </div>
-          <div class="tab-pane " id="settings-just-all" role="tabpanel" aria-labelledby="settings-tab-justified">
-             <div class="card-datatable table-responsive">
-		        <div class="dt-buttons text-danger" style="height : 1.5em;">
-		        <!-- Last 30 Days -->
-		        </div>
-		          <table id="datatable-irm" class="invoice-list-table table" style="width: 100%; font-size:90%">
-		            <thead>
-		              <tr>
-		                <th>#</th>
-		                <th>Action</th>
-		                <th>Incident no</th>
-		                 <th>Status </th>
-		               
-		                 <th>Incident </th>
-		                <th>Project</th>
-		                <th>Department</th>
-		                <th>Level</th>
-		                <th>Reviewer  </th>
-		                <th>Raised by </th>
-		              </tr>
-		            </thead>
-		          </table>
-		        </div>
-            </div>
-            
-            <div class="tab-pane" id="profile-just" role="tabpanel" aria-labelledby="profile-tab-justified" >
-               <div class="card-datatable table-responsive">
-		       <div class="dt-buttons" style="height : 1.5em;">
-		        </div>
-		          <table id="datatable-irm-pending" class="invoice-list-table table" style="width: 100%; font-size:90%">
-		            <thead>
-		              <tr>
-		                <th>#</th>
-		                <th>Action</th>
-		                <th>Incident no</th>
-		                 <th>Status </th>
-		               
-		                 <th>Incident </th>
-		                <th>Project</th>
-		                <th>Department</th>
-		                <th>Level</th>
-		                <th>Reviewer  </th>
-		                <th>Raised by </th>
-		              </tr>
-		            </thead>
-		          </table>
-		        </div>
-            </div>
-            <div class="tab-pane" id="messages-just" role="tabpanel" aria-labelledby="messages-tab-justified">
-              <div class="card-datatable table-responsive">
-		       <div class="dt-buttons text-danger" style="height : 1.5em;">
-		        <!-- Last 30 Days -->
-		        </div>
-		          <table id="datatable-irm-completed" class="invoice-list-table table" style="width: 100%; font-size:90%">
-		            <thead>
-		              <tr>
-		                <th>#</th>
-		                <th>Action</th>
-		                <th>Incident no</th>
-		                 <th>Status </th>
-		               
-		                 <th>Incident </th>
-		                <th>Project</th>
-		                <th>Department</th>
-		                <th>Level</th>
-		                <th>Reviewer  </th>
-		                <th>Raised by </th>
-		              </tr>
-		            </thead>
-		          </table>
-		        </div>
-            </div>
-
-	     <div class="tab-pane" id="settings-just" role="tabpanel" aria-labelledby="settings-tab-norevirwer">
-             <div class="card-datatable table-responsive">
-		        <div class="dt-buttons text-danger" style="height : 1.5em;">
-		        <!-- Last 30 Days -->
-		        </div>
-		          <table id="datatable-irm-no-reviewer" class="invoice-list-table table" style="width: 100%; font-size:90%">
-		            <thead>
-		              <tr>
-		                <th>#</th>
-		                <th>Action</th>
-		                <th>Incident no</th>
-		                 <th>Status </th>
-		               
-		                 <th>Incident </th>
-		                <th>Project</th>
-		                <th>Department</th>
-		                <th>Level</th>
-		                <th>Reviewer  </th>
-		                <th>Raised by </th>
-		              </tr>
-		            </thead>
-		          </table>
-		        </div>
-            </div>
-            
-            
-            
-            
-          </div>
+          <!-- Tab panes -->
         </div>
       </div>
     </div>
@@ -600,37 +350,6 @@ tr td:last-child {
 </section>
   	
   </div>
-<!--   <div class="row">
-  
-    <div class="col-12">
-    
-      <div class="card invoice-list-wrapper">
-        <div class="card-datatable table-responsive">
-       <div class="dt-buttons" style="height : 0.5em;">
-      
-        </div>
-          <table id="datatable-irm" class="invoice-list-table table" style="width: 100%; font-size:90%">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Action</th>
-                <th>Incident no</th>
-                 <th>Status </th>
-               
-                 <th>Incident </th>
-                <th>Project</th>
-                <th>Department</th>
-                <th>Level</th>
-                <th>Reviewer  </th>
-                <th>Raised by </th>
-                <th>Raised on </th>
-              </tr>
-            </thead>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div> -->
 		
  			
   <div class="modal fade" id="historyIRM" tabindex="-1" aria-hidden="true">

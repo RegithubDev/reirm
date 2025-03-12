@@ -120,5 +120,13 @@ public class IRMService {
 		return dao.getIRMLAzyList(obj,startIndex,offset,searchParameter);
 	}
 
+	public List<IRM> L2AlertsMail() throws Exception {
+		return dao.L2AlertsMail();
+	}
+
+	public List<RoleMapping> geL2List(User user) throws Exception {
+		return dao.geL2List(user);
+	}
+
 	
 }

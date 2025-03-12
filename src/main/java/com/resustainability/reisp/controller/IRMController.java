@@ -8,7 +8,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -99,14 +102,14 @@ public class IRMController {
 		String userId = null;
 		String userName = null;
 		String role = null;
-		List<IRM> companiesList = null;
+		List<IRM> companiesList = new ArrayList<IRM>();
 		try {
 			userId = (String) session.getAttribute("USER_ID");
 			userName = (String) session.getAttribute("USER_NAME");
 			role = (String) session.getAttribute("BASE_ROLE");
 			obj.setUser(userId);
 			obj.setRole(role);
-			companiesList = service.getIRMList(obj);
+			//companiesList = service.getIRMList(obj);
 			 if(companiesList.size() > 0) {
 				 model.addObject("all_irm", companiesList.get(0).getAll_irm());
 				 model.addObject("active_irm", companiesList.get(0).getActive_irm());
@@ -388,6 +391,15 @@ public class IRMController {
 			role = (String) session.getAttribute("BASE_ROLE");
 			obj.setUser(userId);
 			obj.setRole(role);
+			if(!StringUtils.isEmpty(obj.getFrom_and_to())) {
+				if(obj.getFrom_and_to().contains("to")) {
+					String [] dates = obj.getFrom_and_to().split("to");
+					obj.setFrom_date(dates[0].trim());
+					obj.setTo_date(dates[1].trim());
+				}else {
+					obj.setFrom_date(obj.getFrom_and_to());
+				}
+			}
 			departments = service.getSBUFilterListFromIRM(obj);
 		}catch (Exception e) {
 			e.printStackTrace();
@@ -409,6 +421,15 @@ public class IRMController {
 			role = (String) session.getAttribute("BASE_ROLE");
 			obj.setUser(userId);
 			obj.setRole(role);
+			if(!StringUtils.isEmpty(obj.getFrom_and_to())) {
+				if(obj.getFrom_and_to().contains("to")) {
+					String [] dates = obj.getFrom_and_to().split("to");
+					obj.setFrom_date(dates[0].trim());
+					obj.setTo_date(dates[1].trim());
+				}else {
+					obj.setFrom_date(obj.getFrom_and_to());
+				}
+			}
 			departments = service.getProjectFilterListFromIRM(obj);
 		}catch (Exception e) {
 			e.printStackTrace();
@@ -430,6 +451,15 @@ public class IRMController {
 			role = (String) session.getAttribute("BASE_ROLE");
 			obj.setUser(userId);
 			obj.setRole(role);
+			if(!StringUtils.isEmpty(obj.getFrom_and_to())) {
+				if(obj.getFrom_and_to().contains("to")) {
+					String [] dates = obj.getFrom_and_to().split("to");
+					obj.setFrom_date(dates[0].trim());
+					obj.setTo_date(dates[1].trim());
+				}else {
+					obj.setFrom_date(obj.getFrom_and_to());
+				}
+			}
 			departments = service.getIncidentFilterListFromIRM(obj);
 		}catch (Exception e) {
 			e.printStackTrace();
@@ -451,6 +481,15 @@ public class IRMController {
 			role = (String) session.getAttribute("BASE_ROLE");
 			obj.setUser(userId);
 			obj.setRole(role);
+			if(!StringUtils.isEmpty(obj.getFrom_and_to())) {
+				if(obj.getFrom_and_to().contains("to")) {
+					String [] dates = obj.getFrom_and_to().split("to");
+					obj.setFrom_date(dates[0].trim());
+					obj.setTo_date(dates[1].trim());
+				}else {
+					obj.setFrom_date(obj.getFrom_and_to());
+				}
+			}
 			departments = service.getStatusFilterListFromIRM(obj);
 		}catch (Exception e) {
 			e.printStackTrace();
@@ -470,7 +509,15 @@ public class IRMController {
 			userId = (String) session.getAttribute("USER_ID");
 			userName = (String) session.getAttribute("USER_NAME");
 			role = (String) session.getAttribute("BASE_ROLE");
-			
+			if(!StringUtils.isEmpty(obj.getFrom_and_to())) {
+				if(obj.getFrom_and_to().contains("to")) {
+					String [] dates = obj.getFrom_and_to().split("to");
+					obj.setFrom_date(dates[0].trim());
+					obj.setTo_date(dates[1].trim());
+				}else {
+					obj.setFrom_date(obj.getFrom_and_to());
+				}
+			}
 			obj.setRole(role);
 			departments = service.getSBUFilterListFromIRM(obj);
 		}catch (Exception e) {
@@ -491,7 +538,15 @@ public class IRMController {
 			userId = (String) session.getAttribute("USER_ID");
 			userName = (String) session.getAttribute("USER_NAME");
 			role = (String) session.getAttribute("BASE_ROLE");
-			
+			if(!StringUtils.isEmpty(obj.getFrom_and_to())) {
+				if(obj.getFrom_and_to().contains("to")) {
+					String [] dates = obj.getFrom_and_to().split("to");
+					obj.setFrom_date(dates[0].trim());
+					obj.setTo_date(dates[1].trim());
+				}else {
+					obj.setFrom_date(obj.getFrom_and_to());
+				}
+			}
 			obj.setRole(role);
 			departments = service.getProjectFilterListFromIRM(obj);
 		}catch (Exception e) {
@@ -512,7 +567,15 @@ public class IRMController {
 			userId = (String) session.getAttribute("USER_ID");
 			userName = (String) session.getAttribute("USER_NAME");
 			role = (String) session.getAttribute("BASE_ROLE");
-			
+			if(!StringUtils.isEmpty(obj.getFrom_and_to())) {
+				if(obj.getFrom_and_to().contains("to")) {
+					String [] dates = obj.getFrom_and_to().split("to");
+					obj.setFrom_date(dates[0].trim());
+					obj.setTo_date(dates[1].trim());
+				}else {
+					obj.setFrom_date(obj.getFrom_and_to());
+				}
+			}
 			obj.setRole(role);
 			departments = service.getIncidentFilterListFromIRM(obj);
 		}catch (Exception e) {
@@ -533,7 +596,15 @@ public class IRMController {
 			userId = (String) session.getAttribute("USER_ID");
 			userName = (String) session.getAttribute("USER_NAME");
 			role = (String) session.getAttribute("BASE_ROLE");
-			
+			if(!StringUtils.isEmpty(obj.getFrom_and_to())) {
+				if(obj.getFrom_and_to().contains("to")) {
+					String [] dates = obj.getFrom_and_to().split("to");
+					obj.setFrom_date(dates[0].trim());
+					obj.setTo_date(dates[1].trim());
+				}else {
+					obj.setFrom_date(obj.getFrom_and_to());
+				}
+			}
 			obj.setRole(role);
 			departments = service.getStatusFilterListFromIRM(obj);
 		}catch (Exception e) {
@@ -549,8 +620,19 @@ public class IRMController {
 	public ModelAndView irmAddIncident(@ModelAttribute User user, HttpSession session) {
 		ModelAndView model = new ModelAndView(PageConstants.irmAdd);
 		try {
+			user.setUser_id((String) session.getAttribute("USER_ID"));
+			
 			List <Project> projectsList = service.getProjectstList(user);
 			model.addObject("projectsList", projectsList);
+			
+			List <RoleMapping> L2List = service.geL2List(user);
+			Set<String> lList = new HashSet<>();
+			L2List = L2List.stream()
+		            .filter(e -> lList.add(e.getProject()))
+		            .collect(Collectors.toList());
+			
+			model.addObject("L2List", L2List);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -765,7 +847,7 @@ public class IRMController {
 		        
 		        
 	            XSSFRow headingRow = sheet.createRow(0);
-	        	String headerString = "Incident Code,SBU,Project,Department,Description,Level,Risk,Date,Raised By" + 
+	        	String headerString = "Incident Code,SBU,Project,Department,Description,Level,Status,Risk,Date,Raised By" + 
 	    				"";
 	            String[] firstHeaderStringArr = headerString.split("\\,");
 	            
@@ -803,6 +885,10 @@ public class IRMController {
 					cell = row.createCell(c++);
 					cell.setCellStyle(sectionStyle);
 					cell.setCellValue (obj1.getApprover_type());
+					
+					cell = row.createCell(c++);
+					cell.setCellStyle(sectionStyle);
+					cell.setCellValue (obj1.getStatus());
 					
 					cell = row.createCell(c++);
 					cell.setCellStyle(sectionStyle);

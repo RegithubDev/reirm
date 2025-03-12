@@ -2,16 +2,22 @@ package com.resustainability.reisp.controller;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
@@ -40,7 +46,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.resustainability.reisp.constants.PageConstants;
+import com.resustainability.reisp.model.IRM;
+import com.resustainability.reisp.model.RMPaginationObject;
 import com.resustainability.reisp.model.RoleMapping;
 import com.resustainability.reisp.model.RoleMapping;
 import com.resustainability.reisp.model.User;
@@ -87,16 +97,23 @@ public class RoleMappingController {
 			model.addObject("projectsList", projectsList);
 			
 			List<RoleMapping> deptList = service.getDeptsList(obj);
+			
+
+
+			Set<String> emailList = new HashSet<>();
+			deptList = deptList.stream()
+		            .filter(e -> emailList.add(e.getDepartment_code()))
+		            .collect(Collectors.toList());
 			model.addObject("deptList", deptList);
 			
 			List<RoleMapping> empList = service.getEmpstList(obj);
 			model.addObject("empList", empList);
 			
-			List<RoleMapping> rolestList = service.getRolestList(obj);
-			model.addObject("rolestList", rolestList);
+			//List<RoleMapping> rolestList = service.getRolestList(obj);
+			//model.addObject("rolestList", rolestList);
 			
-			List<RoleMapping> incidentsList = service.getRoleMappingsList(obj);
-			model.addObject("incidentsList", incidentsList);
+			//List<RoleMapping> incidentsList = service.getRoleMappingsList(obj);
+			//model.addObject("incidentsList", incidentsList);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -121,7 +138,7 @@ public class RoleMappingController {
 		return companiesList;
 	}
 	
-	@RequestMapping(value = "/ajax/getRoleMappings", method = {RequestMethod.GET,RequestMethod.POST},produces=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/ajax/getRoleMappings1", method = {RequestMethod.GET,RequestMethod.POST},produces=MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<RoleMapping> getCompaniesList(@ModelAttribute RoleMapping obj,HttpSession session) {
 		List<RoleMapping> companiesList = null;
@@ -138,7 +155,103 @@ public class RoleMappingController {
 		return companiesList;
 	}
 	
-	
+	@RequestMapping(value = "/ajax/getRoleMappings", method = { RequestMethod.POST, RequestMethod.GET })
+	public void getRoleMappingListLaztLoad(@ModelAttribute RoleMapping obj, HttpServletRequest request,
+			HttpServletResponse response, HttpSession session) throws IOException {
+		PrintWriter pw = null;
+		String json2 = null;
+		String userId = null;
+		String userName = null;
+		try {
+			userId = (String) session.getAttribute("USER_ID");
+			userName = (String) session.getAttribute("USER_NAME");
+
+			pw = response.getWriter();
+			//Fetch the page number from client
+			Integer pageNumber = 0;
+			Integer pageDisplayLength = 0;
+			if (null != request.getParameter("iDisplayStart")) {
+				pageDisplayLength = Integer.valueOf(request.getParameter("iDisplayLength"));
+				pageNumber = (Integer.valueOf(request.getParameter("iDisplayStart")) / pageDisplayLength) + 1;
+			}
+			//Fetch search parameter
+			String searchParameter = request.getParameter("sSearch");
+
+			//Fetch Page display length
+			pageDisplayLength = Integer.valueOf(request.getParameter("iDisplayLength"));
+
+			List<RoleMapping> budgetList = new ArrayList<RoleMapping>();
+
+			//Here is server side pagination logic. Based on the page number you could make call 
+			//to the data base create new list and send back to the client. For demo I am shuffling 
+			//the same list to show data randomly
+			int startIndex = 0;
+			int offset = pageDisplayLength;
+
+			if (pageNumber == 1) {
+				startIndex = 0;
+				offset = pageDisplayLength;
+				budgetList = createPaginationData(startIndex, offset, obj, searchParameter);
+			} else {
+				startIndex = (pageNumber * offset) - offset;
+				offset = pageDisplayLength;
+				budgetList = createPaginationData(startIndex, offset, obj, searchParameter);
+			}
+
+			//Search functionality: Returns filtered list based on search parameter
+			//budgetList = getListBasedOnSearchParameter(searchParameter,budgetList);
+
+			int totalRecords = getTotalRecords(obj, searchParameter);
+
+			RMPaginationObject personJsonObject = new RMPaginationObject();
+			//Set Total display record
+			personJsonObject.setiTotalDisplayRecords(totalRecords);
+			//Set Total record
+			personJsonObject.setiTotalRecords(totalRecords);
+			personJsonObject.setAaData(budgetList);
+
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			json2 = gson.toJson(personJsonObject);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(
+					"getUsersList : User Id - " + userId + " - User Name - " + userName + " - " + e.getMessage());
+		}
+
+		pw.println(json2);
+	}
+
+	/**
+	 * @param searchParameter 
+	 * @param activity 
+	 * @return
+	 */
+	public int getTotalRecords(RoleMapping obj, String searchParameter) {
+		int totalRecords = 0;
+		try {
+			totalRecords = service.getTotalRecords(obj, searchParameter);
+		} catch (Exception e) {
+			logger.error("getTotalRecords : " + e.getMessage());
+		}
+		return totalRecords;
+	}
+
+	/**
+	 * @param pageDisplayLength
+	 * @param offset 
+	 * @param activity 
+	 * @param clientId 
+	 * @return
+	 */
+	public List<RoleMapping> createPaginationData(int startIndex, int offset, RoleMapping obj, String searchParameter) {
+		List<RoleMapping> objList = null;
+		try {
+			objList = service.getRoleMappingsList(obj, startIndex, offset, searchParameter);
+		} catch (Exception e) {
+			logger.error("createPaginationData : " + e.getMessage());
+		}
+		return objList;
+	}
 	@RequestMapping(value = "/ajax/getFilteredRolesList", method = {RequestMethod.GET,RequestMethod.POST},produces=MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<RoleMapping> getFilteredRolesList(@ModelAttribute RoleMapping obj,HttpSession session) {
@@ -242,14 +355,14 @@ public class RoleMappingController {
 	}
 
 	
-	@RequestMapping(value = "/add-role-mapping", method = {RequestMethod.GET,RequestMethod.POST})
+		@RequestMapping(value = "/add-role-mapping", method = {RequestMethod.GET,RequestMethod.POST})
 	public ModelAndView addRoleMapping(@ModelAttribute RoleMapping obj,RedirectAttributes attributes,HttpSession session) {
 		boolean flag = false;
 		String userId = null;
 		String userName = null;
 		ModelAndView model = new ModelAndView();
 		try {
-			model.setViewName("redirect:/role-mapping");
+			model.setViewName("redirect:/done-rp");
 			userId = (String) session.getAttribute("USER_ID");
 			userName = (String) session.getAttribute("USER_NAME");
 			obj.setUser_id(userId);
@@ -268,6 +381,18 @@ public class RoleMappingController {
 		return model;
 	}
 	
+	@RequestMapping(value = "/done-rp", method = {RequestMethod.POST, RequestMethod.GET})
+	public ModelAndView roleMappingSupport(@ModelAttribute User user, HttpSession session) {
+		ModelAndView model = new ModelAndView(PageConstants.done);
+		try {
+			model.addObject("redirect", "role-mapping");
+			model.addObject("module", "Role Mapping");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return model;
+	}
+	
 	@RequestMapping(value = "/update-role-mapping", method = {RequestMethod.GET,RequestMethod.POST})
 	public ModelAndView updateRoleMapping(@ModelAttribute RoleMapping obj,RedirectAttributes attributes,HttpSession session) {
 		boolean flag = false;
@@ -275,7 +400,7 @@ public class RoleMappingController {
 		String userName = null;
 		ModelAndView model = new ModelAndView();
 		try {
-			model.setViewName("redirect:/role-mapping");
+			model.setViewName("redirect:/done-rp");
 			userId = (String) session.getAttribute("USER_ID");
 			userName = (String) session.getAttribute("USER_NAME");
 			flag = service.updateRoleMapping(obj);
@@ -291,7 +416,6 @@ public class RoleMappingController {
 		}
 		return model;
 	}
-	
 	@RequestMapping(value = "/export-role-mapping", method = {RequestMethod.GET,RequestMethod.POST})
 	public void exportRoleMapping(HttpServletRequest request, HttpServletResponse response,HttpSession session,@ModelAttribute RoleMapping obj,RedirectAttributes attributes){
 		ModelAndView view = new ModelAndView(PageConstants.roleMapping);

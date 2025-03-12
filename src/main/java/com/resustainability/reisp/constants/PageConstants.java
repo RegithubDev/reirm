@@ -12,6 +12,7 @@ public class PageConstants {
 	public static final String dashboardAdmin = "dashboardAdmin";
 	public static final String dashboardAdmin2 = "dashboardAdmin2";
 	
+	public static final String done = "done";
 	/// Mobile Forms  
 	public static final String Applogin = "mobilepages/newLoginPage";  
 	public static final String AppdashboardAdmin = "mobilepages/dashboardAdmin";	

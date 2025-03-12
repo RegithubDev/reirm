@@ -64,4 +64,12 @@ public class RoleMappingService {
 	public List<RoleMapping> getMappingUserSecurity(RoleMapping obj) throws Exception {
 		return dao.getMappingUserSecurity(obj);
 	}
+
+	public int getTotalRecords(RoleMapping obj, String searchParameter) throws Exception {
+		return dao.getTotalRecords(obj, searchParameter);
+	}
+
+	public List<RoleMapping> getRoleMappingsList(RoleMapping obj, int startIndex, int offset, String searchParameter) throws Exception {
+		return dao.getRoleMappingsList(obj, startIndex, offset, searchParameter);
+	}
 }

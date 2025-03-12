@@ -258,13 +258,26 @@ body {
               <div class="col-md-6 col-12">
                <div class="mb-1">
                    <label class="form-label" for="select2-basic">Project</label><span class="required"> *</span><br>
-               <c:if test="${sessionScope.BASE_ROLE ne 'Management' }">	  
-                    <p class="badge bg-secondary" >${sessionScope.BASE_PROJECT_CODE } - ${sessionScope.BASE_PROJECT }</p>
-                    <input type="hidden" id="project_code" name="project_code" value="${sessionScope.BASE_PROJECT_CODE }"/>
-                      <input type="hidden"  name="project_name" value="${sessionScope.BASE_PROJECT }"/>
-               </c:if>
-	           <c:if test="${sessionScope.BASE_ROLE eq 'Management' }">	             
-			        <select 
+                   
+                    <c:choose>
+   
+          <c:when test="${not empty L2List or fn:length(L2List) > 1}">
+		       	<select 
+		            id="project_code"
+		            name="project_code"
+		            class="select2 form-select select2Form"
+		            aria-label="Default select example" onchange="roleMapping();"
+		          >
+			               <option value="">Select Project</option>
+			               <option value="${sessionScope.BASE_PROJECT_CODE }" >[${sessionScope.BASE_PROJECT_CODE }] - ${sessionScope.BASE_PROJECT }</option>
+			             <c:forEach var="obj" items="${L2List}">
+							<option value="${obj.project }" >[${obj.project }] - ${obj.project_name }</option>
+						</c:forEach>
+			      </select> 
+			      <span id="select2-project_code-containerError" class="error-msg" ></span>
+   		 </c:when>
+         <c:when  test="${sessionScope.BASE_ROLE eq 'Management' }">
+           		<select 
 		            id="project_code"
 		            name="project_code"
 		            class="select2 form-select select2Form"
@@ -274,9 +287,17 @@ body {
 			             <c:forEach var="obj" items="${projectsList}">
 							<option value="${obj.project_code }" >[${obj.sbu_code }]/[${obj.project_code }] - ${obj.project_name }</option>
 						</c:forEach>
-			            </select> 
-			             <span id="select2-project_code-containerError" class="error-msg" ></span>
-	           </c:if>
+			      </select> 
+			      <span id="select2-project_code-containerError" class="error-msg" ></span>
+         </c:when>
+         
+         <c:otherwise>
+           			<p class="badge bg-secondary" >${sessionScope.BASE_PROJECT_CODE } - ${sessionScope.BASE_PROJECT }</p>
+                    <input type="hidden" id="project_code" name="project_code" value="${sessionScope.BASE_PROJECT_CODE }"/>
+                      <input type="hidden"  name="project_name" value="${sessionScope.BASE_PROJECT }"/>
+         </c:otherwise>
+      </c:choose>
+      
 	     
                 </div>
               </div>

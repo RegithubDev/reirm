@@ -76,11 +76,12 @@ public class HomeController {
 			User uBoj = new User();
 			uBoj.setEmail_id(email);
 			User userDetails = service.validateUser(uBoj);
-			companiesList = service2.getIRMLAzyList(obj, 0, 10, email);
+			companiesList = service2.getIRMLAzyList(obj, 0, 10, null);
 			user.setUser_id(userId);
 			user.setRole(role);
-			List<User> rewardsList = service.getRewardsHistory(user);
-			if(role.equals("Admin") || role.equals("Management")) {
+			
+			if(!StringUtils.isEmpty(role) &&  role.equals("Admin") || role.equals("Management")) {
+				List<User> rewardsList = service.getRewardsHistory(user);
 				 model = new ModelAndView(PageConstants.dashboardAdmin);
 				 model.addObject("rewardsList", rewardsList);
 				 model.addObject("reward_points", userDetails.getReward_points());
@@ -90,9 +91,9 @@ public class HomeController {
 					 model.addObject("inActive_irm", companiesList.get(0).getInActive_irm());
 					 model.addObject("not_assigned", companiesList.get(0).getNot_assigned());
 				 }
-			}else if(role.equals("User")) {
+			}else if(!StringUtils.isEmpty(role) && role.equals("User")) {
 				 model = new ModelAndView(PageConstants.dashboard);
-				 model.addObject("rewardsList", rewardsList);
+				// model.addObject("rewardsList", rewardsList);
 				 model.addObject("reward_points", userDetails.getReward_points());
 				 if(!StringUtils.isEmpty(companiesList) && companiesList.size() > 0) {
 					 model.addObject("all_irm", companiesList.get(0).getAll_irm());
@@ -102,7 +103,7 @@ public class HomeController {
 				 }
 			}else {
 				model = new ModelAndView(PageConstants.dashboard);
-				model.addObject("rewardsList", rewardsList);
+				//model.addObject("rewardsList", rewardsList);
 				 model.addObject("reward_points", userDetails.getReward_points());
 				 if(!StringUtils.isEmpty(companiesList) && companiesList.size() > 0) {
 					 model.addObject("all_irm", companiesList.get(0).getAll_irm());

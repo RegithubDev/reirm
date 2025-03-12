@@ -380,7 +380,7 @@ public class UserController {
 		String userName = null;
 		ModelAndView model = new ModelAndView();
 		try {
-			model.setViewName("redirect:/user");
+			model.setViewName("redirect:/done-ua");
 			userId = (String) session.getAttribute("USER_ID");
 			userName = (String) session.getAttribute("USER_NAME");
 			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 
@@ -403,6 +403,18 @@ public class UserController {
 		return model;
 	}
 	
+	@RequestMapping(value = "/done-ua", method = {RequestMethod.POST, RequestMethod.GET})
+	public ModelAndView roleMappingSupport(@ModelAttribute User user, HttpSession session) {
+		ModelAndView model = new ModelAndView(PageConstants.done);
+		try {
+			model.addObject("redirect", "user");
+			model.addObject("module", "User");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return model;
+	}
+	
 	@RequestMapping(value = "/update-user", method = {RequestMethod.GET,RequestMethod.POST})
 	public ModelAndView updateUser(@ModelAttribute User obj,RedirectAttributes attributes,HttpSession session) {
 		boolean flag = false;
@@ -410,7 +422,7 @@ public class UserController {
 		String userName = null;
 		ModelAndView model = new ModelAndView();
 		try {
-			model.setViewName("redirect:/user");
+			model.setViewName("redirect:/done-ua");
 			userId = (String) session.getAttribute("USER_ID");
 			userName = (String) session.getAttribute("USER_NAME");
 			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 

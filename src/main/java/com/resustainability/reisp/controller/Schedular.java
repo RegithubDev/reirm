@@ -98,14 +98,14 @@ public class Schedular {
 		}
 	}
 
-/*	@Scheduled(cron = "${cron.expression.user.login.timeout}")
+	@Scheduled(cron = "${cron.expression.user.login.l2}")
 	public void UserActivityCheck(){	
 		if(is_cron_jobs_enabled || is_cron_jobs_enabled_in_qa) {
 		     logger.error("userLoginTimeout : Method executed every day. Current time is :"+ new Date());	    
 		     try {
 		    	 System.out.println("cronJob ActivityCheck!!!!"); 
 		    	 boolean flag = true;
-		    		List<IRM>  list = service.UserActivityCheck();
+		    		List<IRM>  list = service.L2AlertsMail();
 		    		System.out.println(list);
 		    		 if(is_cron_jobs_enabled || is_cron_jobs_enabled_in_qa) {
 		    			 System.out.println("cronJob ActivityCheck!!!!"); 
@@ -118,6 +118,6 @@ public class Schedular {
 			 }
 		}
 	}
-*/
+
 	
 }

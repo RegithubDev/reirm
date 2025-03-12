@@ -425,7 +425,7 @@ public class ProjectDao {
 	public List<SBU> getSbuList(Project obj) throws SQLException {
 		List<SBU> menuList = null;
 		try{  
-			String qry = "select sbu_name, sbu_code,company_code from sbu ";
+			String qry = "select sbu_name, sbu_code,company_code from sbu";
 			menuList = jdbcTemplate.query( qry, new BeanPropertyRowMapper<SBU>(SBU.class));
 			
 		}catch(Exception e){ 

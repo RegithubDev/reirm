@@ -21,6 +21,23 @@ License: You must have a valid license purchased only from themeforest(the above
 <head>
    
 <style>
+.input-field .searchable_label{
+      		font-size:0.85rem;
+        } 
+        td,th{
+        	box-sizing:content-box !important;
+        }
+ 	 .dataTables_filter label{
+         	content:'';
+         }
+         .right-btns .fa{
+         	position:relative;
+         	top:-35px;
+         	right: 32px !important;
+         }
+         .right-btns .fa+.fa{
+         	right: 18px !important;
+         }
 .mdl-grid{
 	display: flex !important;
     padding: 4px;
@@ -718,7 +735,16 @@ tr td:last-child {
             feather.replace({ width: 14, height: 14 });
           }
           $('.modal').modal({ dismissible: false });
-          getIRMList('');
+      	$('#allIncidents').html(0)
+ 		$('#activeApprovers').html(0)
+ 		$('#inActiveApprovers').html(0)
+ 		$('#not_assigned').html(0)
+	     	table = $('#datatable-irm').DataTable();
+			table.destroy();
+			getProjectFilterList();
+ 	    	getSBUFilterList();
+ 	    	getIncidentFilterList();
+ 	    	getStatusFilterList();
          }));
       	document.getElementById("currentYear").innerHTML = new Date().getFullYear();
 	    
@@ -861,6 +887,7 @@ tr td:last-child {
 	       	     	  }
 	            });
 	        }
+	        $(".page-loader").hide();
 	    }
 
       function getProjectFilterList() {
@@ -890,7 +917,9 @@ tr td:last-child {
 	       	          	  getErrorMessage(jqXHR, exception);
 	       	     	  }
 	            });
+	            
 	        }
+	        $(".page-loader").hide();
 	    }
 
       function getIncidentFilterList() {
@@ -921,6 +950,7 @@ tr td:last-child {
 	       	     	  }
 	            });
 	        }
+	        $(".page-loader").hide();
 	    }
 
       function getStatusFilterList() {
@@ -952,9 +982,452 @@ tr td:last-child {
 	       	     	  }
 	            });
 	        }
+	        $(".page-loader").hide();
 	    }
 
-	    function getIRMList(){
+      var pageIndex;
+      function getBTNVAL(pNo){
+     	  console.log(pNo)
+     	  pageIndex = pNo;
+      }
+     
+ 	    function getIRMList() {
+ 	    	$('#counts').html(0)
+ 	    	if('${inActive_irm}' != ''){
+ 	    		$('#counts').html('${inActive_irm}')
+ 	    	}
+ 	    	$('#noCounts').html('${not_assigned}')
+ 	    	
+ 	    	//$(".page-loader").show();
+ 	    	getProjectFilterList();
+ 	    	getSBUFilterList();
+ 	    	getIncidentFilterList();
+ 	    	getStatusFilterList();
+ 	    	var project_code = $("#select2-Project_filter-container").val();
+ 		    var sbu_code = $("#select2-sbu_filter-container").val();
+ 	        var incident_type = $("#select2-incident_type_filter-container").val();
+ 	        var status = $("#select2-status_filter-container").val();
+ 	        var from_and_to = $("#from_and_to").val();
+ 	        var from_date = $("#from_date").val();
+ 	        var to_date = $("#to_date").val();
+ 	      
+ 	    	$('#allIncidents').html(0)
+     		$('#activeApprovers').html(0)
+     		$('#inActiveApprovers').html(0)
+     		$('#not_assigned').html(0)
+ 	     	table = $('#datatable-irm').DataTable();
+ 			table.destroy();
+ 				var i = 0;
+ 	    		$.fn.dataTable.moment('DD-MMM-YYYY');
+ 	    		var rowLen = 0;
+ 	    		var myParams =  "incident_type="
+ 	    				+ incident_type + "&status="+ status+ "&project_code="+ project_code+ "&sbu_code="+ sbu_code+ "&from_and_to="+ from_and_to;
+
+ 	    		/***************************************************************************************************/
+
+ 	    		$('#datatable-irm')
+ 	    				.DataTable(
+ 	    						{
+ 	    							"bProcessing" : true,
+ 	    							"bServerSide" : true,
+ 	    							"sort" : "position",
+ 	    							//bStateSave variable you can use to save state on client cookies: set value "true" 
+ 	    							"bStateSave" : false,
+ 	    							 stateSave: true,
+ 	    							 "fnStateSave": function (oSettings, oData) {
+ 	    							 	localStorage.setItem('MRVCDataTables', JSON.stringify(oData));
+ 	    							},
+ 	    							 "fnStateLoad": function (oSettings) {
+ 	    								return JSON.parse(localStorage.getItem('MRVCDataTables'));
+ 	    							 },
+ 	    							//Default: Page display length
+ 	    							"iDisplayLength" : 10,
+ 	    							"iData" : {
+ 	    								"start" : 52
+ 	    							},
+ 	    							//We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
+ 	    							"iDisplayStart" : 0,
+ 	    							"fnDrawCallback" : function() {
+ 	    								//Get page numer on client. Please note: number start from 0 So
+ 	    								//for the first page you will see 0 second page 1 third page 2...
+ 	    								//Un-comment below alert to see page number
+ 	    								//alert("Current page number: "+this.fnPagingInfo().iPage);
+ 	    							},
+ 	    							//"sDom": 'l<"toolbar">frtip',
+ 	    							"initComplete" : function() {
+ 	    								$('.dataTables_filter input[type="search"]')
+ 	    										.attr('placeholder', 'Search')
+ 	    										.css({
+ 	    											'width' : '350px ',
+ 	    											'display' : 'inline-block'
+ 	    										});
+
+ 	    								var input = $('.dataTables_filter input')
+ 	    										.unbind()
+ 	    										.bind('keyup',function(e){
+ 	    										    if (e.which == 13){
+ 	    										    	self.search(input.val()).draw();
+ 	    										    }
+ 	    										}), self = this.api(), $searchButton = $(
+ 	    										'<i class="fa fa-search" title="Go" >')
+ 	    								//.text('Go')
+ 	    								.click(function() {
+ 	    									self.search(input.val()).draw();
+ 	    								}), $clearButton = $(
+ 	    										'<i class="fa fa-close" title="Reset">')
+ 	    								//.text('X')
+ 	    								.click(function() {
+ 	    									input.val('');
+ 	    									$searchButton.click();
+ 	    								})
+ 	    								$('.dataTables_filter').append(
+ 	    										'<div class="right-btns"></div>');
+ 	    								$('.dataTables_filter div').append(
+ 	    										$searchButton, $clearButton);
+ 	    								rowLen = $('#datatable-user tbody tr:visible').length
+ 	    								/* var input = $('.dataTables_filter input').unbind(),
+ 	    								self = this.api(),
+ 	    								$searchButton = $('<i class="fa fa-search">')
+ 	    								           //.text('Go')
+ 	    								           .click(function() {			   	                    	 
+ 	    								              self.search(input.val()).draw();
+ 	    								           })			   	        
+ 	    								  $('.dataTables_filter label').append($searchButton); */
+ 	    							}
+ 	    							,
+ 	    							columnDefs : [ {
+ 	    								"targets" : '',
+ 	    								"orderable" : false,
+ 	    							}
+ 	    			                ],
+ 	    							"sScrollX" : "100%",
+ 	    							"sScrollXInner" : "100%",
+ 	    							"ordering":false,
+ 	    							"bScrollCollapse" : true,
+ 	    							"language" : {
+ 	    								"info" : "_START_ - _END_ of _TOTAL_",
+ 	    								paginate : {
+ 	    									next : '<i class="fa fa-angle-right"></i>', 
+ 	    									previous : '<i class="fa fa-angle-left"></i>'  
+ 	    								}
+ 	    							},
+ 	    							
+ 	    							"bDestroy" : true,
+ 	    							"sAjaxSource" : "<%=request.getContextPath()%>/ajax/getIRMListLaztLoad?"+myParams,
+ 	    		        "aoColumns": [
+ 	    		        
+ 	      		         	{ "mData": function(data,type,row){
+ 	      		         		var irm_data = "'"+data.document_code+"','"+data.approver_type+"','"+data.status+"','"+data.approver_code+"'";
+ 			         			var irm_initiate_data = "'"+data.document_code+"','"+data.department_code+"','"+data.department_name+"','"+data.project_code+"','"+data.project_name+"','"+data.incident_code+"'";
+ 			         			
+ 	      		         		 if('${sessionScope.BASE_ROLE}' != 'User' && '${sessionScope.BASE_ROLE}' != 'Management' && $.trim(data.status) != 'Resolved'){
+ 		                    		 var text = ' <a href="javascript:void(0);" onclick="getIRM('+irm_data+');" title="Edit" class="btn btn-outline-danger"><i class="fa fa-pencil"></i></a>'
+ 		                    	 }else if('${sessionScope.BASE_ROLE}' != 'User' && '${sessionScope.BASE_ROLE}' != 'Management' && $.trim(data.status) == 'Resolved'){
+ 			                    		var text = ' <a  href="javascript:void(0);" onclick="getIRM('+irm_data+');" title="View"  class="btn btn-outline-danger"><i class="fa fa-eye"></i></a>'
+ 		                    	 }else{
+ 	 	                    		var text = ' <a  href="javascript:void(0);" onclick="getIRM('+irm_data+');" title="View"  class="btn btn-outline-danger"><i class="fa fa-eye"></i></a>'
+ 	                    	     }
+ 			                    var actions = ' <div class="col-lg-6 col-12">'
+ 			                    	 +' <div class="btn-group" role="group" aria-label="Basic example">'+text
+ 			                    	
+ 			                    +'  <a href="javascript:void(0);" onclick="historyIRM('+irm_data+');" title="History" class="btn btn-outline-danger"><i class="fa fa-history"></i></a>'
+ 			                    +' </div>';
+ 			               
+ 			                    var str2 = "No Reviewer Assigned";
+ 								var approver =  "<p style='color : red; font-size: 12px;'><b>No Reviewer  Assigned</b></p>";
+ 			         			if($.trim(data.approver_code) != ''){
+ 			         				approver = "["+ $.trim(data.approver_code)+"]"+" - "+ data.approver_name;
+ 			         			}
+ 			         			var incident_no = "<p font-size:50%>"+$.trim(data.document_code)+"<br> ( "+$.trim(data.created_date)+" )</p>";
+ 			         			var status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">'+$.trim(data.status)+'</span>';
+ 			         			if($.trim(data.status) != "In Progress"){status = '<span class="badge rounded-pill badge-light-success me-1" style=" text-align: center;font-size: .9rem;">'+$.trim(data.status)+'</span>';}
+ 			         			var type = '<p class="text-danger"> '+$.trim(data.approver_type)+"</p>";
+ 			                   	var rowArray = [];    
+ 			                   	var maxRole =  $.trim(data.maxRole)
+ 			                   	var maxRole2 =  $.trim(data.maxRole2)
+ 			                   	if(maxRole2 == ""){ maxRole2 = 'IRL3'}
+ 			                   	
+ 			                   	var checkRole ="";
+ 			                    if(maxRole != '' && maxRole.indexOf('L2') != -1 ){
+ 			                    	checkRole = 'L2'
+ 			                    }else if(maxRole != '' && maxRole.indexOf('L3') != -1 ){
+ 			                    	checkRole = 'L3'
+ 			                    }
+ 			                    
+ 			                    if(($.trim(data.approver_type).indexOf('L1') != -1)){
+ 			                    	status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">In Progress</span>';
+ 			                    }else if($.trim(data.approver_type).indexOf('L2') != -1){
+ 			                    	status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">Action Taken <br> Review Inprogress</span>';
+ 			                    }else if($.trim(data.approver_type).indexOf('L3') != -1 && $.trim(data.status) != 'Resolved'){
+ 			                    	status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">Review Done <br> Closure Pending</span>';
+ 			                    }else if($.trim(data.approver_type).indexOf('L3') != -1 && $.trim(data.status) == 'Resolved'){
+ 			                    	status = '<span class="badge rounded-pill badge-light-success me-1" style=" text-align: center;font-size: .9rem;">Resolved</span>';
+ 			                    }
+ 			               
+ 			                    if($.trim(data.approver_code) != ''){
+ 			         				approver = "["+ $.trim(data.approver_code)+"]"+" - "+ data.approver_name;
+ 			         			}else{
+ 			         				status = approver;
+ 			         			}
+ 			                    if( $.trim(data.status) == 'Resolved'){
+ 			                    	type = '<p class="text-success"> '+$.trim(data.approver_type)+"</p>";
+ 			                    	status = '<span class="badge rounded-pill badge-light-success me-1" style=" text-align: center;font-size: .9rem;">Resolved</span>';
+ 			                    }
+ 			                    if(data.approver_code.indexOf(str2) != -1){
+ 			         				approver =  "<p style='color : red; font-size: 12px;'  title='No Reviewer Assigned'><b>No Reviewer Assigned</b></p>";
+ 			         				status =  "<p style='color : red; font-size: 12px;' title='No Reviewer Assigned'><b>No Reviewer Assigned</b></p>";
+ 			         			}
+ 			         			$('#counts').html(data.counts)
+ 			                	$('#noCounts').html(data.noCounts)
+ 			                   	$('#allIncidents').html(data.all_irm)
+ 			            		$('#activeApprovers').html(data.active_irm)
+ 			            		$('#inActiveApprovers').html(data.inActive_irm)
+ 			            		$('#not_assigned').html(data.not_assigned)
+ 			            	
+ 	                             if($.trim(data.id) == ''){ return '-'; }else{ return data.id ; }
+ 	      		            } },
+ 	      		          { "mData": function(data,type,row){
+ 	      		        	var irm_data = "'"+data.document_code+"','"+data.approver_type+"','"+data.status+"','"+data.approver_code+"'";
+ 		         			var irm_initiate_data = "'"+data.document_code+"','"+data.department_code+"','"+data.department_name+"','"+data.project_code+"','"+data.project_name+"','"+data.incident_code+"'";
+ 		         			 if('${sessionScope.BASE_ROLE}' != 'User' && '${sessionScope.BASE_ROLE}' != 'Management' && $.trim(data.status) != 'Resolved'){
+ 	                    		 var text = ' <a href="javascript:void(0);" onclick="getIRM('+irm_data+');" title="Edit" class="btn btn-outline-danger"><i class="fa fa-pencil"></i></a>'
+ 	                    	 }else if('${sessionScope.BASE_ROLE}' != 'User' && '${sessionScope.BASE_ROLE}' != 'Management' && $.trim(data.status) == 'Resolved'){
+ 		                    		var text = ' <a  href="javascript:void(0);" onclick="getIRM('+irm_data+');" title="View"  class="btn btn-outline-danger"><i class="fa fa-eye"></i></a>'
+ 	                    	 }else{
+  	                    		var text = ' <a  href="javascript:void(0);" onclick="getIRM('+irm_data+');" title="View"  class="btn btn-outline-danger"><i class="fa fa-eye"></i></a>'
+                     	     }
+ 		                    var actions = ' <div class="col-lg-6 col-12">'
+ 		                    	 +' <div class="btn-group" role="group" aria-label="Basic example">'+text
+ 		                    	
+ 		                    +'  <a href="javascript:void(0);" onclick="historyIRM('+irm_data+');" title="History" class="btn btn-outline-danger"><i class="fa fa-history"></i></a>'
+ 		                    +' </div>';
+ 	
+ 		                    var str2 = "No Reviewer Assigned";
+ 							var approver =  "<p style='color : red; font-size: 12px;'><b>No Reviewer  Assigned</b></p>";
+ 		         			if($.trim(data.approver_code) != ''){
+ 		         				approver = "["+ $.trim(data.approver_code)+"]"+" - "+ data.approver_name;
+ 		         			}
+ 		         			var incident_no = "<p font-size:50%>"+$.trim(data.document_code)+"<br> ( "+$.trim(data.created_date)+" )</p>";
+ 		         			var status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">'+$.trim(data.status)+'</span>';
+ 		         			if($.trim(data.status) != "In Progress"){status = '<span class="badge rounded-pill badge-light-success me-1" style=" text-align: center;font-size: .9rem;">'+$.trim(data.status)+'</span>';}
+ 		         			var type = '<p class="text-danger"> '+$.trim(data.approver_type)+"</p>";
+ 		                   	var rowArray = [];    
+ 		                   	var maxRole =  $.trim(data.maxRole)
+ 		                   	var maxRole2 =  $.trim(data.maxRole2)
+ 		                   	if(maxRole2 == ""){ maxRole2 = 'IRL3'}
+ 		                   	
+ 		                   	var checkRole ="";
+ 		                    if(maxRole != '' && maxRole.indexOf('L2') != -1 ){
+ 		                    	checkRole = 'L2'
+ 		                    }else if(maxRole != '' && maxRole.indexOf('L3') != -1 ){
+ 		                    	checkRole = 'L3'
+ 		                    }
+ 		                    
+ 		                    if(($.trim(data.approver_type).indexOf('L1') != -1)){
+ 		                    	status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">In Progress</span>';
+ 		                    }else if($.trim(data.approver_type).indexOf('L2') != -1){
+ 		                    	status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">Action Taken <br> Review Inprogress</span>';
+ 		                    }else if($.trim(data.approver_type).indexOf('L3') != -1 && $.trim(data.status) != 'Resolved'){
+ 		                    	status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">Review Done <br> Closure Pending</span>';
+ 		                    }else if($.trim(data.approver_type).indexOf('L3') != -1 && $.trim(data.status) == 'Resolved'){
+ 		                    	status = '<span class="badge rounded-pill badge-light-success me-1" style=" text-align: center;font-size: .9rem;">Resolved</span>';
+ 		                    }
+ 		                 
+ 		                    if($.trim(data.approver_code) != ''){
+ 		         				approver = "["+ $.trim(data.approver_code)+"]"+" - "+ data.approver_name;
+ 		         			}else{
+ 		         				status = approver;
+ 		         			}
+ 		                    if( $.trim(data.status) == 'Resolved'){
+ 		                    	type = '<p class="text-success"> '+$.trim(data.approver_type)+"</p>";
+ 		                    	status = '<span class="badge rounded-pill badge-light-success me-1" style=" text-align: center;font-size: .9rem;">Resolved</span>';
+ 		                    }
+ 		                    if(data.approver_code.indexOf(str2) != -1){
+ 		         				approver =  "<p style='color : red; font-size: 12px;'  title='No Reviewer Assigned'><b>No Reviewer Assigned</b></p>";
+ 		         				status =  "<p style='color : red; font-size: 12px;' title='No Reviewer Assigned'><b>No Reviewer Assigned</b></p>";
+ 		         			}
+ 			                    //var actions = '<a href="javascript:void(0);"  onclick="getIRM('+irm_data+');" class="btn btn-primary"  title="Edit"><i class="fa fa-pencil"></i></a>';    	                   	
+ 	    		            	return actions;
+ 	    		            } },
+ 	    		         	{ "mData": function(data,type,row){
+ 	    		         		  var document_code = '';
+ 	    		         		  if ($.trim(data.document_code) != '') { document_code = $.trim(data.document_code) }    	
+ 		                             if($.trim(data.document_code) == ''){ return '-'; }else{ return document_code; }
+ 	    		            } },
+ 	    		            { "mData": function(data,type,row){
+ 	    		            	  var str2 = "No Reviewer Assigned";
+ 									var approver =  "<p style='color : red; font-size: 12px;'><b>No Reviewer  Assigned</b></p>";
+ 				         			if($.trim(data.approver_code) != ''){
+ 				         				approver = "["+ $.trim(data.approver_code)+"]"+" - "+ data.approver_name;
+ 				         			}
+ 				         			var incident_no = "<p font-size:50%>"+$.trim(data.document_code)+"<br> ( "+$.trim(data.created_date)+" )</p>";
+ 				         			var status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">'+$.trim(data.status)+'</span>';
+ 				         			if($.trim(data.status) != "In Progress"){status = '<span class="badge rounded-pill badge-light-success me-1" style=" text-align: center;font-size: .9rem;">'+$.trim(data.status)+'</span>';}
+ 				         			var type = '<p class="text-danger"> '+$.trim(data.approver_type)+"</p>";
+ 				                   	var rowArray = [];    
+ 				                   	var maxRole =  $.trim(data.maxRole)
+ 				                   	var maxRole2 =  $.trim(data.maxRole2)
+ 				                   	if(maxRole2 == ""){ maxRole2 = 'IRL3'}
+ 				                   	
+ 				                   	var checkRole ="";
+ 				                    if(maxRole != '' && maxRole.indexOf('L2') != -1 ){
+ 				                    	checkRole = 'L2'
+ 				                    }else if(maxRole != '' && maxRole.indexOf('L3') != -1 ){
+ 				                    	checkRole = 'L3'
+ 				                    }
+ 				                    
+ 				                    if(($.trim(data.approver_type).indexOf('L1') != -1)){
+ 				                    	status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">In Progress</span>';
+ 				                    }else if($.trim(data.approver_type).indexOf('L2') != -1){
+ 				                    	status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">Action Taken <br> Review Inprogress</span>';
+ 				                    }else if($.trim(data.approver_type).indexOf('L3') != -1 && $.trim(data.status) != 'Resolved'){
+ 				                    	status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">Review Done <br> Closure Pending</span>';
+ 				                    }else if($.trim(data.approver_type).indexOf('L3') != -1 && $.trim(data.status) == 'Resolved'){
+ 				                    	status = '<span class="badge rounded-pill badge-light-success me-1" style=" text-align: center;font-size: .9rem;">Resolved</span>';
+ 				                    }
+ 				               
+ 				                    if($.trim(data.approver_code) != ''){
+ 				         				approver = "["+ $.trim(data.approver_code)+"]"+" - "+ data.approver_name;
+ 				         			}else{
+ 				         				status = approver;
+ 				         			}
+ 				                    if( $.trim(data.status) == 'Resolved'){
+ 				                    	type = '<p class="text-success"> '+$.trim(data.approver_type)+"</p>";
+ 				                    	status = '<span class="badge rounded-pill badge-light-success me-1" style=" text-align: center;font-size: .9rem;">Resolved</span>';
+ 				                    }
+ 				                    if(data.approver_code.indexOf(str2) != -1){
+ 				         				approver =  "<p style='color : red; font-size: 12px;'  title='No Reviewer Assigned'><b>No Reviewer Assigned</b></p>";
+ 				         				status =  "<p style='color : red; font-size: 12px;' title='No Reviewer Assigned'><b>No Reviewer Assigned</b></p>";
+ 				         			}
+ 		                             if($.trim(data.status) == ''){ return '-'; }else{ return status ; }
+ 	    		            } },
+ 	    		            { "mData": function(data,type,row){
+ 	    		            	 var incident_type = '';
+ 	    		            	  if ($.trim(data.incident_type) != '') { incident_type = ' - ' + $.trim(data.incident_type) }    	
+ 		                             if($.trim(data.incident_type) == ''){ return '-'; }else{ return data.incident_type ; }
+ 	    		            }},
+ 	    		            { "mData": function(data,type,row){
+	    		            	 var incident_type = '';
+	    		            	  if ($.trim(data.incident_type) != '') { incident_type = ' - ' + $.trim(data.incident_type) }    	
+		                             if($.trim(data.incident_type) == ''){ return '-'; }else{ return data.incident_type ; }
+	    		            }},
+ 	    		         	{ "mData": function(data,type,row){
+ 	    		         		 var project_code = '';
+ 	    		         		  if ($.trim(data.project_code) != '') { project_code = ' - ' + $.trim(data.project_code) }    	
+ 		                             if($.trim(data.project_code) == ''){ return '-'; }else{ return "["+ $.trim(data.sbu_code)+"]"+"/["+ $.trim(data.project_code)+"]"+" - "+ data.project_name }
+ 	    		            } },
+ 	    		            { "mData": function(data,type,row){
+ 	    		            	 var department_code = '';
+ 	    		            	 if ($.trim(data.department_code) != '') { department_code = ' - ' + $.trim(data.department_code) }    	
+ 	                             if($.trim(data.department_code) == ''){ return '-'; }else{ return "["+ $.trim(data.department_code)+"]"+" - "+ data.department_name }
+ 	    		            } }, 
+ 	    		            { "mData": function(data,type,row){
+ 	    		            	  var str2 = "No Reviewer Assigned";
+ 									var approver =  "<p style='color : red; font-size: 12px;'><b>No Reviewer  Assigned</b></p>";
+ 				         			if($.trim(data.approver_code) != ''){
+ 				         				approver = "["+ $.trim(data.approver_code)+"]"+" - "+ data.approver_name;
+ 				         			}
+ 				         			var incident_no = "<p font-size:50%>"+$.trim(data.document_code)+"<br> ( "+$.trim(data.created_date)+" )</p>";
+ 				         			var status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">'+$.trim(data.status)+'</span>';
+ 				         			if($.trim(data.status) != "In Progress"){status = '<span class="badge rounded-pill badge-light-success me-1" style=" text-align: center;font-size: .9rem;">'+$.trim(data.status)+'</span>';}
+ 				         			var type = '<p class="text-danger"> '+$.trim(data.approver_type)+"</p>";
+ 				                   	var rowArray = [];    
+ 				                   	var maxRole =  $.trim(data.maxRole)
+ 				                   	var maxRole2 =  $.trim(data.maxRole2)
+ 				                   	if(maxRole2 == ""){ maxRole2 = 'IRL3'}
+ 				                   	
+ 				                   	var checkRole ="";
+ 				                    if(maxRole != '' && maxRole.indexOf('L2') != -1 ){
+ 				                    	checkRole = 'L2'
+ 				                    }else if(maxRole != '' && maxRole.indexOf('L3') != -1 ){
+ 				                    	checkRole = 'L3'
+ 				                    }
+ 				                    
+ 				                    if(($.trim(data.approver_type).indexOf('L1') != -1)){
+ 				                    	status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">In Progress</span>';
+ 				                    }else if($.trim(data.approver_type).indexOf('L2') != -1){
+ 				                    	status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">Action Taken <br> Review Inprogress</span>';
+ 				                    }else if($.trim(data.approver_type).indexOf('L3') != -1 && $.trim(data.status) != 'Resolved'){
+ 				                    	status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">Review Done <br> Closure Pending</span>';
+ 				                    }else if($.trim(data.approver_type).indexOf('L3') != -1 && $.trim(data.status) == 'Resolved'){
+ 				                    	status = '<span class="badge rounded-pill badge-light-success me-1" style=" text-align: center;font-size: .9rem;">Resolved</span>';
+ 				                    }
+ 				               
+ 				                    if($.trim(data.approver_code) != ''){
+ 				         				approver = "["+ $.trim(data.approver_code)+"]"+" - "+ data.approver_name;
+ 				         			}else{
+ 				         				status = approver;
+ 				         			}
+ 				                    if( $.trim(data.status) == 'Resolved'){
+ 				                    	type = '<p class="text-success"> '+$.trim(data.approver_type)+"</p>";
+ 				                    	status = '<span class="badge rounded-pill badge-light-success me-1" style=" text-align: center;font-size: .9rem;">Resolved</span>';
+ 				                    }
+ 				                    if(data.approver_code.indexOf(str2) != -1){
+ 				         				approver =  "<p style='color : red; font-size: 12px;'  title='No Reviewer Assigned'><b>No Reviewer Assigned</b></p>";
+ 				         				status =  "<p style='color : red; font-size: 12px;' title='No Reviewer Assigned'><b>No Reviewer Assigned</b></p>";
+ 				         			}
+ 	                             if($.trim(data.approver_type) == ''){ return '-'; }else{ return type ; }
+    		            		} },
+    		            	 	{ "mData": function(data,type,row){
+    		            	 	  var str2 = "No Reviewer Assigned";
+ 								var approver =  "<p style='color : red; font-size: 12px;'><b>No Reviewer  Assigned</b></p>";
+ 			         			if($.trim(data.approver_code) != ''){
+ 			         				approver = "["+ $.trim(data.approver_code)+"]"+" - "+ data.approver_name;
+ 			         			}
+ 			         			var incident_no = "<p font-size:50%>"+$.trim(data.document_code)+"<br> ( "+$.trim(data.created_date)+" )</p>";
+ 			         			var status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">'+$.trim(data.status)+'</span>';
+ 			         			if($.trim(data.status) != "In Progress"){status = '<span class="badge rounded-pill badge-light-success me-1" style=" text-align: center;font-size: .9rem;">'+$.trim(data.status)+'</span>';}
+ 			         			var type = '<p class="text-danger"> '+$.trim(data.approver_type)+"</p>";
+ 			                   	var rowArray = [];    
+ 			                   	var maxRole =  $.trim(data.maxRole)
+ 			                   	var maxRole2 =  $.trim(data.maxRole2)
+ 			                   	if(maxRole2 == ""){ maxRole2 = 'IRL3'}
+ 			                   	
+ 			                   	var checkRole ="";
+ 			                    if(maxRole != '' && maxRole.indexOf('L2') != -1 ){
+ 			                    	checkRole = 'L2'
+ 			                    }else if(maxRole != '' && maxRole.indexOf('L3') != -1 ){
+ 			                    	checkRole = 'L3'
+ 			                    }
+ 			                    
+ 			                    if(($.trim(data.approver_type).indexOf('L1') != -1)){
+ 			                    	status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">In Progress</span>';
+ 			                    }else if($.trim(data.approver_type).indexOf('L2') != -1){
+ 			                    	status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">Action Taken <br> Review Inprogress</span>';
+ 			                    }else if($.trim(data.approver_type).indexOf('L3') != -1 && $.trim(data.status) != 'Resolved'){
+ 			                    	status = '<span class="badge rounded-pill badge-light-warning me-1" style=" text-align: center;font-size: .9rem;">Review Done <br> Closure Pending</span>';
+ 			                    }else if($.trim(data.approver_type).indexOf('L3') != -1 && $.trim(data.status) == 'Resolved'){
+ 			                    	status = '<span class="badge rounded-pill badge-light-success me-1" style=" text-align: center;font-size: .9rem;">Resolved</span>';
+ 			                    }
+ 			               
+ 			                    if($.trim(data.approver_code) != ''){
+ 			         				approver = "["+ $.trim(data.approver_code)+"]"+" - "+ data.approver_name;
+ 			         			}else{
+ 			         				status = approver;
+ 			         			}
+ 			                    if( $.trim(data.status) == 'Resolved'){
+ 			                    	type = '<p class="text-success"> '+$.trim(data.approver_type)+"</p>";
+ 			                    	status = '<span class="badge rounded-pill badge-light-success me-1" style=" text-align: center;font-size: .9rem;">Resolved</span>';
+ 			                    }
+ 			                    if(data.approver_code.indexOf(str2) != -1){
+ 			         				approver =  "<p style='color : red; font-size: 12px;'  title='No Reviewer Assigned'><b>No Reviewer Assigned</b></p>";
+ 			         				status =  "<p style='color : red; font-size: 12px;' title='No Reviewer Assigned'><b>No Reviewer Assigned</b></p>";
+ 			         			}
+                              if($.trim(data.approver_code) == ''){ return '-'; }else{ return approver ; }
+ 		            		} },
+ 		            		 { "mData": function(data,type,row){
+ 	                             if($.trim(data.created_by) == ''){ return '-'; }else{ return "["+ $.trim(data.created_by)+"]"+" - "+ data.user_name ; }
+    		            		} }
+ 	    		        ]
+ 	    		    });
+ 	    	
+ 	    	
+ 		  $(".page-loader").hide();  		     
+ 	  	
+ 	 }
+
+ 	    
+	    function getIRMList1(){
 	    	$(".page-loader").show();
 	    	getProjectFilterList('');
 	    	getSBUFilterList('');
